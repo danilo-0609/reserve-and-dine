@@ -8,7 +8,7 @@ public sealed record MenuSchedule
 
     public TimeRange AvailableMenuHours { get; private set; }
 
-    public MenuSchedule(List<string> days, string availableMenuHours)
+    public MenuSchedule(List<string> days, TimeRange availableMenuHours)
     {
         Days = days;
         AvailableMenuHours = availableMenuHours;

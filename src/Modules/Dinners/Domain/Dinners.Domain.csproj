@@ -11,13 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Restaurants\" />
-    <Folder Include="Reservations\" />
-    <Folder Include="Reviews\" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <Folder Include="Restaurants\Errors\" />
+    <Folder Include="Restaurants\Rules\" />
   </ItemGroup>
 
 </Project>
