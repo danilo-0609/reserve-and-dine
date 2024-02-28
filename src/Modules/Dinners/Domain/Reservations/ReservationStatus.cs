@@ -6,7 +6,7 @@ public sealed record ReservationStatus
 
     public ReservationStatus Cancelled => new ReservationStatus(nameof(Cancelled));
 
-    public static ReservationStatus Confirmed => new ReservationStatus(nameof(Confirmed));
+    public static ReservationStatus Asisted => new ReservationStatus(nameof(Asisted));
 
     public static ReservationStatus Requested => new ReservationStatus(nameof(Requested));
     

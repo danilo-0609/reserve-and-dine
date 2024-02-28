@@ -5,6 +5,6 @@ namespace Dinners.Domain.Reservations.ReservationsPayments.Errors;
 
 public static class ReservationPaymentsErrorsCodes
 {
-    public static Error CannotPayWhenStatusIsNotConfirmed =>
-        Error.Validation("Payment.CannotPayWhenStatusIsNotConfirmed", PaymentCannotBeMadeWhenReservationStatusIsNotConfirmedRule.Message);
+    public static Error CannotPayWhenStatusIsNotRequested =>
+        Error.Validation("Payment.CannotPayWhenStatusIsNotConfirmed", PaymentCannotBeMadeWhenReservationStatusIsNotRequestedRule.Message);
 }

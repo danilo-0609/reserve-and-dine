@@ -1,4 +1,6 @@
 ﻿using BuildingBlocks.Domain.Entities;
+using Dinners.Domain.Common;
+using Dinners.Domain.Reservations.Payments.Events;
 using Dinners.Domain.Reservations.ReservationsPayments.Rules;
 using ErrorOr;
 
@@ -12,44 +14,52 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
 
     public Guid PayerId { get; private set; }
 
-    public decimal MoneyAmount { get; private set; }
+    public Price Price { get; private set; }
 
     public DateTime PayedAt { get; private set; }
 
     internal static ErrorOr<ReservationPayment> PayFromReservation(
         Guid payerId, 
         ReservationId reservationId,
-        decimal moneyAmount,
+        Price price,
         ReservationStatus reservationStatus,
         DateTime payedAt)
     {
         var payment = new ReservationPayment(
             ReservationPaymentId.CreateUnique(),
             payerId,
-            moneyAmount,
+            price,
             payedAt,
             reservationId);
 
-        var statusIsConfirmedRule = payment.CheckRule(new PaymentCannotBeMadeWhenReservationStatusIsNotConfirmedRule(reservationStatus));
+        var statusMustBeRequestedRule = payment.CheckRule(new PaymentCannotBeMadeWhenReservationStatusIsNotRequestedRule(reservationStatus));
 
-        if (statusIsConfirmedRule.IsError)
+        if (statusMustBeRequestedRule.IsError)
         {
-            return statusIsConfirmedRule.FirstError;
+            return statusMustBeRequestedRule.FirstError;
         }
+
+        payment.AddDomainEvent(new ReservationPayedDomainEvent(Guid.NewGuid(),
+            payment.Id,
+            payment.ReservationId,
+            payerId,
+            payedAt));
 
         return payment;
     }
 
-    public ReservationPayment(ReservationPaymentId id,
+    private ReservationPayment(ReservationPaymentId id,
         Guid payerId,
-        decimal moneyAmount,
+        Price price,
         DateTime payedAt,
         ReservationId reservationId)
     {
         Id = id;
         PayerId = payerId;
-        MoneyAmount = moneyAmount;
+        Price = price;
         PayedAt = payedAt;
         ReservationId = reservationId;
     }
+
+    private ReservationPayment() { }
 }
