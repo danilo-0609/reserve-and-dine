@@ -1,22 +1,20 @@
 ﻿using Dinners.Domain.Common;
 
-namespace Dinners.Domain.Restaurants;
+namespace Dinners.Domain.Restaurants.RestaurantSchedules;
 
 public sealed record RestaurantSchedule
 {
-    private readonly List<string> _days;
-
-    public IReadOnlyList<string> Days => _days.AsReadOnly();
+    public List<DayOfWeek> Days { get; set; }
 
     public TimeRange HoursOfOperation { get; private set; }
 
-    private RestaurantSchedule(List<string> days, TimeRange hoursOfOperation)
+    private RestaurantSchedule(List<DayOfWeek> days, TimeRange hoursOfOperation)
     {
-        _days = days;
+        Days = days;
         HoursOfOperation = hoursOfOperation;
     }
 
-    public static RestaurantSchedule Create(List<string> days,
+    public static RestaurantSchedule Create(List<DayOfWeek> days,
         TimeSpan start,
         TimeSpan end)
     {

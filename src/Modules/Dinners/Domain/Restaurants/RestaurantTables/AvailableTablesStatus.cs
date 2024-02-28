@@ -1,4 +1,4 @@
-﻿namespace Dinners.Domain.Restaurants;
+﻿namespace Dinners.Domain.Restaurants.RestaurantTables;
 
 public sealed record AvailableTablesStatus
 {

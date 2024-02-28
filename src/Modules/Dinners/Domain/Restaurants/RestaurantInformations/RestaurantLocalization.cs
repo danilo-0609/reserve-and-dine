@@ -1,4 +1,4 @@
-﻿namespace Dinners.Domain.Restaurants;
+﻿namespace Dinners.Domain.Restaurants.RestaurantInformations;
 
 public sealed record RestaurantLocalization
 {
@@ -15,11 +15,11 @@ public sealed record RestaurantLocalization
     public string LocalizationDetails { get; private set; } = string.Empty;
 
     private RestaurantLocalization(
-        string country, 
-        string city, 
-        string region, 
-        string neighborhood, 
-        string addresss, 
+        string country,
+        string city,
+        string region,
+        string neighborhood,
+        string addresss,
         string localizationDetails)
     {
         Country = country;

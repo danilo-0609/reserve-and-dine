@@ -1,4 +1,4 @@
-﻿namespace Dinners.Domain.Restaurants;
+﻿namespace Dinners.Domain.Restaurants.RestaurantInformations;
 
 public sealed record RestaurantContact
 {
@@ -18,7 +18,7 @@ public sealed record RestaurantContact
 
     public string Website { get; private set; } = string.Empty;
 
-    
+
     public static RestaurantContact Create(string email,
         string whatsapp,
         string facebook,
@@ -39,12 +39,12 @@ public sealed record RestaurantContact
     }
 
 
-    private RestaurantContact(string email, 
-        string whatsapp, 
-        string facebook, 
-        string phoneNumber, 
-        string instagram, 
-        string twitter, 
+    private RestaurantContact(string email,
+        string whatsapp,
+        string facebook,
+        string phoneNumber,
+        string instagram,
+        string twitter,
         string tikTok,
         string website)
     {

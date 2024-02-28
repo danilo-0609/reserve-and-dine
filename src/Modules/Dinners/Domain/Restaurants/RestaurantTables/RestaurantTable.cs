@@ -1,10 +1,10 @@
-﻿namespace Dinners.Domain.Restaurants;
+﻿namespace Dinners.Domain.Restaurants.RestaurantTables;
 
 public sealed record RestaurantTable
 {
     public int Number { get; private set; }
 
-    public int Seats { get; private set; } 
+    public int Seats { get; private set; }
 
     public bool IsPremium { get; private set; }
 
@@ -17,6 +17,16 @@ public sealed record RestaurantTable
         bool isReserved)
     {
         return new RestaurantTable(number, seats, isPremium, isReserved);
+    }
+
+    public void Reserve()
+    {
+        IsReserved = true;
+    }
+
+    public void FreeTable()
+    {
+        IsReserved = false;
     }
 
 
