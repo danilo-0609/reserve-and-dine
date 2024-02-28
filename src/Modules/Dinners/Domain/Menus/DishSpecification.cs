@@ -6,21 +6,43 @@ public sealed record DishSpecification
 
     public string MainCourse { get; private set; }
 
-    public string SideDishes { get; private set; } = string.Empty;
+    public string SideDishes { get; private set; }
 
-    public string Appetizers { get; private set; } = string.Empty;
+    public string Appetizers { get; private set; }
 
-    public string Beverages { get; private set; } = string.Empty;
+    public string Beverages { get; private set; }
 
-    public string Desserts { get; private set; } = string.Empty;
+    public string Desserts { get; private set; }
 
-    public string Sauces { get; private set; } = string.Empty;
+    public string Sauces { get; private set; }
 
-    public string Condiments { get; private set; } = string.Empty;
+    public string Condiments { get; private set; }
 
-    public string Coffee { get; private set; } = string.Empty;
+    public string Coffee { get; private set; }
 
-    public DishSpecification(List<string> ingredients, 
+
+    public static DishSpecification Create(List<string> ingredients,
+        string mainCourse = "",
+        string sideDishes = "",
+        string appetizers = "",
+        string beverages = "",
+        string desserts = "",
+        string sauces = "",
+        string condiments = "",
+        string coffee = "")
+    {
+        return new DishSpecification(ingredients,
+            mainCourse,
+            sideDishes,
+            appetizers,
+            beverages,
+            desserts,
+            sauces,
+            condiments,
+            coffee);
+    }
+
+    private DishSpecification(List<string> ingredients, 
         string mainCourse, 
         string sideDishes, 
         string appetizers, 
@@ -40,4 +62,6 @@ public sealed record DishSpecification
         Condiments = condiments;
         Coffee = coffee;
     }
+
+    private DishSpecification() { }
 }

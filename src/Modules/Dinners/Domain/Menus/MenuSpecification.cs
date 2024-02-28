@@ -1,4 +1,6 @@
-﻿namespace Dinners.Domain.Menus;
+﻿using Dinners.Domain.Common;
+
+namespace Dinners.Domain.Menus;
 
 public sealed record MenuSpecification
 {
@@ -10,11 +12,13 @@ public sealed record MenuSpecification
 
     public string DiscountTerms { get; private set; } = string.Empty;
 
+    public Price Price { get; private set; }
+
     public decimal Discount {  get; private set; }
 
-    public List<string> MenuImagesUrl { get; private set; }
+    public List<string?> MenuImagesUrl { get; private set; }
 
-    public List<string> Tags { get; private set; }
+    public List<string?> Tags { get; private set; }
 
     public bool IsVegetarian { get; private set; }
 
@@ -22,16 +26,43 @@ public sealed record MenuSpecification
 
     public bool HasAlcohol { get; private set; }
 
-    public MenuSpecification(string title, 
-        string description, 
-        MenuType menuType, 
-        string discountTerms, 
-        decimal discount, 
-        List<string> menuImagesUrl, 
-        List<string> tags, 
-        bool isVegetarian, 
-        string primaryChefName, 
-        bool hasAlcohol)
+
+    public static MenuSpecification Create(string title,
+        string description,
+        MenuType menuType,
+        Price price,
+        decimal discount,
+        List<string?> menuImagesUrl,
+        List<string?> tags,
+        bool isVegetarian,
+        string primaryChefName,
+        bool hasAlcohol,
+        string discountTerms = "")
+    {
+        return new MenuSpecification(title,
+            description,
+            menuType,
+            price,
+            discount,
+            menuImagesUrl,
+            tags,
+            isVegetarian,
+            primaryChefName,
+            hasAlcohol,
+            discountTerms);
+    }
+
+    private MenuSpecification(string title,
+        string description,
+        MenuType menuType,
+        Price price,
+        decimal discount,
+        List<string?> menuImagesUrl,
+        List<string?> tags,
+        bool isVegetarian,
+        string primaryChefName,
+        bool hasAlcohol,
+        string discountTerms = "")
     {
         Title = title;
         Description = description;
@@ -43,5 +74,8 @@ public sealed record MenuSpecification
         IsVegetarian = isVegetarian;
         PrimaryChefName = primaryChefName;
         HasAlcohol = hasAlcohol;
+        Price = price;
     }
+
+    private MenuSpecification() { }
 }
