@@ -2,7 +2,7 @@
 
 namespace Dinners.Domain.Menus;
 
-public sealed record MenuSpecification
+public sealed record MenuDetails
 {
     public string Title { get; private set; }
 
@@ -27,7 +27,7 @@ public sealed record MenuSpecification
     public bool HasAlcohol { get; private set; }
 
 
-    public static MenuSpecification Create(string title,
+    public static MenuDetails Create(string title,
         string description,
         MenuType menuType,
         Price price,
@@ -39,7 +39,7 @@ public sealed record MenuSpecification
         bool hasAlcohol,
         string discountTerms = "")
     {
-        return new MenuSpecification(title,
+        return new MenuDetails(title,
             description,
             menuType,
             price,
@@ -52,7 +52,7 @@ public sealed record MenuSpecification
             discountTerms);
     }
 
-    private MenuSpecification(string title,
+    private MenuDetails(string title,
         string description,
         MenuType menuType,
         Price price,
@@ -77,5 +77,5 @@ public sealed record MenuSpecification
         Price = price;
     }
 
-    private MenuSpecification() { }
+    private MenuDetails() { }
 }
