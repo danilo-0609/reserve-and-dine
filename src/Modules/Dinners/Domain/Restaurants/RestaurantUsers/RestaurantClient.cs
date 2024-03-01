@@ -15,6 +15,11 @@ public sealed record RestaurantClient
         return new RestaurantClient(restaurantId, clientId, numberOfVisits);
     }
 
+    public void AddVisit()
+    {
+        NumberOfVisits = NumberOfVisits + 1;
+    }
+
     private RestaurantClient(RestaurantId restaurantId, Guid clientId, int numberOfVisits)
     {
         RestaurantId = restaurantId;
