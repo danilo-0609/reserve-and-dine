@@ -10,13 +10,13 @@ namespace Dinners.Domain.Menus;
 public sealed class Menu : AggregateRoot<MenuId, Guid>
 {
     private readonly List<MenuReviewId> _menuReviewIds = new();
-    private readonly List<MenuConsumer> _menuConsumer = new();
+    private readonly List<MenuConsumer> _menuConsumers = new();
 
     public new MenuId Id { get; private set; }
 
     public RestaurantId RestaurantId { get; private set; }
 
-    public MenuSpecification MenuSpecification { get; private set; }
+    public MenuDetails MenuSpecification { get; private set; }
 
     public DishSpecification DishSpecification { get; private set; }
 
@@ -24,7 +24,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
     public MenuSchedule MenuSchedule { get; private set; }
 
-    public IReadOnlyList<MenuConsumer> MenuConsumers => _menuConsumer.AsReadOnly();
+    public IReadOnlyList<MenuConsumer> MenuConsumers => _menuConsumers.AsReadOnly();
 
     public DateTime CreatedOn { get; private set; }
 
@@ -33,7 +33,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
 
     public static Menu Publish(RestaurantId restaurantId,
-        MenuSpecification menuSpecification,
+        MenuDetails menuDetails,
         DishSpecification dishSpecification,
         MenuSchedule menuSchedule,
         DateTime createdOn)
@@ -41,9 +41,10 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         Menu menu = new Menu(new List<MenuReviewId>(),
             MenuId.CreateUnique(),
             restaurantId,
-            menuSpecification,
+            menuDetails,
             dishSpecification,
             menuSchedule,
+            new List<MenuConsumer>(),
             createdOn,
             null);
 
@@ -54,7 +55,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         return menu;
     }
 
-    public MenuSpecification UpdateMenuSpecification(string title,
+    public MenuDetails UpdateMenuSpecification(string title,
         string description,
         MenuType menuType,
         Price price,
@@ -66,7 +67,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         bool hasAlcohol,
         string discountTerms = "")
     {
-        var menuSpecification = MenuSpecification.Create(title,
+        var menuSpecification = MenuDetails.Create(title,
             description,
             menuType,
             price,
@@ -81,7 +82,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         return menuSpecification;
     }
 
-    public ErrorOr<MenuReviewId> Review(Guid clientId,
+    public ErrorOr<MenuReview> Review(Guid clientId,
         decimal rate,
         List<MenuConsumer> menuConsumers,
         DateTime reviewedAt,
@@ -96,7 +97,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
         _menuReviewIds.Add(menuReview.Value.Id);
 
-        return menuReview.Value.Id;
+        return menuReview;
     }
 
     public DishSpecification UpdateDishSpecification(List<string> ingredients,
@@ -121,15 +122,18 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             coffee);
     }
 
-    public MenuSchedule SetMenuSchedule(List<DayOfWeek> days, TimeSpan start, TimeSpan end)
+    public MenuSchedule SetMenuSchedule(List<DayOfWeek> days, 
+        TimeSpan start, 
+        TimeSpan end)
     {
         return MenuSchedule.Create(days, start, end);
     }
 
     public Menu Update(List<MenuReviewId> menuReviewIds,
-        MenuSpecification menuSpecification,
+        MenuDetails menuSpecification,
         DishSpecification dishSpecification,
         MenuSchedule menuSchedule,
+        List<MenuConsumer> menuConsumers,
         DateTime? updatedOn)
     {
         return new Menu(menuReviewIds,
@@ -138,25 +142,41 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             menuSpecification,
             dishSpecification,
             menuSchedule,
+            menuConsumers,
             CreatedOn,
             updatedOn);
     }
 
     public MenuConsumer Consume(Guid clientId)
     {
-        return new MenuConsumer(clientId, Id);
-    }
+        MenuConsumer menuConsumer = new(clientId, Id);
 
+        if (_menuConsumers.Any(o => o.MenuId == menuConsumer.MenuId 
+            && o.ClientId == menuConsumer.ClientId))
+        {
+            return _menuConsumers
+                .Where(r => r.MenuId == Id && r.ClientId == clientId)
+                .Single();
+        }
+
+        _menuConsumers.Add(menuConsumer);
+
+        return menuConsumer;
+    }
+        
     private Menu(List<MenuReviewId> menuReviewIds, 
         MenuId id, 
         RestaurantId restaurantId,
-        MenuSpecification menuSpecification, 
+        MenuDetails menuSpecification, 
         DishSpecification dishSpecification, 
-        MenuSchedule menuSchedule, 
+        MenuSchedule menuSchedule,
+        List<MenuConsumer> menuConsumers,
         DateTime createdOn, 
         DateTime? updatedOn)
     {
         _menuReviewIds = menuReviewIds;
+        _menuConsumers = menuConsumers;
+
         Id = id;
         RestaurantId = restaurantId;
         MenuSpecification = menuSpecification;
