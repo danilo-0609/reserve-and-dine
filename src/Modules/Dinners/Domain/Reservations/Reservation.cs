@@ -51,7 +51,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         }
 
         var isnumberOfAttendeesGreaterThanTableSeats = reservation.CheckRule(
-            new CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule(reservationAttendees.NumberOfAttendess, numberOfSeats));
+            new CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule(reservationAttendees.NumberOfAttendees, numberOfSeats));
 
         if (isnumberOfAttendeesGreaterThanTableSeats.IsError)
         {
@@ -62,6 +62,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             Guid.NewGuid(),
             reservation.Id,
             reservation.ReservationAttendees.ClientId,
+            reservation.ReservationInformation.ReservedTable,
             DateTime.UtcNow));
 
         return reservation;
@@ -83,6 +84,11 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
                 ReservationAttendees.ClientId,
                 ReservationInformation.ReservationPrice,
                 DateTime.UtcNow);
+
+            AddDomainEvent(new ReservationCancelledDomainEvent(
+                Guid.NewGuid(),
+                Id,
+                DateTime.UtcNow));
 
             return ReservationStatus.Cancelled;
         }
@@ -127,6 +133,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
         AddDomainEvent(new ReservationAsistedDomainEvent(Guid.NewGuid(),
             Id,
+            RestaurantId,
+            ReservationAttendees.ClientId,
             _menuIds,
             DateTime.UtcNow));
 
