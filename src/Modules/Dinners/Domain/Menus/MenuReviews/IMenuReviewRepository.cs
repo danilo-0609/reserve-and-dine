@@ -2,4 +2,5 @@
 
 public interface IMenuReviewRepository
 {
+    Task AddAsync(MenuReview menuReview);
 }
