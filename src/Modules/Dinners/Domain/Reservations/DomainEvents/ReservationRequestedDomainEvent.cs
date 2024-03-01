@@ -6,4 +6,5 @@ public sealed record ReservationRequestedDomainEvent(
     Guid DomainEventId,
     ReservationId ReservationId,
     Guid ClientId,
+    int TableNumber,
     DateTime OcurredOn) : IDomainEvent;
