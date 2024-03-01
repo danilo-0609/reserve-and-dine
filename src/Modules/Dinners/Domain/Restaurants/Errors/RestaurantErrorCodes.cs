@@ -5,6 +5,9 @@ namespace Dinners.Domain.Restaurants.Errors;
 
 public static class RestaurantErrorCodes
 {
+    public static Error NotFound =>
+        Error.Validation("Restaurant.NotFound", "Restaurant was not found");
+
     public static Error CannotChangeRestaurantScheduleStatus =>
         Error.Validation("Restaurant.CannotChangeRestaurantScheduleStatus", CannotChangeRestaurantScheduleStatusWhenUserIsNotAdministratorRule.Message);
 
@@ -22,4 +25,7 @@ public static class RestaurantErrorCodes
 
     public static Error EqualAvailableTableStatus =>
         Error.Validation("Restaurant.EqualAvailableTableStatus", "The current available table status is equal than the status requested. Cannot change.");
+
+    public static Error CannotReserveWhenRestaurantIsClosed =>
+        Error.Validation("Restaurant.CannotReserveWhenScheduleStatusIsClosed", TableCannotReserveWhenRestaurantIsClosedRule.Message);
 }
