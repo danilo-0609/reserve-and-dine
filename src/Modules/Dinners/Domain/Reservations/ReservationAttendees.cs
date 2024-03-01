@@ -6,7 +6,7 @@ public sealed record ReservationAttendees
 
     public string Name { get; private set; }
 
-    public int NumberOfAttendess { get; private set; }
+    public int NumberOfAttendees { get; private set; }
 
     public static ReservationAttendees Create(
         Guid clientId, 
@@ -15,14 +15,14 @@ public sealed record ReservationAttendees
 
     public void UpdateAttendees(int numberOfAttendees)
     {
-        NumberOfAttendess = numberOfAttendees;
+        NumberOfAttendees = numberOfAttendees;
     }
     
-    private ReservationAttendees(Guid clientId, string name, int numberOfAttendess)
+    private ReservationAttendees(Guid clientId, string name, int numberOfAttendees)
     {
         ClientId = clientId;
         Name = name;
-        NumberOfAttendess = numberOfAttendess;
+        NumberOfAttendees = numberOfAttendees;
     }
 
     private ReservationAttendees() { }
