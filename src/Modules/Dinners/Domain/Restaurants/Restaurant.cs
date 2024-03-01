@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.AggregateRoots;
+using Dinners.Domain.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using Dinners.Domain.Restaurants.Events;
@@ -161,8 +162,24 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return RestaurantScheduleStatus.Opened;
     }
 
-    public ErrorOr<RestaurantTable> ReserveTable(int tableNumber)
+    public ErrorOr<RestaurantTable> ReserveTable(int tableNumber, 
+        TimeRange reservationTimeRange, 
+        DateTime reservationDateTimeRequested)
     {
+        var isRestaurantOpenToReserve = CheckRule(new TableCannotReserveWhenRestaurantIsClosedRule(RestaurantSchedule, reservationTimeRange, reservationDateTimeRequested));
+
+        if (isRestaurantOpenToReserve.IsError)
+        {
+            return isRestaurantOpenToReserve.FirstError;
+        }
+
+        var cannotBeReservedWhenItWillBeOcuppiedRule = CheckRule(new TableCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTimeNowRule(_restaurantTables, reservationDateTimeRequested, reservationTimeRange));
+
+        if (cannotBeReservedWhenItWillBeOcuppiedRule.IsError)
+        {
+            return cannotBeReservedWhenItWillBeOcuppiedRule.FirstError;
+        }
+
         RestaurantTable? table = _restaurantTables
             .Where(r => r.Number == tableNumber)
             .SingleOrDefault();
@@ -172,14 +189,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        var canReserveRule = CheckRule(new TableCannotBeReservedWhenTableIsReservedNowRule(table));
-
-        if (canReserveRule.IsError)
-        {
-            return canReserveRule.FirstError;
-        }
-
-        table.Reserve();
+        table.Reserve(reservationDateTimeRequested, reservationTimeRange);
 
         AddDomainEvent(new TableReservedDomainEvent(Guid.NewGuid(),
             Id,
@@ -211,7 +221,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return table;
     }
 
-    public ErrorOr<RestaurantTable> FreeTable(int tableNumber, Guid clientId)
+    public ErrorOr<RestaurantTable> FreeTable(int tableNumber)
     {
         RestaurantTable? table = _restaurantTables
             .Where(r => r.Number == tableNumber)
@@ -221,8 +231,6 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         {
             return RestaurantErrorCodes.TableDoesNotExist;
         }
-
-        ConfirmVisitation(clientId);
 
         AddDomainEvent(new TableFreedDomainEvent(Guid.NewGuid(),
             Id,
@@ -234,14 +242,22 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return table;
     }
     
-    private void ConfirmVisitation(Guid clientId)
+    public RestaurantClient AddRestaurantClient(Guid clientId)
     {
         if (RestaurantClients.Any(r => r.ClientId != clientId))
         {
-            var restaurantClient = RestaurantClient.Create(Id, clientId, 1);
+            var client = RestaurantClient.Create(Id, clientId, 1);
 
-            _restaurantClients.Add(restaurantClient);
+            _restaurantClients.Add(client);
+
+            return client;
         }
+
+        RestaurantClient restaurantClient = RestaurantClients.Single(f => f.ClientId == clientId);
+
+        restaurantClient.AddVisit();
+
+        return restaurantClient;
     }
     
     public ErrorOr<AvailableTablesStatus> ModifyAvailableTableStatus(AvailableTablesStatus availableTablesStatus)
