@@ -7,7 +7,36 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\Domain\Dinners.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Menus\DishSpecification\Ingredients\" />
+    <Folder Include="Menus\DishSpecification\MainCourse\" />
+    <Folder Include="Menus\DishSpecification\Appetizers\" />
+    <Folder Include="Menus\DishSpecification\Beverages\" />
+    <Folder Include="Menus\DishSpecification\Desserts\" />
+    <Folder Include="Menus\DishSpecification\Condiments\" />
+    <Folder Include="Menus\DishSpecification\Coffee\" />
+    <Folder Include="Menus\DishSpecification\Sauces\" />
+    <Folder Include="Menus\DishSpecification\SideDishes\" />
+    <Folder Include="Menus\MenuSpecification\MenuType\" />
+    <Folder Include="Menus\MenuSpecification\DiscountTerms\" />
+    <Folder Include="Menus\MenuSpecification\Discount\" />
+    <Folder Include="Menus\MenuSpecification\Images\" />
+    <Folder Include="Menus\MenuSpecification\IsVegetarian\" />
+    <Folder Include="Menus\MenuSpecification\HasAlcohol\" />
+    <Folder Include="Menus\MenuSpecification\PrimaryChef\" />
+    <Folder Include="Menus\MenuSpecification\Tags\" />
+    <Folder Include="Menus\MenuSpecification\Price\" />
+    <Folder Include="Menus\MenuSpecification\Title\" />
+    <Folder Include="Menus\UpdateReview\" />
+    <Folder Include="Restaurants\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
   </ItemGroup>
 
 </Project>
