@@ -16,7 +16,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
     public RestaurantId RestaurantId { get; private set; }
 
-    public MenuDetails MenuSpecification { get; private set; }
+    public MenuDetails MenuDetails { get; private set; }
 
     public DishSpecification DishSpecification { get; private set; }
 
@@ -55,7 +55,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         return menu;
     }
 
-    public MenuDetails UpdateMenuSpecification(string title,
+    public MenuDetails UpdateMenuDetails(string title,
         string description,
         MenuType menuType,
         Price price,
@@ -179,7 +179,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
         Id = id;
         RestaurantId = restaurantId;
-        MenuSpecification = menuSpecification;
+        MenuDetails = menuSpecification;
         DishSpecification = dishSpecification;
         MenuSchedule = menuSchedule;
         CreatedOn = createdOn;
