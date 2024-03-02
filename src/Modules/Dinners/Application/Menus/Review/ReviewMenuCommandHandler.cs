@@ -41,7 +41,7 @@ internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuComma
         }
 
         var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
-            menu.MenuSpecification,
+            menu.MenuDetails,
             menu.DishSpecification,
             menu.MenuSchedule,
             menu.MenuConsumers.ToList(),

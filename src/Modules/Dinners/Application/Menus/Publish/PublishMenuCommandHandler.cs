@@ -52,7 +52,7 @@ internal sealed class PublishMenuCommandHandler : ICommandHandler<PublishMenuCom
             request.Condiments,
             request.Coffee);
 
-        MenuSchedule menuSchedule = MenuSchedules.Create(request.DayOfWeeks,
+        MenuSchedule menuSchedule = MenuSchedule.Create(request.DayOfWeeks,
             request.Start,
             request.End);
 
