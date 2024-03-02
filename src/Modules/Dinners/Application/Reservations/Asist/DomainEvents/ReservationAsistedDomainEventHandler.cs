@@ -2,7 +2,6 @@
 using Dinners.Domain.Menus;
 using Dinners.Domain.Reservations.DomainEvents;
 using Dinners.Domain.Restaurants;
-using Dinners.Domain.Restaurants.RestaurantUsers;
 using Domain.Restaurants;
 
 namespace Dinners.Application.Reservations.Asist.DomainEvents;
@@ -24,19 +23,7 @@ internal sealed class ReservationAsistedDomainEventHandler : IDomainEventHandler
 
         restaurant!.AddRestaurantClient(notification.ClientId);
 
-        var restaurantUpdate = restaurant.Update(restaurant.NumberOfTables,
-            restaurant.AvailableTablesStatus,
-            restaurant.RestaurantInformation,
-            restaurant.RestaurantLocalization,
-            restaurant.RestaurantScheduleStatus,
-            restaurant.RestaurantSchedule,
-            restaurant.RestaurantContact,
-            restaurant.RestaurantRatingIds.ToList(),
-            restaurant.RestaurantClients.ToList(),
-            restaurant.RestaurantTables.ToList(),
-            restaurant.RestaurantAdministrations.ToList());
-
-        await _restaurantRepository.UpdateAsync(restaurantUpdate);
+        await _restaurantRepository.UpdateAsync(restaurant);
 
         if (notification.MenuIds.Any())
         {
@@ -69,7 +56,7 @@ internal sealed class ReservationAsistedDomainEventHandler : IDomainEventHandler
         menus.ForEach(async menu =>
         {
             var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
-                menu.MenuSpecification,
+                menu.MenuDetails,
                 menu.DishSpecification,
                 menu.MenuSchedule,
                 menu.MenuConsumers.ToList(),
