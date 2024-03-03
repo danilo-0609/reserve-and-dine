@@ -4,9 +4,11 @@ public sealed record ReservationStatus
 {
     public string Value { get; private set; }
 
-    public ReservationStatus Cancelled => new ReservationStatus(nameof(Cancelled));
+    public static ReservationStatus Finished => new ReservationStatus(nameof(Finished));
 
-    public static ReservationStatus Asisted => new ReservationStatus(nameof(Asisted));
+    public static ReservationStatus Cancelled => new ReservationStatus(nameof(Cancelled));
+
+    public static ReservationStatus Asisting => new ReservationStatus(nameof(Asisting));
 
     public static ReservationStatus Requested => new ReservationStatus(nameof(Requested));
     

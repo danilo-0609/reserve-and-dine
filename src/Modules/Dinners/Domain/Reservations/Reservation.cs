@@ -88,6 +88,9 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             AddDomainEvent(new ReservationCancelledDomainEvent(
                 Guid.NewGuid(),
                 Id,
+                RestaurantId,
+                ReservationInformation.ReservedTable,
+                ReservationInformation.ReservationDateTime,
                 DateTime.UtcNow));
 
             return ReservationStatus.Cancelled;
@@ -96,6 +99,9 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         AddDomainEvent(new ReservationCancelledDomainEvent(
             Guid.NewGuid(),
             Id,
+            RestaurantId,
+            ReservationInformation.ReservedTable,
+            ReservationInformation.ReservationDateTime,
             DateTime.UtcNow));
 
         return ReservationStatus.Cancelled;
@@ -114,10 +120,6 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         {
             return payment.FirstError;
         }
-
-        AddDomainEvent(new ReservationCancelledDomainEvent(Guid.NewGuid(),
-            Id,
-            DateTime.UtcNow));
 
         return ReservationStatus.Payed;
     }
@@ -138,7 +140,26 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             _menuIds,
             DateTime.UtcNow));
 
-        return ReservationStatus.Asisted;
+        return ReservationStatus.Asisting;
+    }
+
+    public ErrorOr<ReservationStatus> Finish()
+    {
+        var statusMustBeAsisting = CheckRule(new CannotFinishAReservationWhenReservationStatusIsNotAsistingRule(ReservationStatus));
+    
+        if (statusMustBeAsisting.IsError)
+        {
+            return statusMustBeAsisting.FirstError;
+        }
+
+        AddDomainEvent(new ReservationFinishedDomainEvent(Guid.NewGuid(),
+            Id,
+            RestaurantId,
+            ReservationAttendees.ClientId,
+            ReservationInformation.ReservedTable,
+            DateTime.UtcNow));
+
+        return ReservationStatus.Finished;
     }
 
     public Reservation Update(ReservationInformation reservationInformation,
