@@ -28,4 +28,7 @@ public static class RestaurantErrorCodes
 
     public static Error CannotReserveWhenRestaurantIsClosed =>
         Error.Validation("Restaurant.CannotReserveWhenScheduleStatusIsClosed", TableCannotReserveWhenRestaurantIsClosedRule.Message);
+
+    public static Error TableIsNotFree =>
+        Error.Validation("Restaurant.TableIsNotFree", TableMustNotBeOccuppiedToAssistRule.Message);
 }
