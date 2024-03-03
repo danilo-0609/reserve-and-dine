@@ -48,7 +48,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     public DateTime PostedAt { get; private set; }
 
 
-    public static ErrorOr<Restaurant> Post(RestaurantInformation restaurantInformation,
+    public static Restaurant Post(RestaurantInformation restaurantInformation,
         RestaurantLocalization restaurantLocalization,
         RestaurantSchedule restaurantSchedule,
         RestaurantContact restaurantContact,
@@ -64,6 +64,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             restaurantContact,
             restaurantTables,
             restaurantAdministrations,
+            new List<RestaurantClient>(),
             postedAt);
 
         restaurant.AddDomainEvent(new NewRestaurantPostedDomainEvent(
@@ -191,15 +192,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         table.Reserve(reservationDateTimeRequested, reservationTimeRange);
 
-        AddDomainEvent(new TableReservedDomainEvent(Guid.NewGuid(),
-            Id,
-            tableNumber,
-            DateTime.UtcNow));
-
         return table;
     }
 
-    public ErrorOr<RestaurantTable> CancelReservation(int tableNumber)
+    public ErrorOr<RestaurantTable> CancelReservation(int tableNumber, DateTime reservationDateTime)
     {
         RestaurantTable? table = _restaurantTables
             .Where(r => r.Number == tableNumber)
@@ -210,13 +206,30 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        table.FreeTable();
+        table.CancelReservation(reservationDateTime);
 
-        AddDomainEvent(new TableReservationCancelledDomainEvent(
-            Guid.NewGuid(),
-            Id,
-            tableNumber,
-            DateTime.UtcNow));
+        return table;
+    }
+
+    public ErrorOr<RestaurantTable> OccupyTable(int tableNumber)
+    {
+        RestaurantTable? table = _restaurantTables
+           .Where(r => r.Number == tableNumber)
+           .SingleOrDefault();
+
+        if (table is null)
+        {
+            return RestaurantErrorCodes.TableDoesNotExist;
+        }
+
+        var isTableFree = CheckRule(new TableMustNotBeOccuppiedToAssistRule(table.IsOccuppied));
+
+        if (isTableFree.IsError)
+        {
+            return isTableFree.FirstError;
+        }
+
+        table.OccupyTable();
 
         return table;
     }
@@ -231,11 +244,6 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         {
             return RestaurantErrorCodes.TableDoesNotExist;
         }
-
-        AddDomainEvent(new TableFreedDomainEvent(Guid.NewGuid(),
-            Id,
-            tableNumber,
-            DateTime.UtcNow));
         
         table.FreeTable();
 
@@ -244,7 +252,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     
     public RestaurantClient AddRestaurantClient(Guid clientId)
     {
-        if (RestaurantClients.Any(r => r.ClientId != clientId))
+        if (!RestaurantClients.Any(r => r.ClientId == clientId))
         {
             var client = RestaurantClient.Create(Id, clientId, 1);
 
@@ -253,9 +261,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return client;
         }
 
-        RestaurantClient restaurantClient = RestaurantClients.Single(f => f.ClientId == clientId);
+        RestaurantClient? restaurantClient = RestaurantClients.SingleOrDefault(f => f.ClientId == clientId);
 
-        restaurantClient.AddVisit();
+        restaurantClient!.AddVisit();
 
         return restaurantClient;
     }
@@ -320,13 +328,11 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
     public RestaurantAdministration AddAdministration(string name,
         Guid administratorId,
-        RestaurantId restaurantId,
         string administratorTitle)
     {
         return RestaurantAdministration.Create(
             name, 
             administratorId,
-            restaurantId,
             administratorTitle);
     }
 
@@ -369,6 +375,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantContact restaurantContact,
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
+        List<RestaurantClient> restaurantClients,
         DateTime postedAt)
     {
         Id = id;
@@ -378,6 +385,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantSchedule = restaurantSchedule;
         RestaurantContact = restaurantContact;
 
+        _restaurantClients = restaurantClients;
         _restaurantTables = restaurantTables;
         _restaurantAdministrations = restaurantAdministrations;
 
@@ -390,10 +398,12 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     private AvailableTablesStatus UpdateAvailableTablesStatus()
     {
         int reservedTables = _restaurantTables
-            .Select(r => r.IsReserved == true)
+            .Where(r => r.IsOccuppied == true)
             .Count();
 
-        if (reservedTables < _restaurantTables.Count / 0.6)
+        int percentageOfReservedTables = reservedTables % 100;
+
+        if (percentageOfReservedTables >= _restaurantTables.Count % 60)
         {
             return AvailableTablesStatus.Few;
         }
