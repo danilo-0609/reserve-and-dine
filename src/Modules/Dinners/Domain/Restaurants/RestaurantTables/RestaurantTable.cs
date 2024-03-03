@@ -12,38 +12,45 @@ public sealed record RestaurantTable
 
     public bool IsPremium { get; private set; }
 
-    public bool IsReserved { get; private set; }
+    public bool IsOccuppied { get; private set; }
 
     public IReadOnlyDictionary<DateTime, TimeRange> ReservedHours => _reservedHours.AsReadOnly();
 
     public static RestaurantTable Create(int number,
         int seats,
         bool isPremium,
-        bool isReserved,
         Dictionary<DateTime, TimeRange> reservedHours)
     {
-        return new RestaurantTable(number, seats, isPremium, isReserved, reservedHours);
+        return new RestaurantTable(number, seats, isPremium, reservedHours);
+    }
+
+    public void CancelReservation(DateTime reservedTime)
+    {
+        _reservedHours.Remove(reservedTime);
     }
 
     public void Reserve(DateTime reservedTime, TimeRange reservationTimeRange)
     {
         _reservedHours.Add(reservedTime, reservationTimeRange);
+    }
 
-        IsReserved = true;
+    public void OccupyTable()
+    {
+        IsOccuppied = true;
     }
 
     public void FreeTable()
     {
-        IsReserved = false;
+        IsOccuppied = false;
     }
 
 
-    private RestaurantTable(int number, int seats, bool isPremium, bool isReserved, Dictionary<DateTime, TimeRange> reservedHours)
+    private RestaurantTable(int number, int seats, bool isPremium, Dictionary<DateTime, TimeRange> reservedHours)
     {
         Number = number;
         Seats = seats;
         IsPremium = isPremium;
-        IsReserved = isReserved;
+        IsOccuppied = false;
 
         _reservedHours = reservedHours;
     }
