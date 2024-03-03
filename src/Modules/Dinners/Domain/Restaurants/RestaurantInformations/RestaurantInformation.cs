@@ -19,22 +19,6 @@ public sealed record RestaurantInformation
 
     public IReadOnlyList<string>? RestaurantImagesUrl => _imagesUrl.AsReadOnly();
 
-    private RestaurantInformation(string title,
-        string description,
-        string type,
-        List<string>? chefs,
-        List<string>? specialties,
-        List<string>? imagesUrl)
-    {
-        Title = title;
-        Description = description;
-        Type = type;
-
-        _chefs = chefs;
-        _specialties = specialties;
-        _imagesUrl = imagesUrl;
-    }
-
     public static RestaurantInformation Create(
         string title,
         string description,
@@ -49,6 +33,23 @@ public sealed record RestaurantInformation
             chefs,
             specialties,
             imagesUrl);
+    }
+
+
+    private RestaurantInformation(string title,
+        string description,
+        string type,
+        List<string>? chefs,
+        List<string>? specialties,
+        List<string>? imagesUrl)
+    {
+        Title = title;
+        Description = description;
+        Type = type;
+
+        _chefs = chefs;
+        _specialties = specialties;
+        _imagesUrl = imagesUrl;
     }
 
     private RestaurantInformation() { }
