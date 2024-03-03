@@ -5,6 +5,9 @@ namespace Dinners.Domain.Reservations.Errors;
 
 public static class ReservationErrorsCodes
 {
+    public static Error CannotFinishIfStatusIsNotAsisting =>
+        Error.Validation("Reservation.CannotFinishIfStatusIsNotAsisting", CannotFinishAReservationWhenReservationStatusIsNotAsistingRule.Message);
+    
     public static Error CannotBeMadeWhenTableIsNotAvailable =>
         Error.Validation("Reservation.CannotBeMadeWhenTableIsNotAvailable", ReservationCannotBeMadeWhenTableIsNotAvailableRule.Message);
 
