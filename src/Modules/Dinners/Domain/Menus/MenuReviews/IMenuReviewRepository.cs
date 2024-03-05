@@ -6,5 +6,5 @@ public interface IMenuReviewRepository
 
     Task UpdateAsync(MenuReview menuReview);
 
-    Task<MenuReview?> GetByIdAsync(MenuReviewId menuReviewId);  
+    Task<MenuReview?> GetByIdAsync(MenuReviewId menuReviewId, CancellationToken cancellationToken);  
 }
