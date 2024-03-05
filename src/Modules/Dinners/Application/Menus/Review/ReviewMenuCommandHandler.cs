@@ -22,7 +22,7 @@ internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuComma
 
     public async Task<ErrorOr<Guid>> Handle(ReviewMenuCommand request, CancellationToken cancellationToken)
     {
-        Menu? menu = await _menuRepository.GetByIdAsync(MenuId.Create(request.MenuId));
+        Menu? menu = await _menuRepository.GetByIdAsync(MenuId.Create(request.MenuId), cancellationToken);
 
         if (menu is null)
         {
@@ -48,7 +48,7 @@ internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuComma
             DateTime.UtcNow);
 
         await _menuReviewRepository.AddAsync(review.Value);
-        await _menuRepository.UpdateAsync(menuUpdate);
+        await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
 
         return review.Value.Id.Value;
     }

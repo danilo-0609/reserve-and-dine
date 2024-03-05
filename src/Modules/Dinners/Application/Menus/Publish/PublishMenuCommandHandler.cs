@@ -63,7 +63,7 @@ internal sealed class PublishMenuCommandHandler : ICommandHandler<PublishMenuCom
             menuSchedule,
             DateTime.UtcNow);
 
-        await _menuRepository.AddAsync(menu);
+        await _menuRepository.AddAsync(menu, cancellationToken);
 
         return menu.Id.Value;
     }

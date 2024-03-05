@@ -17,7 +17,7 @@ internal sealed class UpdateReviewCommentCommandHandler : ICommandHandler<Update
 
     public async Task<ErrorOr<Unit>> Handle(UpdateReviewCommentCommand request, CancellationToken cancellationToken)
     {
-        MenuReview? menuReview = await _menuReviewRepository.GetByIdAsync(MenuReviewId.Create(request.MenuReviewId));
+        MenuReview? menuReview = await _menuReviewRepository.GetByIdAsync(MenuReviewId.Create(request.MenuReviewId), cancellationToken);
 
         if (menuReview is null)
         {

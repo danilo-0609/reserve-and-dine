@@ -17,7 +17,7 @@ internal sealed class UpdateDishSpecificationCommandHandler : ICommandHandler<Up
 
     public async Task<ErrorOr<Unit>> Handle(UpdateDishSpecificationCommand request, CancellationToken cancellationToken)
     {
-        Menu? menu = await _menuRepository.GetByIdAsync(MenuId.Create(request.MenuId));
+        Menu? menu = await _menuRepository.GetByIdAsync(MenuId.Create(request.MenuId), cancellationToken);
 
         if (menu is null)
         {
@@ -34,7 +34,7 @@ internal sealed class UpdateDishSpecificationCommandHandler : ICommandHandler<Up
             request.Condiments,
             request.Coffee);
 
-        await _menuRepository.UpdateAsync(menu);
+        await _menuRepository.UpdateAsync(menu, cancellationToken);
 
         return Unit.Value;
     }

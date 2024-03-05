@@ -17,7 +17,7 @@ internal sealed class SetMenuScheduleCommandHandler : ICommandHandler<SetMenuSch
 
     public async Task<ErrorOr<Unit>> Handle(SetMenuScheduleCommand request, CancellationToken cancellationToken)
     {
-        Menu? menu = await _menuRepository.GetByIdAsync(MenuId.Create(request.MenuId));
+        Menu? menu = await _menuRepository.GetByIdAsync(MenuId.Create(request.MenuId), cancellationToken);
 
         if (menu is null)
         {
@@ -33,7 +33,7 @@ internal sealed class SetMenuScheduleCommandHandler : ICommandHandler<SetMenuSch
             menu.MenuConsumers.ToList(),
             DateTime.UtcNow);
 
-        await _menuRepository.UpdateAsync(menuUpdate);
+        await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
 
         return Unit.Value;
     }
