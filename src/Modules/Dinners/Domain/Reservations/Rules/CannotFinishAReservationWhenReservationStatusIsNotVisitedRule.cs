@@ -4,18 +4,18 @@ using ErrorOr;
 
 namespace Dinners.Domain.Reservations.Rules;
 
-internal sealed class CannotFinishAReservationWhenReservationStatusIsNotAsistingRule : IBusinessRule
+internal sealed class CannotFinishAReservationWhenReservationStatusIsNotVisitedRule : IBusinessRule
 {
     private readonly ReservationStatus _reservationStatus;
 
-    public CannotFinishAReservationWhenReservationStatusIsNotAsistingRule(ReservationStatus reservationStatus)
+    public CannotFinishAReservationWhenReservationStatusIsNotVisitedRule(ReservationStatus reservationStatus)
     {
         _reservationStatus = reservationStatus;
     }
 
     public Error Error => ReservationErrorsCodes.CannotFinishIfStatusIsNotAsisting;
 
-    public bool IsBroken() => _reservationStatus != ReservationStatus.Asisting;
+    public bool IsBroken() => _reservationStatus != ReservationStatus.Visiting;
 
     public static string Message => "Cannot finish a reservation when reservation status is not asisting";
 }
