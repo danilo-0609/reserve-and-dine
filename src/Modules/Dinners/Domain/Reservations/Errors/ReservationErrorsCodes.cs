@@ -5,8 +5,11 @@ namespace Dinners.Domain.Reservations.Errors;
 
 public static class ReservationErrorsCodes
 {
+    public static Error NotFound =>
+        Error.Validation("Reservation.NotFound", "Reservation was not found");
+
     public static Error CannotFinishIfStatusIsNotAsisting =>
-        Error.Validation("Reservation.CannotFinishIfStatusIsNotAsisting", CannotFinishAReservationWhenReservationStatusIsNotAsistingRule.Message);
+        Error.Validation("Reservation.CannotFinishIfStatusIsNotAsisting", CannotFinishAReservationWhenReservationStatusIsNotVisitedRule.Message);
     
     public static Error CannotBeMadeWhenTableIsNotAvailable =>
         Error.Validation("Reservation.CannotBeMadeWhenTableIsNotAvailable", ReservationCannotBeMadeWhenTableIsNotAvailableRule.Message);
