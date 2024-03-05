@@ -9,12 +9,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\Domain\Dinners.Domain.csproj" />
+    <ProjectReference Include="..\IntegrationEvents\Dinners.IntegrationEvents.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Menus\GetByName\" />
-    <Folder Include="Menus\GetByIngredients\" />
-    <Folder Include="Menus\GetMenuImagesById\" />
     <Folder Include="Restaurants\" />
   </ItemGroup>
 
