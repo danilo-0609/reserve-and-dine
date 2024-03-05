@@ -4,7 +4,7 @@ using Dinners.Domain.Restaurants;
 
 namespace Dinners.Domain.Reservations.DomainEvents;
 
-public sealed record ReservationAsistedDomainEvent(
+public sealed record ReservationVisitedDomainEvent(
     Guid DomainEventId,
     ReservationId ReservationId,
     RestaurantId RestaurantId,
