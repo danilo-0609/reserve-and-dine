@@ -43,9 +43,19 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
             payment.Id,
             payment.ReservationId,
             payerId,
+            price,
             payedAt));
 
         return payment;
+    }
+
+    public static ReservationPayment Create(ReservationPaymentId id,
+        ReservationId reservationId,
+        Guid payerId,
+        Price price,
+        DateTime payedAt)
+    {
+        return new ReservationPayment(id, payerId, price, payedAt, reservationId);
     }
 
     private ReservationPayment(ReservationPaymentId id,
