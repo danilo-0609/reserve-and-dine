@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dinners.Tests", "Modules\Dinners\Tests\Dinners.Tests.csproj", "{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dinners.IntegrationEvents", "Modules\Dinners\IntegrationEvents\Dinners.IntegrationEvents.csproj", "{1548B384-B246-4151-8757-EA5E592F4E18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1548B384-B246-4151-8757-EA5E592F4E18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1548B384-B246-4151-8757-EA5E592F4E18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1548B384-B246-4151-8757-EA5E592F4E18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1548B384-B246-4151-8757-EA5E592F4E18}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,5 +85,6 @@ Global
 		{3CC42BAE-E072-433D-A55E-C47A94902977} = {D6DBF13F-9D17-4A53-B294-FEFD7379E0C7}
 		{46408962-CC02-452B-B76A-B2BC732EFCFA} = {D6DBF13F-9D17-4A53-B294-FEFD7379E0C7}
 		{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9} = {398BA4F9-50AE-4E24-84F3-CB3FCDC2C0EE}
+		{1548B384-B246-4151-8757-EA5E592F4E18} = {398BA4F9-50AE-4E24-84F3-CB3FCDC2C0EE}
 	EndGlobalSection
 EndGlobal
