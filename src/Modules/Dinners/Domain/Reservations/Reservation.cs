@@ -1,8 +1,8 @@
 ﻿using BuildingBlocks.Domain.AggregateRoots;
 using Dinners.Domain.Menus;
-using Dinners.Domain.Reservations.Devolutions;
 using Dinners.Domain.Reservations.DomainEvents;
 using Dinners.Domain.Reservations.Errors;
+using Dinners.Domain.Reservations.Refunds;
 using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Reservations.Rules;
 using Dinners.Domain.Restaurants;
@@ -28,6 +28,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
     public ReservationPaymentId? ReservationPaymentId { get; private set; }
 
+    public RefundId? RefundId { get; private set; }
 
     public static ErrorOr<Reservation> Request(ReservationInformation reservationInformation,
         List<int> availableTables,
@@ -50,19 +51,22 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             return isTableReservedNow.FirstError;
         }
 
-        var isnumberOfAttendeesGreaterThanTableSeats = reservation.CheckRule(
+        var isNumberOfAttendeesGreaterThanTableSeats = reservation.CheckRule(
             new CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule(reservationAttendees.NumberOfAttendees, numberOfSeats));
 
-        if (isnumberOfAttendeesGreaterThanTableSeats.IsError)
+        if (isNumberOfAttendeesGreaterThanTableSeats.IsError)
         {
-            return isnumberOfAttendeesGreaterThanTableSeats.FirstError;
+            return isNumberOfAttendeesGreaterThanTableSeats.FirstError;
         }
 
         reservation.AddDomainEvent(new ReservationRequestedDomainEvent(
             Guid.NewGuid(),
             reservation.Id,
+            reservation.RestaurantId,
             reservation.ReservationAttendees.ClientId,
             reservation.ReservationInformation.ReservedTable,
+            reservation.ReservationInformation.TimeOfReservation,
+            reservation.ReservationInformation.ReservationDateTime,
             DateTime.UtcNow));
 
         return reservation;
@@ -79,7 +83,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
         if (ReservationStatus == ReservationStatus.Payed)
         {
-            Devolution.Refund(
+            Refund refund = Refund.Payback(
                 Id,
                 ReservationAttendees.ClientId,
                 ReservationInformation.ReservationPrice,
@@ -92,6 +96,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
                 ReservationInformation.ReservedTable,
                 ReservationInformation.ReservationDateTime,
                 DateTime.UtcNow));
+
+            RefundId = refund.Id;
 
             return ReservationStatus.Cancelled;
         }
@@ -107,7 +113,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return ReservationStatus.Cancelled;
     }
 
-    public ErrorOr<ReservationStatus> Pay()
+    public ErrorOr<ReservationPaymentId> Pay()
     {
         var payment = ReservationPayment.PayFromReservation(
             ReservationAttendees.ClientId,
@@ -121,35 +127,37 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             return payment.FirstError;
         }
 
-        return ReservationStatus.Payed;
+        ReservationStatus = ReservationStatus.Payed;
+
+        return payment.Value.Id;
     }
 
-    public ErrorOr<ReservationStatus> Asist()
+    public ErrorOr<ReservationStatus> Visit()
     {
-        var cannotAssistWhenReservationStatusIsNotPayedRule = CheckRule(new CannotAssistWhenReservationStatusIsNotPayedRule(ReservationStatus));
+        var cannotVisitWhenReservationStatusIsNotPayedRule = CheckRule(new CannotAssistWhenReservationStatusIsNotPayedRule(ReservationStatus));
 
-        if (cannotAssistWhenReservationStatusIsNotPayedRule.IsError)
+        if (cannotVisitWhenReservationStatusIsNotPayedRule.IsError)
         {
-            return cannotAssistWhenReservationStatusIsNotPayedRule.FirstError;
+            return cannotVisitWhenReservationStatusIsNotPayedRule.FirstError;
         }
 
-        AddDomainEvent(new ReservationAsistedDomainEvent(Guid.NewGuid(),
+        AddDomainEvent(new ReservationVisitedDomainEvent(Guid.NewGuid(),
             Id,
             RestaurantId,
             ReservationAttendees.ClientId,
             _menuIds,
             DateTime.UtcNow));
 
-        return ReservationStatus.Asisting;
+        return ReservationStatus.Visiting;
     }
 
     public ErrorOr<ReservationStatus> Finish()
     {
-        var statusMustBeAsisting = CheckRule(new CannotFinishAReservationWhenReservationStatusIsNotAsistingRule(ReservationStatus));
+        var statusMustBeVisited = CheckRule(new CannotFinishAReservationWhenReservationStatusIsNotVisitedRule(ReservationStatus));
     
-        if (statusMustBeAsisting.IsError)
+        if (statusMustBeVisited.IsError)
         {
-            return statusMustBeAsisting.FirstError;
+            return statusMustBeVisited.FirstError;
         }
 
         AddDomainEvent(new ReservationFinishedDomainEvent(Guid.NewGuid(),
@@ -166,7 +174,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         List<MenuId?> menuIds,
         ReservationStatus reservationStatus,
         ReservationAttendees reservationAttendees,
-        ReservationPaymentId reservationPaymentId)
+        ReservationPaymentId? reservationPaymentId,
+        RefundId? refundId)
     {
         return new Reservation(Id,
             reservationInformation,
@@ -174,7 +183,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             RestaurantId,
             reservationStatus,
             reservationAttendees,
-            reservationPaymentId);
+            reservationPaymentId,
+            refundId);
     }
 
     public ErrorOr<ReservationAttendees> UpdateAttendees(int numberOfAttendees, int numberOfSeats)
@@ -232,7 +242,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         RestaurantId restaurantId,
         ReservationStatus reservationStatus,
         ReservationAttendees reservationAttendees,
-        ReservationPaymentId reservationPaymentId)
+        ReservationPaymentId? reservationPaymentId,
+        RefundId? refundId)
     {
         Id = id;
         ReservationInformation = reservationInformation;
@@ -241,6 +252,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         ReservationAttendees = reservationAttendees;
         ReservationStatus = reservationStatus;
         ReservationPaymentId = reservationPaymentId;
+        RefundId = refundId;
     }
 
     private Reservation() { }
