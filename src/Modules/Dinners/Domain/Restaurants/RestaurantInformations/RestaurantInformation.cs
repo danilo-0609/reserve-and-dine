@@ -6,7 +6,6 @@ public sealed record RestaurantInformation
     private readonly List<string>? _specialties = new();
     private readonly List<string>? _imagesUrl = new();
 
-
     public string Title { get; private set; }
 
     public string Description { get; private set; }
