@@ -8,8 +8,17 @@ public static class RestaurantErrorCodes
     public static Error NotFound =>
         Error.Validation("Restaurant.NotFound", "Restaurant was not found");
 
-    public static Error CannotChangeRestaurantScheduleStatus =>
-        Error.Validation("Restaurant.CannotChangeRestaurantScheduleStatus", CannotChangeRestaurantScheduleStatusWhenUserIsNotAdministratorRule.Message);
+    public static Error CannotDeleteRestaurant =>
+        Error.Unauthorized("Restaurant.CannotDeleteRestaurant", "Cannot delete restaurant if you are not a restaurant administrator");
+
+    public static Error CannotAccessToAdministrationContent =>
+        Error.Unauthorized("Restaurant.CannotAccessToAdministrationContent", "Cannot access to administration content if user is not a restaurant administrator");
+
+    public static Error CannotChangeRestaurantProperties =>
+        Error.Unauthorized("Restaurant.CannotChangeRestaurantScheduleStatus", CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule.Message);
+
+    public static Error CannotAddTableWithDuplicateNumber =>
+        Error.Validation("Restaurant.CannotAddTableWithDuplicateNumber", "Cannot add table when there's another table with that number");
 
     public static Error CannotCloseWhenRestaurantIsClosed =>
         Error.Validation("Restaurant.CannotCloseTheRestaurant", CannotCloseWhenRestaurantScheduleStatusIsClosedRule.Message);
@@ -31,4 +40,7 @@ public static class RestaurantErrorCodes
 
     public static Error TableIsNotFree =>
         Error.Validation("Restaurant.TableIsNotFree", TableMustNotBeOccuppiedToAssistRule.Message);
+
+    public static Error RateWhenUserIsAdministrator =>
+        Error.Validation("Restaurant.RateWhenUserIsAdministrator", CannotRateWhenUserIsAdministratorRule.Message);
 }
