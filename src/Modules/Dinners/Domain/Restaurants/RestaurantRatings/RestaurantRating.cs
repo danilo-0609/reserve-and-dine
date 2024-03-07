@@ -61,7 +61,7 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
         return rating;
     }
 
-    public RestaurantRating Update(RestaurantRatingId id,
+    public ErrorOr<RestaurantRating> Update(RestaurantRatingId id,
         RestaurantId restaurantId,
         int stars,
         Guid clientId,
@@ -69,6 +69,13 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
         DateTime updatedAt,
         string comment = "")
     {
+        var canUpdateRate = CheckRule(new CannotUpdateRatingWhenIsNotRaterUserRule(clientId, ClientId));
+
+        if (canUpdateRate.IsError)
+        {
+            return canUpdateRate.FirstError;
+        }
+
         return new RestaurantRating(
             id,
             restaurantId,
