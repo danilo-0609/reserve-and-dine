@@ -21,4 +21,11 @@ public sealed record RestaurantAdministration
     {
         return new RestaurantAdministration(administratorId, name, administratorTitle);
     }
+
+    public RestaurantAdministration Update(string name,
+        Guid administratorId,
+        string administratorTitle)
+    {
+        return new RestaurantAdministration(administratorId, name, administratorTitle);
+    }
 }
