@@ -10,7 +10,9 @@ using Dinners.Domain.Restaurants.RestaurantTables;
 using Dinners.Domain.Restaurants.RestaurantUsers;
 using Dinners.Domain.Restaurants.Rules;
 using ErrorOr;
+using MediatR;
 using System.Data;
+using System.Xml.Linq;
 
 namespace Domain.Restaurants;
 
@@ -70,6 +72,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         restaurant.AddDomainEvent(new NewRestaurantPostedDomainEvent(
             Guid.NewGuid(),
             restaurant.Id,
+            restaurantAdministrations.First().AdministratorId,
             DateTime.UtcNow));
 
         return restaurant;
@@ -106,6 +109,13 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         Guid clientId,
         string comment = "")
     {
+        var mustNotBeAnAdministrator = CheckRule(new CannotRateWhenUserIsAdministratorRule(clientId, _restaurantAdministrations));
+
+        if (mustNotBeAnAdministrator.IsError)
+        {
+            return mustNotBeAnAdministrator.FirstError;
+        }
+
         ErrorOr<RestaurantRating> ratingOperation = RestaurantRating.GiveRating(Id,
             stars,
             clientId,
@@ -126,8 +136,8 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     public ErrorOr<RestaurantScheduleStatus> Close(
         Guid userId)
     {
-        var canChangeRestaurantScheduleStatusRule = CheckRule(new CannotChangeRestaurantScheduleStatusWhenUserIsNotAdministratorRule(RestaurantAdministrations.ToList(), userId));
-    
+        var canChangeRestaurantScheduleStatusRule = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(RestaurantAdministrations.ToList(), userId));
+
         if (canChangeRestaurantScheduleStatusRule.IsError)
         {
             return canChangeRestaurantScheduleStatusRule.FirstError;
@@ -140,17 +150,19 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return mustNotBeClosedRule.FirstError;
         }
 
+        RestaurantScheduleStatus = RestaurantScheduleStatus.Closed;
+
         return RestaurantScheduleStatus.Closed;
     }
 
-    public ErrorOr<RestaurantScheduleStatus> Open(
+    public ErrorOr<Unit> Open(
         Guid userId)
     {
-        var canChangeRestaurantScheduleStatusRule = CheckRule(new CannotChangeRestaurantScheduleStatusWhenUserIsNotAdministratorRule(RestaurantAdministrations.ToList(), userId));
+        var canOpenRule = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(RestaurantAdministrations.ToList(), userId));
 
-        if (canChangeRestaurantScheduleStatusRule.IsError)
+        if (canOpenRule.IsError)
         {
-            return canChangeRestaurantScheduleStatusRule.FirstError;
+            return canOpenRule.FirstError;
         }
 
         var mustNotBeOpenedRule = CheckRule(new CannotOpenWhenRestaurantScheduleStatusIsOpenedRule(RestaurantScheduleStatus));
@@ -160,11 +172,86 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return mustNotBeOpenedRule.FirstError;
         }
 
-        return RestaurantScheduleStatus.Opened;
+        RestaurantScheduleStatus = RestaurantScheduleStatus.Opened;
+
+        return Unit.Value;
     }
 
-    public ErrorOr<RestaurantTable> ReserveTable(int tableNumber, 
-        TimeRange reservationTimeRange, 
+    public ErrorOr<Unit> AddTable(Guid userId,
+        int number,
+        int seats,
+        bool isPremium)
+    {
+        var canAddTable = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
+    
+        if (canAddTable.IsError)
+        {
+            return canAddTable.FirstError;
+        }
+
+        if (_restaurantTables.Any(g => g.Number == number))
+        {
+            return RestaurantErrorCodes.CannotAddTableWithDuplicateNumber;
+        }
+
+        RestaurantTable restaurantTable = RestaurantTable.Create(number, 
+            seats, 
+            isPremium, 
+            new Dictionary<DateTime, TimeRange>());
+
+        _restaurantTables.Add(restaurantTable);
+
+        return Unit.Value;
+    }
+
+    public ErrorOr<Unit> DeleteTable(Guid userId,
+        int number)
+    {
+        var canDeleteTable = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
+    
+        if (canDeleteTable.IsError)
+        {
+            return canDeleteTable.FirstError;
+        }
+
+        if (!_restaurantTables.Any(g => g.Number == number))
+        {
+            return RestaurantErrorCodes.TableDoesNotExist;
+        }
+
+        RestaurantTable? table = _restaurantTables.Where(r => r.Number == number).SingleOrDefault();
+
+        _restaurantTables.Remove(table!);
+
+        return Unit.Value;
+    }
+
+    public ErrorOr<Unit> UpgradeTable(Guid userId,
+        int number,
+        int seats,
+        bool isPremium)
+    {
+        var canUpgradeTable = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
+
+        if (canUpgradeTable.IsError)
+        {
+            return canUpgradeTable.FirstError;
+        }
+
+        if (!_restaurantTables.Any(r => r.Number == number))
+        {
+            return RestaurantErrorCodes.TableDoesNotExist;
+        }
+
+        RestaurantTable? table = _restaurantTables.Where(r => r.Number == number)
+            .SingleOrDefault()!
+            .Upgrade(number, seats, isPremium);
+
+        return Unit.Value;
+    }
+
+    public ErrorOr<RestaurantTable> ReserveTable(int tableNumber,
+        TimeRange reservationTimeRange,
         DateTime reservationDateTimeRequested)
     {
         var isRestaurantOpenToReserve = CheckRule(new TableCannotReserveWhenRestaurantIsClosedRule(RestaurantSchedule, reservationTimeRange, reservationDateTimeRequested));
@@ -244,12 +331,12 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         {
             return RestaurantErrorCodes.TableDoesNotExist;
         }
-        
+
         table.FreeTable();
 
         return table;
     }
-    
+
     public RestaurantClient AddRestaurantClient(Guid clientId)
     {
         if (!RestaurantClients.Any(r => r.ClientId == clientId))
@@ -267,7 +354,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         return restaurantClient;
     }
-    
+
     public ErrorOr<AvailableTablesStatus> ModifyAvailableTableStatus(AvailableTablesStatus availableTablesStatus)
     {
         if (AvailableTablesStatus == availableTablesStatus)
@@ -275,39 +362,76 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.EqualAvailableTableStatus;
         }
 
-        return availableTablesStatus;        
+        return availableTablesStatus;
     }
 
-    public RestaurantInformation UpdateInformation(string title,
+    public ErrorOr<Unit> UpdateInformation(Guid userId,
+        string title,
         string description,
         string type,
         List<string>? chefs,
         List<string>? specialties,
         List<string>? imagesUrl)
     {
-        return RestaurantInformation
+        var canUpdateInformation = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
+        
+        if (canUpdateInformation.IsError)
+        {
+            return canUpdateInformation.FirstError;
+        }
+
+        RestaurantInformation restaurantInformation = RestaurantInformation
             .Create(title, description, type, chefs, specialties, imagesUrl);
+
+        RestaurantInformation = restaurantInformation;
+
+        return Unit.Value;
     }
-     
-    public RestaurantLocalization ChangeLocalization(string country,
+
+    public ErrorOr<Unit> ChangeLocalization(Guid adminId,
+        string country,
         string city,
         string region,
         string neighborhood,
         string address,
         string localizationDetails = "")
     {
-        return RestaurantLocalization.Create(
+        var canChangeLocalization = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, adminId));
+
+        if (canChangeLocalization.IsError)
+        {
+            return canChangeLocalization.FirstError;
+        }
+
+        var restaurantLocalization = RestaurantLocalization.Create(
             country, city, region, neighborhood, address, localizationDetails);
+
+        RestaurantLocalization = restaurantLocalization;
+
+        return Unit.Value;
     }
 
-    public RestaurantSchedule ModifySchedule(List<DayOfWeek> days,
+    public ErrorOr<Unit> ModifySchedule(Guid userId,
+        List<DayOfWeek> days,
         TimeSpan start,
         TimeSpan end)
     {
-        return RestaurantSchedule.Create(days, start, end);
+        var canChangeProperty = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
+
+        if (canChangeProperty.IsError)
+        {
+            return canChangeProperty.FirstError;
+        }
+
+        RestaurantSchedule schedule = RestaurantSchedule.Create(days, start, end);
+    
+        RestaurantSchedule = schedule;
+
+        return Unit.Value;
     }
 
-    public RestaurantContact UpdateContact(string email = "",
+    public ErrorOr<Unit> UpdateContact(Guid adminId,
+        string email = "",
         string whatsapp = "",
         string facebook = "",
         string phoneNumber = "",
@@ -316,7 +440,14 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         string tikTok = "",
         string website = "")
     {
-        return RestaurantContact.Create(email,
+        var canChangeRestaurantContact = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, adminId));
+
+        if (canChangeRestaurantContact.IsError)
+        {
+            return canChangeRestaurantContact.FirstError;
+        }
+
+        var restaurantContact = RestaurantContact.Create(email,
             whatsapp,
             facebook,
             phoneNumber,
@@ -324,16 +455,85 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             twitter,
             tikTok,
             website);
+
+        RestaurantContact = restaurantContact;
+
+        return Unit.Value;
     }
 
-    public RestaurantAdministration AddAdministration(string name,
-        Guid administratorId,
-        string administratorTitle)
+    public ErrorOr<RestaurantAdministration> AddAdministration(string name,
+        Guid newAdministratorId,
+        string administratorTitle,
+        Guid adminId)
     {
-        return RestaurantAdministration.Create(
-            name, 
-            administratorId,
+        var canAddNewAdmin = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, adminId));
+
+        if (canAddNewAdmin.IsError)
+        {
+            return canAddNewAdmin.FirstError;
+        }
+
+        if (_restaurantAdministrations.Any(r => r.AdministratorId == newAdministratorId))
+        {
+            return Error.Validation("RestaurantAdministration.AdministratorExists", "The administrator already exists");
+        }
+
+        var restaurantAdministration = RestaurantAdministration.Create(
+            name,
+            newAdministratorId,
             administratorTitle);
+
+        _restaurantAdministrations.Add(restaurantAdministration);
+
+        return restaurantAdministration;
+    }
+
+    public ErrorOr<Unit> DeleteAdministrator(Guid administratorId, Guid adminId)
+    {
+        var canDeleteAdmin = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, adminId));
+
+        if (canDeleteAdmin.IsError)
+        {
+            return canDeleteAdmin.FirstError;
+        }
+
+        if (_restaurantAdministrations.Any(t => t.AdministratorId == administratorId))
+        {
+            return Error.NotFound("RestaurantAdministration.NotFound", "Restaurant administrator was not found");
+        }
+
+        RestaurantAdministration? restaurantAdministrator = _restaurantAdministrations
+            .Where(r => r.AdministratorId == administratorId)
+            .SingleOrDefault();
+
+        _restaurantAdministrations.Remove(restaurantAdministrator!);
+
+        return Unit.Value;
+    }
+
+    public ErrorOr<Unit> UpdateAdministrator(Guid administratorId,
+        string name,
+        string administratorTitle,
+        Guid adminId)
+    {
+        var canUpdateAdmin = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, adminId));
+
+        if (canUpdateAdmin.IsError)
+        {
+            return canUpdateAdmin.FirstError;
+        }
+
+        if (_restaurantAdministrations.Any(t => t.AdministratorId == administratorId))
+        {
+            return Error.NotFound("RestaurantAdministration.NotFound", "Restaurant administrator was not found");
+        }
+
+            _restaurantAdministrations
+                .Where(r => r.AdministratorId == administratorId)
+                .SingleOrDefault()!
+                .Update(name, administratorId, administratorTitle);
+
+        return Unit.Value;
     }
 
     private Restaurant(

@@ -12,4 +12,12 @@ public interface IRestaurantRepository
     Task UpdateAsync(Restaurant restaurant);
 
     Task<List<RestaurantTable>> GetRestaurantTablesById(RestaurantId restaurantId, CancellationToken cancellationToken); 
+
+    Task AddAsync(Restaurant restaurant, CancellationToken cancellationToken);
+
+    Task DeleteAsync(RestaurantId restaurant, CancellationToken cancellationToken);
+
+    Task<List<Restaurant>> GetRestaurantsByNameAsync(string name, CancellationToken cancellationToken);
+
+    Task<List<Restaurant>> GetByLocalizationAsync(string country, string region, string city, string? neighborhood, CancellationToken);
 }
