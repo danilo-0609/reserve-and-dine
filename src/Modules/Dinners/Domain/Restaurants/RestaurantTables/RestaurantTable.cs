@@ -24,6 +24,13 @@ public sealed record RestaurantTable
         return new RestaurantTable(number, seats, isPremium, reservedHours);
     }
 
+    public RestaurantTable Upgrade(int number,
+        int seats,
+        bool isPremium)
+    {
+        return new RestaurantTable(number, seats, isPremium, _reservedHours);
+    }
+
     public void CancelReservation(DateTime reservedTime)
     {
         _reservedHours.Remove(reservedTime);
