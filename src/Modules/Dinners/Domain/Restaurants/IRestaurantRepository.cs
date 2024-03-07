@@ -19,5 +19,5 @@ public interface IRestaurantRepository
 
     Task<List<Restaurant>> GetRestaurantsByNameAsync(string name, CancellationToken cancellationToken);
 
-    Task<List<Restaurant>> GetByLocalizationAsync(string country, string region, string city, string? neighborhood, CancellationToken);
+    Task<List<Restaurant>> GetByLocalizationAsync(string country, string region, string city, string? neighborhood, CancellationToken cancellationToken);
 }
