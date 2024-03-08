@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  reservations.backend:
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    ports: 
+      - "5000:5000"
+      - "5001:5001"
+    depends_on: 
+        - "reservations.database"
+   
+  reservations.database: 
+      image: mcr.microsoft.com/mssql/server:2022-latest
+      container_name: Reservations.Db
+      volumes:
+        - ./.containers/database:/var/opt/mssql/data
+      ports:
+        - "1433:1433"
+      environment:
+        ACCEPT_EULA: "Y"
+        SA_PASSWORD: "SqlP@ssword123"
+        
