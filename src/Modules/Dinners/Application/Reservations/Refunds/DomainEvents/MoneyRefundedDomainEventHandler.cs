@@ -22,7 +22,6 @@ internal sealed class MoneyRefundedDomainEventHandler : IDomainEventHandler<Mone
     public async Task Handle(MoneyRefundedDomainEvent notification, CancellationToken cancellationToken)
     {
         Refund refund = Refund.Create(notification.RefundId, 
-            notification.ReservationId, 
             notification.ClientId,
             notification.RefundedMoney,
             notification.OcurredOn);

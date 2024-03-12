@@ -22,7 +22,6 @@ internal sealed class ReservationPayedDomainEventHandler : IDomainEventHandler<R
     public async Task Handle(ReservationPayedDomainEvent notification, CancellationToken cancellationToken)
     {
         var payment = ReservationPayment.Create(notification.ReservationPaymentId,
-            notification.ReservationId,
             notification.ClientId,
             notification.Price,
             notification.OcurredOn);
