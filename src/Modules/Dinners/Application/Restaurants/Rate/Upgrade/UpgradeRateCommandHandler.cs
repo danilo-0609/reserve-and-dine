@@ -28,7 +28,6 @@ internal sealed class UpgradeRateCommandHandler : ICommandHandler<UpgradeRateCom
         }
 
         ErrorOr<RestaurantRating> updateRating = rating.Update(rating.Id,
-            rating.RestaurantId,
             request.Stars,
             _executionContextAccessor.UserId,
             rating.RatedAt,

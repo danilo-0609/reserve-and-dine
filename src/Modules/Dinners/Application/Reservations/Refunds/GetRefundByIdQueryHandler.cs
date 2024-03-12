@@ -23,7 +23,6 @@ internal sealed class GetRefundByIdQueryHandler : IQueryHandler<GetRefundByIdQue
         }
 
         return new RefundResponse(refund.Id.Value, 
-            refund.ReservationId.Value, 
             refund.ClientId,
             refund.RefundedMoney,
             refund.RefundedAt);

@@ -24,7 +24,6 @@ internal sealed class GetPaymentByIdQueryHandler : IQueryHandler<GetPaymentByIdQ
         }
 
         return new PaymentResponse(payment.Id.Value,
-            payment.ReservationId.Value,
             payment.PayerId,
             payment.Price,
             payment.PayedAt);
