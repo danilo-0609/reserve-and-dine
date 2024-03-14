@@ -10,8 +10,6 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
 {
     public new ReservationPaymentId Id { get; private set; }
 
-    public ReservationId ReservationId { get; private set; }
-
     public Guid PayerId { get; private set; }
 
     public Price Price { get; private set; }
@@ -29,8 +27,7 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
             ReservationPaymentId.CreateUnique(),
             payerId,
             price,
-            payedAt,
-            reservationId);
+            payedAt);
 
         var statusMustBeRequestedRule = payment.CheckRule(new PaymentCannotBeMadeWhenReservationStatusIsNotRequestedRule(reservationStatus));
 
@@ -41,7 +38,7 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
 
         payment.AddDomainEvent(new ReservationPayedDomainEvent(Guid.NewGuid(),
             payment.Id,
-            payment.ReservationId,
+            reservationId,
             payerId,
             price,
             payedAt));
@@ -50,25 +47,22 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
     }
 
     public static ReservationPayment Create(ReservationPaymentId id,
-        ReservationId reservationId,
         Guid payerId,
         Price price,
         DateTime payedAt)
     {
-        return new ReservationPayment(id, payerId, price, payedAt, reservationId);
+        return new ReservationPayment(id, payerId, price, payedAt);
     }
 
     private ReservationPayment(ReservationPaymentId id,
         Guid payerId,
         Price price,
-        DateTime payedAt,
-        ReservationId reservationId)
+        DateTime payedAt)
     {
         Id = id;
         PayerId = payerId;
         Price = price;
-        PayedAt = payedAt;
-        ReservationId = reservationId;
+        PayedAt = payedAt;;
     }
 
     private ReservationPayment() { }

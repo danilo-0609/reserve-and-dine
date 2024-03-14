@@ -8,8 +8,6 @@ public sealed class Refund : Entity<RefundId, Guid>
 {
     public new RefundId Id { get; private set; }
 
-    public ReservationId ReservationId { get; private set; }
-
     public Guid ClientId { get; private set; }
 
     public Price RefundedMoney { get; private set; }
@@ -22,7 +20,7 @@ public sealed class Refund : Entity<RefundId, Guid>
         Price refundedMoney,
         DateTime refundedAt)
     {
-        Refund refund = new Refund(RefundId.CreateUnique(), reservationId, clientId, refundedMoney, refundedAt);
+        Refund refund = new Refund(RefundId.CreateUnique(), clientId, refundedMoney, refundedAt);
 
         refund.AddDomainEvent(new MoneyRefundedDomainEvent(Guid.NewGuid(), 
             refund.Id,
@@ -35,22 +33,19 @@ public sealed class Refund : Entity<RefundId, Guid>
     }
 
     public static Refund Create(RefundId refundId,
-        ReservationId reservationId,
         Guid clientId,
         Price refundedMoney,
         DateTime refundedAt)
     {
-        return new Refund(refundId, reservationId, clientId, refundedMoney, refundedAt);
+        return new Refund(refundId, clientId, refundedMoney, refundedAt);
     }
 
     private Refund(RefundId id, 
-        ReservationId reservationId, 
         Guid clientId, 
         Price refundedMoney, 
         DateTime refundedAt)
     {
         Id = id;
-        ReservationId = reservationId;
         ClientId = clientId;
         RefundedMoney = refundedMoney;
         RefundedAt = refundedAt;
