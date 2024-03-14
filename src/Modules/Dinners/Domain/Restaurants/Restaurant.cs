@@ -12,7 +12,6 @@ using Dinners.Domain.Restaurants.Rules;
 using ErrorOr;
 using MediatR;
 using System.Data;
-using System.Xml.Linq;
 
 namespace Domain.Restaurants;
 
@@ -369,9 +368,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         string title,
         string description,
         string type,
-        List<string>? chefs,
-        List<string>? specialties,
-        List<string>? imagesUrl)
+        List<string> chefs,
+        List<string> specialties,
+        List<Uri> imagesUrl)
     {
         var canUpdateInformation = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
         

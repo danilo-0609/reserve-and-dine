@@ -63,5 +63,9 @@ public sealed record DishSpecification
         Coffee = coffee;
     }
 
+#pragma warning disable CS0169
+
     private DishSpecification() { }
+
+#pragma warning disable CS0169
 }
