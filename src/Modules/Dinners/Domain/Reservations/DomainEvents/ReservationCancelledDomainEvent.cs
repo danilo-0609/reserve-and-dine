@@ -8,5 +8,6 @@ public sealed record ReservationCancelledDomainEvent(
     ReservationId ReservationId,
     RestaurantId RestaurantId,
     int NumberOfTable,
+    string causeOfCancellation,
     DateTime ReservationDateTime,
     DateTime OcurredOn) : IDomainEvent;
