@@ -7,18 +7,19 @@ using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Reservations.Rules;
 using Dinners.Domain.Restaurants;
 using ErrorOr;
+using MediatR;
 
 namespace Dinners.Domain.Reservations;
 
 public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 {
-    private readonly List<MenuId?> _menuIds = new();
+    private readonly List<MenuId> _menuIds = new();
 
     public new ReservationId Id { get; private set; }
 
     public ReservationInformation ReservationInformation { get; private set; }
 
-    public IReadOnlyList<MenuId?> MenuIds => _menuIds.AsReadOnly();
+    public IReadOnlyList<MenuId> MenuIds => _menuIds.AsReadOnly();
 
     public RestaurantId RestaurantId { get; private set; }
 
@@ -30,19 +31,26 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
     public RefundId? RefundId { get; private set; }
 
+    public DateTime RequestedAt { get; private set; }
+
+    public DateTime? PayedAt { get; private set; }
+
+    public DateTime? CancelledAt { get; private set; }
+
     public static ErrorOr<Reservation> Request(ReservationInformation reservationInformation,
         List<int> availableTables,
         int numberOfSeats,
         RestaurantId restaurantId,
         ReservationAttendees reservationAttendees,
-        List<MenuId?> menuIds)
+        List<MenuId> menuIds)
     {
         Reservation reservation = new Reservation(ReservationId.CreateUnique(),
             reservationInformation,
             restaurantId,
             reservationAttendees,
             ReservationStatus.Requested,
-            menuIds);
+            menuIds,
+            DateTime.UtcNow);
 
         var isTableReservedNow = reservation.CheckRule(new ReservationCannotBeMadeWhenTableIsNotAvailableRule(availableTables, reservationInformation.ReservedTable));
 
@@ -72,7 +80,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return reservation;
     }
 
-    public ErrorOr<ReservationStatus> Cancel()
+    public ErrorOr<Unit> Cancel(string causeOfCancellation = "")
     {
         var canCancelReservation = CheckRule(new CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule(ReservationStatus));
 
@@ -94,12 +102,15 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
                 Id,
                 RestaurantId,
                 ReservationInformation.ReservedTable,
+                causeOfCancellation,
                 ReservationInformation.ReservationDateTime,
                 DateTime.UtcNow));
 
             RefundId = refund.Id;
+            CancelledAt = DateTime.UtcNow;
+            ReservationStatus = ReservationStatus.Cancelled;
 
-            return ReservationStatus.Cancelled;
+            return Unit.Value;
         }
 
         AddDomainEvent(new ReservationCancelledDomainEvent(
@@ -107,10 +118,14 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             Id,
             RestaurantId,
             ReservationInformation.ReservedTable,
+            causeOfCancellation,
             ReservationInformation.ReservationDateTime,
             DateTime.UtcNow));
 
-        return ReservationStatus.Cancelled;
+        CancelledAt = DateTime.UtcNow;
+        ReservationStatus = ReservationStatus.Cancelled;
+
+        return Unit.Value;
     }
 
     public ErrorOr<ReservationPaymentId> Pay()
@@ -128,6 +143,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         }
 
         ReservationStatus = ReservationStatus.Payed;
+        PayedAt = DateTime.UtcNow;
 
         return payment.Value.Id;
     }
@@ -171,7 +187,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
     }
 
     public Reservation Update(ReservationInformation reservationInformation,
-        List<MenuId?> menuIds,
+        List<MenuId> menuIds,
         ReservationStatus reservationStatus,
         ReservationAttendees reservationAttendees,
         ReservationPaymentId? reservationPaymentId,
@@ -184,7 +200,10 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             reservationStatus,
             reservationAttendees,
             reservationPaymentId,
-            refundId);
+            refundId,
+            RequestedAt,
+            PayedAt,
+            CancelledAt);
     }
 
     public ErrorOr<ReservationAttendees> UpdateAttendees(int numberOfAttendees, int numberOfSeats)
@@ -225,7 +244,10 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         RestaurantId restaurantId,
         ReservationAttendees reservationAttendees,
         ReservationStatus reservationStatus,
-        List<MenuId?> menuIds)
+        List<MenuId> menuIds,
+        DateTime requestedAt,
+        DateTime? payedAt = null,
+        DateTime? cancelledAt = null)
     {
         Id = id;
         ReservationInformation = reservationInformation;
@@ -233,17 +255,24 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         ReservationAttendees = reservationAttendees;
         ReservationStatus = reservationStatus;
 
+        RequestedAt = requestedAt;
+        PayedAt = payedAt;
+        CancelledAt = cancelledAt;
+
         _menuIds = menuIds;
     }
 
     private Reservation(ReservationId id,
         ReservationInformation reservationInformation,
-        List<MenuId?> menuIds,
+        List<MenuId> menuIds,
         RestaurantId restaurantId,
         ReservationStatus reservationStatus,
         ReservationAttendees reservationAttendees,
         ReservationPaymentId? reservationPaymentId,
-        RefundId? refundId)
+        RefundId? refundId,
+        DateTime requestedAt,
+        DateTime? payedAt = null,
+        DateTime? cancelledAt = null)
     {
         Id = id;
         ReservationInformation = reservationInformation;
@@ -253,6 +282,10 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         ReservationStatus = reservationStatus;
         ReservationPaymentId = reservationPaymentId;
         RefundId = refundId;
+
+        RequestedAt = requestedAt;
+        PayedAt = payedAt;
+        CancelledAt = cancelledAt;
     }
 
     private Reservation() { }
