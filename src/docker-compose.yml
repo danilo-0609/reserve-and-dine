@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  reservations.backend:
+  api:
     image: ${DOCKER_REGISTRY-}api
     build:
       context: .
@@ -11,6 +11,8 @@ services:
       - "5001:5001"
     depends_on: 
         - "reservations.database"
+    env_file: 
+        - variables.env
    
   reservations.database: 
       image: mcr.microsoft.com/mssql/server:2022-latest
