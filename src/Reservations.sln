@@ -25,9 +25,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Users.Application", "Module
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{72155F8A-D8EF-4990-8C1D-31160562FB5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dinners.Tests", "Modules\Dinners\Tests\Dinners.Tests.csproj", "{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dinners.Tests", "Modules\Dinners\Tests\Dinners.Tests.csproj", "{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dinners.IntegrationEvents", "Modules\Dinners\IntegrationEvents\Dinners.IntegrationEvents.csproj", "{1548B384-B246-4151-8757-EA5E592F4E18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dinners.IntegrationEvents", "Modules\Dinners\IntegrationEvents\Dinners.IntegrationEvents.csproj", "{1548B384-B246-4151-8757-EA5E592F4E18}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{69FB09D9-490F-4658-B792-AD257CA77F21}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4B6FC372-4182-45AA-8DDA-9C0AC213B977}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dinners.Infrastructure", "Modules\Dinners\Infrastructure\Dinners.Infrastructure.csproj", "{FBAF43D6-A179-4A90-A789-4CDB526BBF80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +80,14 @@ Global
 		{1548B384-B246-4151-8757-EA5E592F4E18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1548B384-B246-4151-8757-EA5E592F4E18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1548B384-B246-4151-8757-EA5E592F4E18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69FB09D9-490F-4658-B792-AD257CA77F21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69FB09D9-490F-4658-B792-AD257CA77F21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69FB09D9-490F-4658-B792-AD257CA77F21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69FB09D9-490F-4658-B792-AD257CA77F21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBAF43D6-A179-4A90-A789-4CDB526BBF80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBAF43D6-A179-4A90-A789-4CDB526BBF80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBAF43D6-A179-4A90-A789-4CDB526BBF80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBAF43D6-A179-4A90-A789-4CDB526BBF80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,5 +103,9 @@ Global
 		{46408962-CC02-452B-B76A-B2BC732EFCFA} = {D6DBF13F-9D17-4A53-B294-FEFD7379E0C7}
 		{06A39C82-BB7D-46B1-8F4C-B6A8B505A7E9} = {398BA4F9-50AE-4E24-84F3-CB3FCDC2C0EE}
 		{1548B384-B246-4151-8757-EA5E592F4E18} = {398BA4F9-50AE-4E24-84F3-CB3FCDC2C0EE}
+		{FBAF43D6-A179-4A90-A789-4CDB526BBF80} = {398BA4F9-50AE-4E24-84F3-CB3FCDC2C0EE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F885FCE0-FC4A-4D3A-B08C-7C461C0C99E8}
 	EndGlobalSection
 EndGlobal
