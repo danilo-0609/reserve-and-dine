@@ -8,20 +8,17 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
 {
     public new RestaurantRatingId Id { get; private set; }
 
-    public RestaurantId RestaurantId { get; private set; }
+    public Guid ClientId { get; private set; }
 
-    public Guid ClientId { get; private set;  }
-    
     public int Stars { get; private set; }
-    
+
     public string Comment { get; private set; }
 
     public DateTime RatedAt { get; private set; }
 
     public DateTime? UpdatedAt { get; private set; }
 
-    public RestaurantRating(RestaurantRatingId id,
-        RestaurantId restaurantId,
+    private RestaurantRating(RestaurantRatingId id,
         Guid clientId,
         int stars,
         string comment,
@@ -29,13 +26,14 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
         DateTime? updatedAt = null)
     {
         Id = id;
-        RestaurantId = restaurantId;
         ClientId = clientId;
         Stars = stars;
         Comment = comment;
         RatedAt = ratedAt;
         UpdatedAt = updatedAt;
     }
+
+
 
     public static ErrorOr<RestaurantRating> GiveRating(RestaurantId restaurantId,
         int stars,
@@ -45,7 +43,6 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
         string comment = "")
     {
         var rating = new RestaurantRating(RestaurantRatingId.CreateUnique(),
-            restaurantId,
             clientId,
             stars,
             comment,
@@ -62,7 +59,6 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
     }
 
     public ErrorOr<RestaurantRating> Update(RestaurantRatingId id,
-        RestaurantId restaurantId,
         int stars,
         Guid clientId,
         DateTime ratedAt,
@@ -78,13 +74,13 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
 
         return new RestaurantRating(
             id,
-            restaurantId,
             clientId,
             stars,
             comment,
             ratedAt,
             updatedAt);
-
     }
+
+    private RestaurantRating() { }
 }
 
