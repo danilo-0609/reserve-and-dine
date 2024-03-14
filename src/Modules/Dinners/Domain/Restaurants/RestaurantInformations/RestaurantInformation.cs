@@ -2,9 +2,9 @@
 
 public sealed record RestaurantInformation
 {
-    private readonly List<string>? _chefs = new();
-    private readonly List<string>? _specialties = new();
-    private readonly List<string>? _imagesUrl = new();
+    private readonly List<string> _chefs = new();
+    private readonly List<string> _specialties = new();
+    private readonly List<Uri> _imagesUrl = new();
 
     public string Title { get; private set; }
 
@@ -12,19 +12,19 @@ public sealed record RestaurantInformation
 
     public string Type { get; private set; }
 
-    public IReadOnlyList<string>? Chefs => _chefs.AsReadOnly();
+    public IReadOnlyList<string> Chefs => _chefs.AsReadOnly();
 
-    public IReadOnlyList<string>? Specialties => _specialties.AsReadOnly();
+    public IReadOnlyList<string> Specialties => _specialties.AsReadOnly();
 
-    public IReadOnlyList<string>? RestaurantImagesUrl => _imagesUrl.AsReadOnly();
+    public IReadOnlyList<Uri> RestaurantImagesUrl => _imagesUrl.AsReadOnly();
 
     public static RestaurantInformation Create(
         string title,
         string description,
         string type,
-        List<string>? chefs,
-        List<string>? specialties,
-        List<string>? imagesUrl)
+        List<string> chefs,
+        List<string> specialties,
+        List<Uri> imagesUrl)
     {
         return new RestaurantInformation(title,
             description,
@@ -37,10 +37,10 @@ public sealed record RestaurantInformation
 
     private RestaurantInformation(string title,
         string description,
-        string type,
-        List<string>? chefs,
-        List<string>? specialties,
-        List<string>? imagesUrl)
+        string type,    
+        List<string> chefs,
+        List<string> specialties,
+        List<Uri> imagesUrl)
     {
         Title = title;
         Description = description;
