@@ -9,5 +9,5 @@ public sealed record ReservationVisitedDomainEvent(
     ReservationId ReservationId,
     RestaurantId RestaurantId,
     Guid ClientId,
-    List<MenuId?> MenuIds,
+    List<MenuId> MenuIds,
     DateTime OcurredOn) : IDomainEvent;
