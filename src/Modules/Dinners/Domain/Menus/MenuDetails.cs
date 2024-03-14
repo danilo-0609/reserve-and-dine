@@ -16,9 +16,9 @@ public sealed record MenuDetails
 
     public decimal Discount {  get; private set; }
 
-    public List<string?> MenuImagesUrl { get; private set; }
+    public List<Uri> MenuImagesUrl { get; private set; }
 
-    public List<string?> Tags { get; private set; }
+    public List<string> Tags { get; private set; }
 
     public bool IsVegetarian { get; private set; }
 
@@ -32,8 +32,8 @@ public sealed record MenuDetails
         MenuType menuType,
         Price price,
         decimal discount,
-        List<string?> menuImagesUrl,
-        List<string?> tags,
+        List<Uri> menuImagesUrl,
+        List<string> tags,
         bool isVegetarian,
         string primaryChefName,
         bool hasAlcohol,
@@ -57,8 +57,8 @@ public sealed record MenuDetails
         MenuType menuType,
         Price price,
         decimal discount,
-        List<string?> menuImagesUrl,
-        List<string?> tags,
+        List<Uri> menuImagesUrl,
+        List<string> tags,
         bool isVegetarian,
         string primaryChefName,
         bool hasAlcohol,
