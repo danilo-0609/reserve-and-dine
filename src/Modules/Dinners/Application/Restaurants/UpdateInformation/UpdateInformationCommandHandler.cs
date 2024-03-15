@@ -34,7 +34,7 @@ internal sealed class UpdateInformationCommandHandler : ICommandHandler<UpdateIn
             request.Type,
             request.Chefs,
             request.Specialties,
-            request.ImagesUrl);
+            restaurant.RestaurantInformation.RestaurantImagesUrl.ToList());
     
         if (updateInformation.IsError)
         {

@@ -23,8 +23,5 @@ internal sealed class UpdateInformationCommandValidator : AbstractValidator<Upda
 
         RuleFor(r => r.Specialties)
             .NotNull();
-
-        RuleFor(r => r.ImagesUrl)
-            .NotNull();
     }
 }

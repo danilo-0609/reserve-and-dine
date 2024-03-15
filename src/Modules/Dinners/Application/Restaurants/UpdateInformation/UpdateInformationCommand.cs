@@ -9,5 +9,4 @@ public sealed record UpdateInformationCommand(Guid RestaurantId,
     string Description,
     string Type,
     List<string>Chefs,
-    List<string> Specialties,
-    List<string> ImagesUrl) : ICommand<ErrorOr<Unit>>;
+    List<string> Specialties) : ICommand<ErrorOr<Unit>>;
