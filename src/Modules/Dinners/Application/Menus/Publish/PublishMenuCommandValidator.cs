@@ -38,11 +38,6 @@ internal sealed class PublishMenuCommandValidator : AbstractValidator<PublishMen
         RuleFor(r => r.Discount)
             .NotEmpty();
 
-
-        RuleFor(r => r.MenuImagesUrl)
-            .NotEmpty()
-            .NotNull();
-
         RuleFor(r => r.Tags)
             .NotEmpty()
             .NotNull();

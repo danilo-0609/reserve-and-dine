@@ -39,10 +39,6 @@ internal sealed class UpdateMenuDetailsCommandValidator : AbstractValidator<Upda
         RuleFor(r => r.Discount)
             .NotEmpty();
 
-        RuleFor(r => r.MenuImagesUrl)
-            .NotEmpty()
-            .NotNull();
-
         RuleFor(r => r.Tags)
             .NotEmpty()
             .NotNull();

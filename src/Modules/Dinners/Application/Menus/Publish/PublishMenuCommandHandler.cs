@@ -34,7 +34,7 @@ internal sealed class PublishMenuCommandHandler : ICommandHandler<PublishMenuCom
             menuType,
             new Price(request.Price, request.Currency),
             request.Discount,
-            request.MenuImagesUrl,
+            new List<Uri>(),
             request.Tags,
             request.IsVegetarian,
             request.PrimaryChefName,

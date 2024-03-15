@@ -32,7 +32,7 @@ internal sealed class UpdateMenuDetailsCommandHandler : ICommandHandler<UpdateMe
             menuType,
             new Price(request.Money, request.Currency),
             request.Discount,
-            request.MenuImagesUrl!,
+            menu.MenuDetails.MenuImagesUrl,
             request.Tags!,
             request.IsVegetarian,
             request.PrimaryChefName,
