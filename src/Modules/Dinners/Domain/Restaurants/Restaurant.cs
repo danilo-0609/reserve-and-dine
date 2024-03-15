@@ -116,6 +116,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         }
 
         ErrorOr<RestaurantRating> ratingOperation = RestaurantRating.GiveRating(Id,
+            RestaurantInformation.Title,
             stars,
             clientId,
             RestaurantClients
