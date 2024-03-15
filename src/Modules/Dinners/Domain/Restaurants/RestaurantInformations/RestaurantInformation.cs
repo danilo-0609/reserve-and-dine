@@ -34,6 +34,15 @@ public sealed record RestaurantInformation
             imagesUrl);
     }
 
+    public void AddImage(Uri imageUrl)
+    {
+        _imagesUrl.Add(imageUrl);
+    }
+
+    public void RemoveImage(Uri imageUrl)
+    {
+        _imagesUrl.Remove(imageUrl);
+    }
 
     private RestaurantInformation(string title,
         string description,
