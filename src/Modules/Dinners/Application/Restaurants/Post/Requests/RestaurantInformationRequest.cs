@@ -4,5 +4,4 @@ public sealed record RestaurantInformationRequest(string Title,
     string Description,
     string Type,
     List<string> Chefs,
-    List<string> Specialties,
-    List<string> ImagesUrl);
+    List<string> Specialties);
