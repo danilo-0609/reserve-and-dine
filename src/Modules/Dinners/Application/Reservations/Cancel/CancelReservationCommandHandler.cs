@@ -24,7 +24,7 @@ internal sealed class CancelReservationCommandHandler : ICommandHandler<CancelRe
             return ReservationErrorsCodes.NotFound;
         }
 
-        ErrorOr<ReservationStatus> cancelReservation = reservation.Cancel();
+        ErrorOr<Unit> cancelReservation = reservation.Cancel();
 
         if (cancelReservation.IsError)
         {
@@ -33,7 +33,7 @@ internal sealed class CancelReservationCommandHandler : ICommandHandler<CancelRe
 
         var reservationUpdate = reservation.Update(reservation.ReservationInformation,
             reservation.MenuIds.ToList(),
-            cancelReservation.Value,
+            reservation.ReservationStatus,
             reservation.ReservationAttendees,
             reservation.ReservationPaymentId,
             reservation.RefundId);
