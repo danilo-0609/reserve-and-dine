@@ -14,7 +14,7 @@ public sealed class RestaurantTests
         "Restaurante de mar",
         new List<string>() { "Juan Carlos González" },
         new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
-        new List<string>());
+        new List<Uri>());
 
     private RestaurantLocalization RestaurantLocalization = RestaurantLocalization.Create("Colombia",
         "Medellin",
