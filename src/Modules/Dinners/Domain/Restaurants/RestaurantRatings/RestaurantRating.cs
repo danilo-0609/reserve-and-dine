@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.Entities;
+using Dinners.Domain.Restaurants.RestaurantRatings.Events;
 using Dinners.Domain.Restaurants.RestaurantRatings.Rules;
 using ErrorOr;
 
@@ -36,6 +37,7 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
 
 
     public static ErrorOr<RestaurantRating> GiveRating(RestaurantId restaurantId,
+        string restaurantTitle,
         int stars,
         Guid clientId,
         bool hasVisited,
@@ -54,6 +56,14 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
         {
             return canRateRule.FirstError;
         }
+
+        rating.AddDomainEvent(new RatingPublishedDomainEvent(Guid.NewGuid(),
+            rating.Id,
+            clientId,
+            stars,
+            restaurantId,
+            restaurantTitle,
+            DateTime.UtcNow));
 
         return rating;
     }
