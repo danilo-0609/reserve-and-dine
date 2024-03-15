@@ -25,7 +25,7 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
             request.RestaurantInformation.Type,
             request.RestaurantInformation.Chefs,
             request.RestaurantInformation.Specialties,
-            request.RestaurantInformation.ImagesUrl);
+            new List<Uri>());
 
         var restaurantLocalization = RestaurantLocalization.Create(request.RestaurantLocalization.Country,
             request.RestaurantLocalization.City,
