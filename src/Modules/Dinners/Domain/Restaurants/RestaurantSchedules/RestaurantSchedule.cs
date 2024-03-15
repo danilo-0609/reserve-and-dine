@@ -20,4 +20,6 @@ public sealed record RestaurantSchedule
     {
         return new RestaurantSchedule(days, new TimeRange(start, end));
     }
+
+    private RestaurantSchedule() { }
 }

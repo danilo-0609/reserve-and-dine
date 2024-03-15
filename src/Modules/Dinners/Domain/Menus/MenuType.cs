@@ -10,8 +10,10 @@ public sealed record MenuType
 
     public static MenuType Dinner => new MenuType(nameof(Dinner));
 
-    public MenuType(string value)
+    private MenuType(string value)
     {
         Value = value;
     }
+
+    private MenuType() { }
 }

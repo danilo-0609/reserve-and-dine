@@ -14,8 +14,10 @@ public sealed record ReservationStatus
     
     public static ReservationStatus Payed => new ReservationStatus(nameof(Payed));
 
-    public ReservationStatus(string value)
+    private ReservationStatus(string value)
     {
         Value = value;
     }
+
+    private ReservationStatus() { }
 }

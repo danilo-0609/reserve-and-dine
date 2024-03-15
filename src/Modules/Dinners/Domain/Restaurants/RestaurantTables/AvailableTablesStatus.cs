@@ -10,8 +10,10 @@ public sealed record AvailableTablesStatus
 
     public static AvailableTablesStatus Availables => new AvailableTablesStatus(nameof(Availables));
 
-    public AvailableTablesStatus(string value)
+    private AvailableTablesStatus(string value)
     {
         Value = value;
     }
+
+    private AvailableTablesStatus() { }
 }

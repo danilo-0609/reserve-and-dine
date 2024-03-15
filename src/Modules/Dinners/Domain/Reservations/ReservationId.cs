@@ -14,4 +14,6 @@ public sealed record ReservationId : AggregateRootId<Guid>
     {
         Value = value;
     }
+
+    private ReservationId() { }
 }

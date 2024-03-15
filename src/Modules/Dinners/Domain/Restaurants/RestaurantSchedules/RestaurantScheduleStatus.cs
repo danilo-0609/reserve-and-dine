@@ -8,8 +8,10 @@ public sealed record RestaurantScheduleStatus
 
     public static RestaurantScheduleStatus Closed => new RestaurantScheduleStatus(nameof(Closed));
 
-    public RestaurantScheduleStatus(string value)
+    private RestaurantScheduleStatus(string value)
     {
         Value = value;
     }
+
+    private RestaurantScheduleStatus() { }
 }

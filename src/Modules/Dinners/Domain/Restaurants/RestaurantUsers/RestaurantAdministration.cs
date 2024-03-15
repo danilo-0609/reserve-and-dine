@@ -28,4 +28,6 @@ public sealed record RestaurantAdministration
     {
         return new RestaurantAdministration(administratorId, name, administratorTitle);
     }
+
+    private RestaurantAdministration() { }
 }

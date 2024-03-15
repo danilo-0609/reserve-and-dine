@@ -10,8 +10,10 @@ public sealed record RestaurantRatingId : EntityId<Guid>
 
     public static RestaurantRatingId CreateUnique() => new RestaurantRatingId(Guid.NewGuid());
 
-    public RestaurantRatingId(Guid value)
+    private RestaurantRatingId(Guid value)
     {
         Value = value;
     }
+
+    private RestaurantRatingId() { }
 }

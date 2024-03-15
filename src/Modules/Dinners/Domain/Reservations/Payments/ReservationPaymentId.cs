@@ -14,4 +14,6 @@ public sealed record ReservationPaymentId : EntityId<Guid>
     {
         Value = value;
     }
+
+    private ReservationPaymentId() { }
 }
