@@ -2,7 +2,8 @@
 
 namespace Dinners.IntegrationEvents;
 
-public sealed record RatingPublishedIntegrationEvent(Guid IntegrationEventId,
+public sealed record RatingPublishedIntegrationEvent(
+    Guid IntegrationEventId,
     Guid RestaurantRatingId,
     Guid ClientId,
     int Stars,
