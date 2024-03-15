@@ -9,6 +9,8 @@ public interface IRestaurantRepository
 
     Task<Restaurant?> GetRestaurantById(RestaurantId restaurantId);
 
+    Task<List<string>> GetRestaurantImagesUrlById(RestaurantId restaurantId, CancellationToken cancellationToken);
+
     Task UpdateAsync(Restaurant restaurant);
 
     Task<List<RestaurantTable>> GetRestaurantTablesById(RestaurantId restaurantId, CancellationToken cancellationToken); 
