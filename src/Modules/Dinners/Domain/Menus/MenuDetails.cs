@@ -14,7 +14,7 @@ public sealed record MenuDetails
 
     public Price Price { get; private set; }
 
-    public decimal Discount {  get; private set; }
+    public decimal Discount { get; private set; }
 
     public List<Uri> MenuImagesUrl { get; private set; }
 
@@ -50,6 +50,16 @@ public sealed record MenuDetails
             primaryChefName,
             hasAlcohol,
             discountTerms);
+    }
+
+    public void AddImage(Uri imageUrl)
+    {
+        MenuImagesUrl.Add(imageUrl);
+    }
+
+    public void DeleteImage(Uri imageUrl)
+    {
+        MenuImagesUrl.Remove(imageUrl);
     }
 
     private MenuDetails(string title,
