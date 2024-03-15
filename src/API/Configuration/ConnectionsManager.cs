@@ -1,5 +1,4 @@
-﻿using Azure;
-using Azure.Identity;
+﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
 namespace API.Configuration;
