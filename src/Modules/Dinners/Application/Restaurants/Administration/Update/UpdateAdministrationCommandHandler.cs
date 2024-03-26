@@ -28,7 +28,7 @@ internal sealed class UpdateAdministrationCommandHandler : ICommandHandler<Updat
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<Unit> updateAdministrator = restaurant.UpdateAdministrator(_executionContextAccessor.UserId, 
+        var updateAdministrator = restaurant.UpdateAdministrator(_executionContextAccessor.UserId, 
             request.Name, 
             request.AdministratorTitle,
             request.AdminId);

@@ -28,7 +28,7 @@ internal sealed class DeleteAdministrationCommandHandler : ICommandHandler<Delet
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<Unit> deleteAdministrator = restaurant.DeleteAdministrator(request.AdministratorId, _executionContextAccessor.UserId);
+        var deleteAdministrator = restaurant.DeleteAdministrator(request.AdministratorId, _executionContextAccessor.UserId);
         
         if (deleteAdministrator.IsError)
         {
