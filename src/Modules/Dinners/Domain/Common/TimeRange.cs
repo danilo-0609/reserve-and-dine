@@ -2,11 +2,11 @@
 
 public sealed record TimeRange
 {
-    public TimeSpan Start   { get; set; } 
+    public DateTime Start   { get; set; } 
 
-    public TimeSpan End { get; set; }
+    public DateTime End { get; set; }
 
-    public TimeRange(TimeSpan start, TimeSpan end)
+    public TimeRange(DateTime start, DateTime end)
     {
         Start = start;
         End = end;
