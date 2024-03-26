@@ -28,7 +28,7 @@ internal sealed class OpenRestaurantCommandHandler : ICommandHandler<OpenRestaur
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<Unit> openRestaurant = restaurant.Open(_executionContextAccessor.UserId);
+        var openRestaurant = restaurant.Open(_executionContextAccessor.UserId);
 
         if (openRestaurant.IsError)
         {
