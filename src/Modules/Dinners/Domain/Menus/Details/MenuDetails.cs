@@ -1,6 +1,6 @@
 ﻿using Dinners.Domain.Common;
 
-namespace Dinners.Domain.Menus;
+namespace Dinners.Domain.Menus.Details;
 
 public sealed record MenuDetails
 {
@@ -16,9 +16,9 @@ public sealed record MenuDetails
 
     public decimal Discount { get; private set; }
 
-    public List<Uri> MenuImagesUrl { get; private set; }
+    public List<MenuImageUrl> MenuImagesUrl { get; private set; }
 
-    public List<string> Tags { get; private set; }
+    public List<Tag> Tags { get; private set; }
 
     public bool IsVegetarian { get; private set; }
 
@@ -32,7 +32,7 @@ public sealed record MenuDetails
         MenuType menuType,
         Price price,
         decimal discount,
-        List<Uri> menuImagesUrl,
+        List<string> menuImagesUrl,
         List<string> tags,
         bool isVegetarian,
         string primaryChefName,
@@ -44,22 +44,22 @@ public sealed record MenuDetails
             menuType,
             price,
             discount,
-            menuImagesUrl,
-            tags,
+            menuImagesUrl.ConvertAll(url => new MenuImageUrl(url)),
+            tags.ConvertAll(value => new Tag(value)),
             isVegetarian,
             primaryChefName,
             hasAlcohol,
             discountTerms);
     }
 
-    public void AddImage(Uri imageUrl)
+    public void AddImage(string imageUrl)
     {
-        MenuImagesUrl.Add(imageUrl);
+        MenuImagesUrl.Add(new MenuImageUrl(imageUrl));
     }
 
-    public void DeleteImage(Uri imageUrl)
+    public void DeleteImage(string imageUrl)
     {
-        MenuImagesUrl.Remove(imageUrl);
+        MenuImagesUrl.Remove(new MenuImageUrl(imageUrl));
     }
 
     private MenuDetails(string title,
@@ -67,8 +67,8 @@ public sealed record MenuDetails
         MenuType menuType,
         Price price,
         decimal discount,
-        List<Uri> menuImagesUrl,
-        List<string> tags,
+        List<MenuImageUrl> menuImagesUrl,
+        List<Tag> tags,
         bool isVegetarian,
         string primaryChefName,
         bool hasAlcohol,

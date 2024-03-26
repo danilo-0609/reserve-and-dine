@@ -1,8 +1,8 @@
-﻿namespace Dinners.Domain.Menus;
+﻿namespace Dinners.Domain.Menus.Dishes;
 
 public sealed record DishSpecification
 {
-    public List<string> Ingredients { get; private set; }
+    public List<Ingredient> Ingredients { get; private set; }
 
     public string MainCourse { get; private set; }
 
@@ -31,7 +31,7 @@ public sealed record DishSpecification
         string condiments = "",
         string coffee = "")
     {
-        return new DishSpecification(ingredients,
+        return new DishSpecification(ingredients.ConvertAll(value => new Ingredient(value)),
             mainCourse,
             sideDishes,
             appetizers,
@@ -42,14 +42,14 @@ public sealed record DishSpecification
             coffee);
     }
 
-    private DishSpecification(List<string> ingredients, 
-        string mainCourse, 
-        string sideDishes, 
-        string appetizers, 
-        string beverages, 
-        string desserts, 
-        string sauces, 
-        string condiments, 
+    private DishSpecification(List<Ingredient> ingredients,
+        string mainCourse,
+        string sideDishes,
+        string appetizers,
+        string beverages,
+        string desserts,
+        string sauces,
+        string condiments,
         string coffee)
     {
         Ingredients = ingredients;

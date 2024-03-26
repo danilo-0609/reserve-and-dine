@@ -1,7 +1,10 @@
 ﻿using BuildingBlocks.Domain.AggregateRoots;
 using Dinners.Domain.Common;
+using Dinners.Domain.Menus.Details;
+using Dinners.Domain.Menus.Dishes;
 using Dinners.Domain.Menus.Events;
 using Dinners.Domain.Menus.MenuReviews;
+using Dinners.Domain.Menus.Schedules;
 using Dinners.Domain.Restaurants;
 using ErrorOr;
 
@@ -60,7 +63,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         MenuType menuType,
         Price price,
         decimal discount,
-        List<Uri> menuImagesUrl,
+        List<string> menuImagesUrl,
         List<string> tags,
         bool isVegetarian,
         string primaryChefName,

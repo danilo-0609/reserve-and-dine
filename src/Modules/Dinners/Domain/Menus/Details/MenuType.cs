@@ -1,4 +1,4 @@
-﻿namespace Dinners.Domain.Menus;
+﻿namespace Dinners.Domain.Menus.Details;
 
 public sealed record MenuType
 {
