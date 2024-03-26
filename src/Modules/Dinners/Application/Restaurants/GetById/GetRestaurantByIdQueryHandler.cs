@@ -27,8 +27,8 @@ internal sealed class GetRestaurantByIdQueryHandler : IQueryHandler<GetRestauran
         var restaurantInformationResponse = new RestaurantInformationResponse(restaurant.RestaurantInformation.Title,
             restaurant.RestaurantInformation.Description,
             restaurant.RestaurantInformation.Type,
-            restaurant.RestaurantInformation.Chefs,
-            restaurant.RestaurantInformation.Specialties);
+            restaurant.RestaurantInformation.Chefs.ToList().ConvertAll(chef => chef.Value),
+            restaurant.RestaurantInformation.Specialties.ToList().ConvertAll(speciality => speciality.Value));
 
         var restaurantLocalizationResponse = new RestaurantLocalizationResponse(restaurant.RestaurantLocalization.Country,
             restaurant.RestaurantLocalization.City,
@@ -37,9 +37,13 @@ internal sealed class GetRestaurantByIdQueryHandler : IQueryHandler<GetRestauran
             restaurant.RestaurantLocalization.Addresss,
             restaurant.RestaurantLocalization.LocalizationDetails);
 
-        var restaurantScheduleResponse = new RestaurantScheduleResponse(restaurant.RestaurantSchedule.Days,
-            restaurant.RestaurantSchedule.HoursOfOperation.Start,
-            restaurant.RestaurantSchedule.HoursOfOperation.End);
+        var restaurantSchedulesResponse = restaurant.RestaurantSchedules.ToList().ConvertAll(schedule =>
+        {
+            return new RestaurantScheduleResponse(schedule.Day.DayOfWeek,
+                schedule.HoursOfOperation.Start,
+                schedule.HoursOfOperation.End,
+                schedule.ReopeningTime);
+        });
 
         var restaurantContactResponse = new RestaurantContactResponse(restaurant.RestaurantContact.Email,
             restaurant.RestaurantContact.Whatsapp,
@@ -75,7 +79,7 @@ internal sealed class GetRestaurantByIdQueryHandler : IQueryHandler<GetRestauran
             restaurantInformationResponse,
             restaurantLocalizationResponse,
             restaurant.RestaurantScheduleStatus.Value,
-            restaurantScheduleResponse,
+            restaurantSchedulesResponse,
             restaurantContactResponse,
             restaurantClientsResponse,
             restaurantTablesResponse,

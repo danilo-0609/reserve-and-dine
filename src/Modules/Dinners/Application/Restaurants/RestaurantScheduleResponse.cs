@@ -1,5 +1,6 @@
 ﻿namespace Dinners.Application.Restaurants;
 
-public sealed record RestaurantScheduleResponse(List<DayOfWeek> Days,
-    TimeSpan Open,
-    TimeSpan Close);
+public sealed record RestaurantScheduleResponse(DayOfWeek Day,
+    DateTime Open,
+    DateTime Close,
+    DateTime? ReopeningTime);
