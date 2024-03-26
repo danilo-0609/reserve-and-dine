@@ -24,7 +24,7 @@ internal sealed class CancelReservationCommandHandler : ICommandHandler<CancelRe
             return ReservationErrorsCodes.NotFound;
         }
 
-        ErrorOr<Unit> cancelReservation = reservation.Cancel();
+        var cancelReservation = reservation.Cancel();
 
         if (cancelReservation.IsError)
         {
