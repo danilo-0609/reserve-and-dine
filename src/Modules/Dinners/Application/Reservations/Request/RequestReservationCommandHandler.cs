@@ -4,7 +4,6 @@ using Dinners.Domain.Menus;
 using Dinners.Domain.Reservations;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
-using Dinners.Domain.Restaurants.RestaurantTables;
 using ErrorOr;
 
 namespace Dinners.Application.Reservations.Request;
@@ -24,43 +23,41 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
 
     public async Task<ErrorOr<Guid>> Handle(RequestReservationCommand request, CancellationToken cancellationToken)
     {
-        bool restaurant = await _restaurantRepository.ExistsAsync(RestaurantId.Create(request.RestaurantId));
+        var restaurant = await _restaurantRepository.GetRestaurantById(RestaurantId.Create(request.RestaurantId));
 
-        if (restaurant is false)
+        if (restaurant is null)
         {
             return RestaurantErrorCodes.NotFound;
         }
 
-        List<RestaurantTable> restaurantTables = await _restaurantRepository.GetRestaurantTablesById(RestaurantId.Create(request.RestaurantId), cancellationToken);
-
         var reservationInformation = ReservationInformation.Create(request.ReservedTable,
             request.Price,
             request.Currency,
-            request.Start,
-            request.End,
-            request.ReservationDateTime);
+            request.StartReservationDateTime.TimeOfDay,
+            request.EndReservationDateTime.TimeOfDay,
+            request.StartReservationDateTime);
 
         var reservationAttendees = ReservationAttendees.Create(_executionContextAccessor.UserId,
             request.Name,
             request.NumberOfAttendees);
 
-        if (!restaurantTables.Any(r => r.Number == reservationInformation.ReservedTable))
+        if (!restaurant.RestaurantTables.Any(r => r.Number == reservationInformation.ReservedTable))
         {
             return Error.NotFound("Reservation.TableNotFound", "The table was not found");
         }
 
-        List<int> availableTables = restaurantTables
+        List<int> availableTables = restaurant.RestaurantTables
             .Where(r => !r.ReservedHours
-                .ContainsKey(reservationInformation.ReservationDateTime)
-                || r.ReservedHours
-                    .Values
-                    .Any(t => t.Start.Hours <= reservationInformation.ReservationDateTime.Hour
-                     && t.End.Hours >= reservationInformation.ReservationDateTime.Hour))
-            .Select(r => r.Number).ToList();
+                .Any(
+                    t => t.ReservationDateTime.Date == reservationInformation.ReservationDateTime.Date &&
+                         t.ReservationTimeRange.Start <= reservationInformation.ReservationDateTime &&
+                         t.ReservationTimeRange.End > reservationInformation.ReservationDateTime))
+            .Select(r => r.Number)
+            .ToList();
 
         var reservation = Reservation.Request(reservationInformation,
             availableTables,   
-            restaurantTables.Where(g => g.Number == reservationInformation.ReservedTable)
+            restaurant.RestaurantTables.Where(g => g.Number == reservationInformation.ReservedTable)
                             .Select(g => g.Seats)
                             .SingleOrDefault(),
             RestaurantId.Create(request.RestaurantId),
@@ -72,7 +69,17 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
             return reservation.FirstError;
         }
 
+        var restaurantTableReservation = restaurant
+            .ReserveTable(request.ReservedTable, 
+                   new Domain.Common.TimeRange(request.StartReservationDateTime, request.EndReservationDateTime));
+        
+        if (restaurantTableReservation.IsError)
+        {
+            return restaurantTableReservation.FirstError;
+        }
+
         await _reservationRepository.AddAsync(reservation.Value, cancellationToken);
+        await _restaurantRepository.UpdateAsync(restaurant);
 
         return reservation.Value.Id.Value;
     }
