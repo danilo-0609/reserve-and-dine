@@ -35,14 +35,23 @@ public static class RestaurantErrorCodes
     public static Error CannotReserveIfTableIsReserved =>
         Error.Validation("Restaurant.CannotReserveIfTableIsReserved", TableCannotBeReservedWhenTableIsReservedNowRule.Message);
 
+    public static Error CannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTime =>
+        Error.Validation("Table.CannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTime", TableCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTimeNowRule.Message);
+
     public static Error EqualAvailableTableStatus =>
         Error.Validation("Restaurant.EqualAvailableTableStatus", "The current available table status is equal than the status requested. Cannot change.");
 
-    public static Error CannotReserveWhenRestaurantIsClosed =>
-        Error.Validation("Restaurant.CannotReserveWhenScheduleStatusIsClosed", TableCannotReserveWhenRestaurantIsClosedRule.Message);
+    public static Error CannotReserveWhenTimeOfReservationIsOutOfSchedule =>
+        Error.Validation("Restaurant.CannotReserveWhenTimeOfReservationIsOutOfSchedule", CannotReserveWhenTimeOfReservationIsOutOfScheduleRule.Message);
+
+    public static Error CannotReserveWhenRestaurantHasClosedOutOfSchedule =>
+        Error.Validation("Restaurant.CannotReserveWhenRestaurantHasClosedOutOfSchedule", CannotReserveWhenRestaurantHasClosedOutOfScheduleRule.Message);
 
     public static Error TableIsNotFree =>
-        Error.Validation("Restaurant.TableIsNotFree", TableMustNotBeOccuppiedToAssistRule.Message);
+        Error.Validation("Restaurant.TableIsNotFree", TableMustNotBeOccupiedToAssistRule.Message);
+
+    public static Error CannotFreeTableWhenTableIsNotOccupied =>
+        Error.Validation("Restaurant.CannotFreeTableWhenTableIsNotOccupied", CannotFreeTableWhenTableIsNotOccupiedRule.Message);
 
     public static Error RateWhenUserIsAdministrator =>
         Error.Validation("Restaurant.RateWhenUserIsAdministrator", CannotRateWhenUserIsAdministratorRule.Message);
