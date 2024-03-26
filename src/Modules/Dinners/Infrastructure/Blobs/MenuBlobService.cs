@@ -51,14 +51,14 @@ internal sealed class MenuBlobService : IMenuBlobService
         }
     }
 
-    public async Task<Uri> UploadFileBlobAsync(string filePath, string fileName)
+    public async Task<string> UploadFileBlobAsync(string filePath, string fileName)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(ContainerName);
 
         var blobClient = containerClient.GetBlobClient(fileName);
 
-        await blobClient.UploadAsync(filePath, true);
+        var response = await blobClient.UploadAsync(filePath, true);
 
-        return new Uri(fileName);
+        return blobClient.Uri.ToString();
     }
 }

@@ -51,7 +51,7 @@ internal sealed class RestaurantBlobService : IRestaurantBlobService
         }
     }
 
-    public async Task<Uri> UploadFileBlobAsync(string filePath, string fileName)
+    public async Task<string> UploadFileBlobAsync(string filePath, string fileName)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(ContainerName);
 
@@ -59,6 +59,6 @@ internal sealed class RestaurantBlobService : IRestaurantBlobService
 
         await blobClient.UploadAsync(filePath, true);
 
-        return new Uri(fileName);
+        return blobClient.Uri.ToString();
     }
 }
