@@ -6,7 +6,7 @@ public interface IRestaurantBlobService
 {
     public Task<BlobObject?> GetBlobAsync(string name);
 
-    public Task<Uri> UploadFileBlobAsync(string filePath, string fileName);
+    public Task<string> UploadFileBlobAsync(string filePath, string fileName);
 
     public Task DeleteBlobAsync(string name);
 }
