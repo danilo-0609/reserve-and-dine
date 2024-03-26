@@ -2,12 +2,12 @@ version: '3.4'
 
 services:
   api:
-    image: ${DOCKER_REGISTRY-}api
+    image: reservationscontainerregistry.azurecr.io/api
     build:
       context: .
       dockerfile: API/Dockerfile
     ports: 
-      - "5000:5000"
+      - "80:80"
       - "5001:5001"
     depends_on: 
         - "reservations.database"
@@ -23,5 +23,3 @@ services:
         - "1433:1433"
       environment:
         ACCEPT_EULA: "Y"
-        SA_PASSWORD: "SqlP@ssword123"
-        
