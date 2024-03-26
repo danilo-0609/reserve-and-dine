@@ -4,9 +4,9 @@ using API.Modules.Dinners.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 //Presentation service
+
 builder.Services.AddPresentation(await ConnectionsManager.GetAzureBlobStorageConnectionString());
 
 //Modules services
