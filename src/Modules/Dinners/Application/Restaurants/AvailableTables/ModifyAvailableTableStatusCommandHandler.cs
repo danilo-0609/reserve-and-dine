@@ -26,7 +26,7 @@ internal sealed class ModifyAvailableTableStatusCommandHandler : ICommandHandler
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<AvailableTablesStatus> availableTablesStatus = restaurant.ModifyAvailableTableStatus(
+        var availableTablesStatus = restaurant.ModifyAvailableTablesStatus(
             GetAvailableTableStatus(request.AvailableTableStatus));
 
         if (availableTablesStatus.IsError)

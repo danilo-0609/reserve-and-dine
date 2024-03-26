@@ -28,7 +28,7 @@ internal sealed class CloseRestaurantCommandHandler : ICommandHandler<CloseResta
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<RestaurantScheduleStatus> closeRestaurant = restaurant.Close(_executionContextAccessor.UserId);
+        var closeRestaurant = restaurant.Close(_executionContextAccessor.UserId);
 
         if (closeRestaurant.IsError)
         {
