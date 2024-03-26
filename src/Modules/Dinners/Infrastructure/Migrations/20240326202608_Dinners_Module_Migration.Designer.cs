@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dinners.Infrastructure.Migrations
 {
     [DbContext(typeof(DinnersDbContext))]
-    [Migration("20240320220121_Dinners_Module_Migration")]
+    [Migration("20240326202608_Dinners_Module_Migration")]
     partial class Dinners_Module_Migration
     {
         /// <inheritdoc />
@@ -615,7 +615,7 @@ namespace Dinners.Infrastructure.Migrations
                                         .HasForeignKey("MenuId");
                                 });
 
-                            b1.OwnsOne("Dinners.Domain.Common.TimeRange", "AvailableMenuHours", b2 =>
+                            b1.OwnsOne("Dinners.Domain.Menus.Schedules.TimeRange", "AvailableMenuHours", b2 =>
                                 {
                                     b2.Property<Guid>("MenuScheduleMenuId")
                                         .HasColumnType("uniqueidentifier");
@@ -754,7 +754,7 @@ namespace Dinners.Infrastructure.Migrations
                                         .HasForeignKey("ReservationInformationReservationId");
                                 });
 
-                            b1.OwnsOne("Dinners.Domain.Common.TimeRange", "TimeOfReservation", b2 =>
+                            b1.OwnsOne("Dinners.Domain.Reservations.TimeRange", "TimeOfReservation", b2 =>
                                 {
                                     b2.Property<Guid>("ReservationInformationReservationId")
                                         .HasColumnType("uniqueidentifier");
@@ -897,9 +897,9 @@ namespace Dinners.Infrastructure.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
 
-                            b1.Property<bool>("IsOccuppied")
+                            b1.Property<bool>("IsOccupied")
                                 .HasColumnType("bit")
-                                .HasColumnName("IsOccuppied");
+                                .HasColumnName("IsOccupied");
 
                             b1.Property<bool>("IsPremium")
                                 .HasColumnType("bit")
@@ -950,6 +950,10 @@ namespace Dinners.Infrastructure.Migrations
                                         .HasColumnType("datetime2")
                                         .HasColumnName("ReservationDateTime");
 
+                                    b2.Property<Guid>("RestaurantId")
+                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnName("RestaurantId");
+
                                     b2.HasKey("RestaurantTableNumberOfTable", "RestaurantTableId", "Id");
 
                                     b2.ToTable("ReservedHour", "dinners");
@@ -968,12 +972,12 @@ namespace Dinners.Infrastructure.Migrations
                                             b3.Property<int>("ReservedHourId")
                                                 .HasColumnType("int");
 
-                                            b3.Property<TimeSpan>("End")
-                                                .HasColumnType("time")
+                                            b3.Property<DateTime>("End")
+                                                .HasColumnType("datetime2")
                                                 .HasColumnName("EndReservationTimeRange");
 
-                                            b3.Property<TimeSpan>("Start")
-                                                .HasColumnType("time")
+                                            b3.Property<DateTime>("Start")
+                                                .HasColumnType("datetime2")
                                                 .HasColumnName("StartReservationTimeRange");
 
                                             b3.HasKey("ReservedHourRestaurantTableNumberOfTable", "ReservedHourRestaurantTableId", "ReservedHourId");
@@ -1193,39 +1197,46 @@ namespace Dinners.Infrastructure.Migrations
                                 .HasForeignKey("RestaurantId");
                         });
 
-                    b.OwnsOne("Dinners.Domain.Restaurants.RestaurantSchedules.RestaurantSchedule", "RestaurantSchedule", b1 =>
+                    b.OwnsMany("Dinners.Domain.Restaurants.RestaurantSchedules.RestaurantSchedule", "RestaurantSchedules", b1 =>
                         {
                             b1.Property<Guid>("RestaurantId")
                                 .HasColumnType("uniqueidentifier");
 
-                            b1.HasKey("RestaurantId");
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
 
-                            b1.ToTable("Restaurants", "dinners");
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<DateTime?>("ReopeningTime")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("ReopeningTime");
+
+                            b1.HasKey("RestaurantId", "Id");
+
+                            b1.ToTable("RestaurantSchedule", "dinners");
 
                             b1.WithOwner()
                                 .HasForeignKey("RestaurantId");
 
-                            b1.OwnsMany("Dinners.Domain.Restaurants.RestaurantSchedules.DayOfOperation", "Days", b2 =>
+                            b1.OwnsOne("Dinners.Domain.Restaurants.RestaurantSchedules.DayOfOperation", "Day", b2 =>
                                 {
-                                    b2.Property<Guid>("RestaurantId")
+                                    b2.Property<Guid>("RestaurantScheduleRestaurantId")
                                         .HasColumnType("uniqueidentifier");
 
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
+                                    b2.Property<int>("RestaurantScheduleId")
                                         .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
 
                                     b2.Property<int>("DayOfWeek")
                                         .HasColumnType("int")
-                                        .HasColumnName("DayOfOperation");
+                                        .HasColumnName("DayOfWeek");
 
-                                    b2.HasKey("RestaurantId", "Id");
+                                    b2.HasKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
 
-                                    b2.ToTable("DaysOfOperation", "dinners");
+                                    b2.ToTable("RestaurantSchedule", "dinners");
 
                                     b2.WithOwner()
-                                        .HasForeignKey("RestaurantId");
+                                        .HasForeignKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
                                 });
 
                             b1.OwnsOne("Dinners.Domain.Common.TimeRange", "HoursOfOperation", b2 =>
@@ -1233,23 +1244,27 @@ namespace Dinners.Infrastructure.Migrations
                                     b2.Property<Guid>("RestaurantScheduleRestaurantId")
                                         .HasColumnType("uniqueidentifier");
 
-                                    b2.Property<TimeSpan>("End")
-                                        .HasColumnType("time")
-                                        .HasColumnName("ClosingTime");
+                                    b2.Property<int>("RestaurantScheduleId")
+                                        .HasColumnType("int");
 
-                                    b2.Property<TimeSpan>("Start")
-                                        .HasColumnType("time")
-                                        .HasColumnName("OpeningTime");
+                                    b2.Property<DateTime>("End")
+                                        .HasColumnType("datetime2")
+                                        .HasColumnName("CloseTime");
 
-                                    b2.HasKey("RestaurantScheduleRestaurantId");
+                                    b2.Property<DateTime>("Start")
+                                        .HasColumnType("datetime2")
+                                        .HasColumnName("OpenTime");
 
-                                    b2.ToTable("Restaurants", "dinners");
+                                    b2.HasKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
+
+                                    b2.ToTable("RestaurantSchedule", "dinners");
 
                                     b2.WithOwner()
-                                        .HasForeignKey("RestaurantScheduleRestaurantId");
+                                        .HasForeignKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
                                 });
 
-                            b1.Navigation("Days");
+                            b1.Navigation("Day")
+                                .IsRequired();
 
                             b1.Navigation("HoursOfOperation")
                                 .IsRequired();
@@ -1367,11 +1382,10 @@ namespace Dinners.Infrastructure.Migrations
                     b.Navigation("RestaurantLocalization")
                         .IsRequired();
 
-                    b.Navigation("RestaurantSchedule")
-                        .IsRequired();
-
                     b.Navigation("RestaurantScheduleStatus")
                         .IsRequired();
+
+                    b.Navigation("RestaurantSchedules");
 
                     b.Navigation("RestaurantTables");
                 });

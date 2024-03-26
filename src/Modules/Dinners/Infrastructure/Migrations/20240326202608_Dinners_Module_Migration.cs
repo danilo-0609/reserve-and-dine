@@ -12,7 +12,7 @@ namespace Dinners.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "dinners");
+     name: "dinners");
 
             migrationBuilder.CreateTable(
                 name: "DinnersOutboxMessages",
@@ -144,17 +144,6 @@ namespace Dinners.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RestaurantRatingId",
-                columns: table => new
-                {
-                    Value = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RestaurantRatingId", x => x.Value);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Restaurants",
                 schema: "dinners",
                 columns: table => new
@@ -172,8 +161,6 @@ namespace Dinners.Infrastructure.Migrations
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LocalizationDetails = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RestaurantScheduleStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OpeningTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    ClosingTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Whatsapp = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Facebook = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -367,39 +354,19 @@ namespace Dinners.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DaysOfOperation",
-                schema: "dinners",
-                columns: table => new
-                {
-                    RestaurantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DayOfOperation = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DaysOfOperation", x => x.RestaurantId);
-                    table.ForeignKey(
-                        name: "FK_DaysOfOperation_Restaurants_RestaurantId",
-                        column: x => x.RestaurantId,
-                        principalSchema: "dinners",
-                        principalTable: "Restaurants",
-                        principalColumn: "RestaurantId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RestaurantTables",
                 schema: "dinners",
                 columns: table => new
                 {
-                    RestaurantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RestaurantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     NumberOfTable = table.Column<int>(type: "int", nullable: false),
                     Seats = table.Column<int>(type: "int", nullable: false),
                     IsPremium = table.Column<bool>(type: "bit", nullable: false),
-                    IsOccuppied = table.Column<bool>(type: "bit", nullable: false)
+                    IsOccupied = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RestaurantTables", x => x.NumberOfTable);
+                    table.PrimaryKey("PK_RestaurantTables", x => new { x.RestaurantId, x.NumberOfTable });
                     table.ForeignKey(
                         name: "FK_RestaurantTables_Restaurants_RestaurantId",
                         column: x => x.RestaurantId,
@@ -478,13 +445,36 @@ namespace Dinners.Infrastructure.Migrations
                 columns: table => new
                 {
                     RestaurantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RatingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    RatingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RestaurantRatings", x => new { x.RestaurantId, x.RatingId });
                     table.ForeignKey(
                         name: "FK_RestaurantRatings_Restaurants_RestaurantId",
+                        column: x => x.RestaurantId,
+                        principalSchema: "dinners",
+                        principalTable: "Restaurants",
+                        principalColumn: "RestaurantId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RestaurantSchedule",
+                schema: "dinners",
+                columns: table => new
+                {
+                    RestaurantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReopeningTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RestaurantSchedule", x => x.RestaurantId);
+                    table.ForeignKey(
+                        name: "FK_RestaurantSchedule_Restaurants_RestaurantId",
                         column: x => x.RestaurantId,
                         principalSchema: "dinners",
                         principalTable: "Restaurants",
@@ -513,24 +503,25 @@ namespace Dinners.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReservedHour",
+                name: "ReservedHours",
                 schema: "dinners",
                 columns: table => new
                 {
                     ReservationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartReservationTimeRange = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndReservationTimeRange = table.Column<TimeSpan>(type: "time", nullable: false),
-                    NumberOfTable = table.Column<int>(type: "int", nullable: false)
+                    StartReservationTimeRange = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndReservationTimeRange = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NumberOfTable = table.Column<int>(type: "int", nullable: false),
+                    RestaurantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReservedHour", x => new { x.NumberOfTable});
+                    table.PrimaryKey("PK_ReservedHours", x => new { x.RestaurantId, x.NumberOfTable });
                     table.ForeignKey(
-                        name: "FK_ReservedHour_ReservedHours_RestaurantTableNumberOfTable_RestaurantTableNumber",
-                        column: x =>  x.NumberOfTable,
+                        name: "FK_ReservedHours_RestaurantTables_RestaurantId_NumberOfTable",
+                        columns: x => new { x.RestaurantId, x.NumberOfTable },
                         principalSchema: "dinners",
                         principalTable: "RestaurantTables",
-                        principalColumn: "NumberOfTable",
+                        principalColumns: new[] { "RestaurantId", "NumberOfTable" },
                         onDelete: ReferentialAction.Cascade);
                 });
         }
@@ -544,10 +535,6 @@ namespace Dinners.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "DaysAvailable",
-                schema: "dinners");
-
-            migrationBuilder.DropTable(
-                name: "DaysOfOperation",
                 schema: "dinners");
 
             migrationBuilder.DropTable(
@@ -604,6 +591,10 @@ namespace Dinners.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "RestaurantRatings",
+                schema: "dinners");
+
+            migrationBuilder.DropTable(
+                name: "RestaurantSchedule",
                 schema: "dinners");
 
             migrationBuilder.DropTable(
