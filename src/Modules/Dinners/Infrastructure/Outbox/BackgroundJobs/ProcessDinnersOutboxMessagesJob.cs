@@ -13,17 +13,14 @@ internal sealed class ProcessDinnersOutboxMessagesJob : IJob
     private readonly DinnersDbContext _dbContext;
     private readonly IPublisher _publisher;
     private readonly ILogger<ProcessDinnersOutboxMessagesJob> _logger;
-    private readonly CancellationToken _cancellationToken;
-
+    
     public ProcessDinnersOutboxMessagesJob(DinnersDbContext dinnersDbContext, 
         IPublisher publisher, 
-        ILogger<ProcessDinnersOutboxMessagesJob> logger, 
-        CancellationToken cancellationToken)
+        ILogger<ProcessDinnersOutboxMessagesJob> logger)
     {
         _dbContext = dinnersDbContext;
         _publisher = publisher;
         _logger = logger;
-        _cancellationToken = cancellationToken;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -59,7 +56,7 @@ internal sealed class ProcessDinnersOutboxMessagesJob : IJob
                     domainEvent.GetType().FullName,
                     DateTime.UtcNow);
 
-                await _publisher.Publish(domainEvent, _cancellationToken);
+                await _publisher.Publish(domainEvent);
             }
             catch (Exception ex)
             {
@@ -69,6 +66,6 @@ internal sealed class ProcessDinnersOutboxMessagesJob : IJob
             message.ProcessedOnUtc = DateTime.UtcNow;
         }
 
-        await _dbContext.SaveChangesAsync(_cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 }

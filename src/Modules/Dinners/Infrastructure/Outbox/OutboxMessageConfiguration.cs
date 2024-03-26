@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dinners.Domain.Restaurants;
+using Domain.Restaurants;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Dinners.Infrastructure.Outbox;
 
@@ -28,7 +31,7 @@ internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outb
             .HasColumnName("ProcessedOn");
 
         builder.Property(x => x.Error)
-             .IsRequired(false)
-             .HasColumnName("ProcessedOn");
+        .IsRequired(false)
+             .HasColumnName("Error");
     }
 }
