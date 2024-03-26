@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.AggregateRoots;
+using BuildingBlocks.Domain.Results;
 using Dinners.Domain.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
@@ -21,6 +22,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     private readonly List<RestaurantClient> _restaurantClients = new();
     private readonly List<RestaurantTable> _restaurantTables = new();
     private readonly List<RestaurantAdministration> _restaurantAdministrations = new();
+    private readonly List<RestaurantSchedule> _restaurantSchedules = new();
 
     public new RestaurantId Id { get; private set; }
 
@@ -34,9 +36,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
     public RestaurantScheduleStatus RestaurantScheduleStatus { get; private set; }
 
-    public RestaurantSchedule RestaurantSchedule { get; private set; }
-
     public RestaurantContact RestaurantContact { get; private set; }
+
+    public IReadOnlyList<RestaurantSchedule> RestaurantSchedules => _restaurantSchedules.AsReadOnly();
 
     public IReadOnlyList<RestaurantRatingId> RestaurantRatingIds => _ratingIds.AsReadOnly();
 
@@ -49,19 +51,20 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     public DateTime PostedAt { get; private set; }
 
 
-    public static Restaurant Post(RestaurantInformation restaurantInformation,
+    public static Restaurant Post(RestaurantId restaurantId,
+        RestaurantInformation restaurantInformation,
         RestaurantLocalization restaurantLocalization,
-        RestaurantSchedule restaurantSchedule,
+        List<RestaurantSchedule> restaurantSchedules,
         RestaurantContact restaurantContact,
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
         DateTime postedAt)
     {
-        var restaurant = new Restaurant(RestaurantId.CreateUnique(),
+        var restaurant = new Restaurant(restaurantId,
             restaurantTables.Count,
             restaurantInformation,
             restaurantLocalization,
-            restaurantSchedule,
+            restaurantSchedules,
             restaurantContact,
             restaurantTables,
             restaurantAdministrations,
@@ -82,7 +85,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantInformation restaurantInformation,
         RestaurantLocalization restaurantLocalization,
         RestaurantScheduleStatus restaurantScheduleStatus,
-        RestaurantSchedule restaurantSchedule,
+        List<RestaurantSchedule> restaurantSchedules,
         RestaurantContact restaurantContact,
         List<RestaurantRatingId> ratingIds,
         List<RestaurantClient> restaurantClients,
@@ -95,7 +98,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             restaurantInformation,
             restaurantLocalization,
             restaurantScheduleStatus,
-            restaurantSchedule,
+            restaurantSchedules,
             restaurantContact,
             ratingIds,
             restaurantClients,
@@ -133,8 +136,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return ratingOperation.Value;
     }
 
-    public ErrorOr<RestaurantScheduleStatus> Close(
-        Guid userId)
+    public ErrorOr<SuccessOperation> Close(Guid userId)
     {
         var canChangeRestaurantScheduleStatusRule = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(RestaurantAdministrations.ToList(), userId));
 
@@ -152,11 +154,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         RestaurantScheduleStatus = RestaurantScheduleStatus.Closed;
 
-        return RestaurantScheduleStatus.Closed;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> Open(
-        Guid userId)
+    public ErrorOr<SuccessOperation> Open(Guid userId)
     {
         var canOpenRule = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(RestaurantAdministrations.ToList(), userId));
 
@@ -174,10 +175,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         RestaurantScheduleStatus = RestaurantScheduleStatus.Opened;
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> AddTable(Guid userId,
+    public ErrorOr<SuccessOperation> AddTable(Guid userId,
         int number,
         int seats,
         bool isPremium)
@@ -194,18 +195,18 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.CannotAddTableWithDuplicateNumber;
         }
 
-        RestaurantTable restaurantTable = RestaurantTable.Create(number, 
+        RestaurantTable restaurantTable = RestaurantTable.Create(Id,
+            number, 
             seats, 
             isPremium, 
-            new Dictionary<DateTime, TimeRange>());
+            new List<ReservedHour>());
 
         _restaurantTables.Add(restaurantTable);
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> DeleteTable(Guid userId,
-        int number)
+    public ErrorOr<SuccessOperation> DeleteTable(Guid userId, int number)
     {
         var canDeleteTable = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
     
@@ -223,10 +224,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         _restaurantTables.Remove(table!);
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> UpgradeTable(Guid userId,
+    public ErrorOr<SuccessOperation> UpgradeTable(Guid userId,
         int number,
         int seats,
         bool isPremium)
@@ -247,27 +248,11 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             .SingleOrDefault()!
             .Upgrade(number, seats, isPremium);
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<RestaurantTable> ReserveTable(int tableNumber,
-        TimeRange reservationTimeRange,
-        DateTime reservationDateTimeRequested)
+    public ErrorOr<SuccessOperation> ReserveTable(int tableNumber, TimeRange reservationTimeRange)
     {
-        var isRestaurantOpenToReserve = CheckRule(new TableCannotReserveWhenRestaurantIsClosedRule(RestaurantSchedule, reservationTimeRange, reservationDateTimeRequested));
-
-        if (isRestaurantOpenToReserve.IsError)
-        {
-            return isRestaurantOpenToReserve.FirstError;
-        }
-
-        var cannotBeReservedWhenItWillBeOcuppiedRule = CheckRule(new TableCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTimeNowRule(_restaurantTables, reservationDateTimeRequested, reservationTimeRange));
-
-        if (cannotBeReservedWhenItWillBeOcuppiedRule.IsError)
-        {
-            return cannotBeReservedWhenItWillBeOcuppiedRule.FirstError;
-        }
-
         RestaurantTable? table = _restaurantTables
             .Where(r => r.Number == tableNumber)
             .SingleOrDefault();
@@ -277,12 +262,37 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        table.Reserve(reservationDateTimeRequested, reservationTimeRange);
+        var currentDaySchedule = RestaurantSchedules
+            .Where(r => r.Day.DayOfWeek == DateTime.Now.DayOfWeek)
+            .Single();
 
-        return table;
+        var isRequestedTimeInRestaurantSchedule = CheckRule(new CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(currentDaySchedule, reservationTimeRange));
+
+        if (isRequestedTimeInRestaurantSchedule.IsError)
+        {
+            return isRequestedTimeInRestaurantSchedule.FirstError;
+        }
+
+        var isRestaurantCloseOutOfNormalSchedule = CheckRule(new CannotReserveWhenRestaurantHasClosedOutOfScheduleRule(currentDaySchedule, RestaurantScheduleStatus, reservationTimeRange));
+
+        if (isRestaurantCloseOutOfNormalSchedule.IsError)
+        {
+            return isRestaurantCloseOutOfNormalSchedule.FirstError;
+        }
+
+        var cannotBeReservedWhenItWillBeOcuppiedRule = CheckRule(new TableCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTimeNowRule(_restaurantTables, reservationTimeRange));
+
+        if (cannotBeReservedWhenItWillBeOcuppiedRule.IsError)
+        {
+            return cannotBeReservedWhenItWillBeOcuppiedRule.FirstError;
+        }
+
+        table.Reserve(reservationTimeRange.Start, reservationTimeRange);
+
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<RestaurantTable> CancelReservation(int tableNumber, DateTime reservationDateTime)
+    public ErrorOr<SuccessOperation> CancelReservation(int tableNumber, DateTime reservationDateTime)
     {
         RestaurantTable? table = _restaurantTables
             .Where(r => r.Number == tableNumber)
@@ -295,10 +305,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         table.CancelReservation(reservationDateTime);
 
-        return table;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<RestaurantTable> OccupyTable(int tableNumber)
+    public ErrorOr<SuccessOperation> OccupyTable(int tableNumber)
     {
         RestaurantTable? table = _restaurantTables
            .Where(r => r.Number == tableNumber)
@@ -309,7 +319,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        var isTableFree = CheckRule(new TableMustNotBeOccuppiedToAssistRule(table.IsOccuppied));
+        var isTableFree = CheckRule(new TableMustNotBeOccupiedToAssistRule(table.IsOccupied));
 
         if (isTableFree.IsError)
         {
@@ -318,10 +328,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         table.OccupyTable();
 
-        return table;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<RestaurantTable> FreeTable(int tableNumber)
+    public ErrorOr<SuccessOperation> FreeTable(int tableNumber)
     {
         RestaurantTable? table = _restaurantTables
             .Where(r => r.Number == tableNumber)
@@ -332,9 +342,16 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
+        var cannotFreeTableWhenTableIsNotOccupied = CheckRule(new CannotFreeTableWhenTableIsNotOccupiedRule(table.IsOccupied));
+
+        if (cannotFreeTableWhenTableIsNotOccupied.IsError)
+        {
+            return cannotFreeTableWhenTableIsNotOccupied.FirstError;
+        }
+
         table.FreeTable();
 
-        return table;
+        return SuccessOperation.Code;
     }
 
     public RestaurantClient AddRestaurantClient(Guid clientId)
@@ -355,23 +372,25 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return restaurantClient;
     }
 
-    public ErrorOr<AvailableTablesStatus> ModifyAvailableTableStatus(AvailableTablesStatus availableTablesStatus)
+    public ErrorOr<SuccessOperation> ModifyAvailableTablesStatus(AvailableTablesStatus availableTablesStatus)
     {
         if (AvailableTablesStatus == availableTablesStatus)
         {
             return RestaurantErrorCodes.EqualAvailableTableStatus;
         }
 
-        return availableTablesStatus;
+        AvailableTablesStatus = availableTablesStatus;
+
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> UpdateInformation(Guid userId,
+    public ErrorOr<SuccessOperation> UpdateInformation(Guid userId,
         string title,
         string description,
         string type,
         List<string> chefs,
         List<string> specialties,
-        List<Uri> imagesUrl)
+        List<string> imagesUrl)
     {
         var canUpdateInformation = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
         
@@ -385,10 +404,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         RestaurantInformation = restaurantInformation;
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> ChangeLocalization(Guid adminId,
+    public ErrorOr<SuccessOperation> ChangeLocalization(Guid adminId,
         string country,
         string city,
         string region,
@@ -408,13 +427,13 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         RestaurantLocalization = restaurantLocalization;
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> ModifySchedule(Guid userId,
-        List<DayOfWeek> days,
-        TimeSpan start,
-        TimeSpan end)
+    public ErrorOr<SuccessOperation> ModifySchedule(Guid userId,
+        DayOfWeek day,
+        DateTime start,
+        DateTime end)
     {
         var canChangeProperty = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
 
@@ -423,14 +442,16 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return canChangeProperty.FirstError;
         }
 
-        RestaurantSchedule schedule = RestaurantSchedule.Create(days, start, end);
-    
-        RestaurantSchedule = schedule;
+        RestaurantSchedule schedule = RestaurantSchedule.Create(day, start, end);
 
-        return Unit.Value;
+        var restaurantSchedule = _restaurantSchedules.Where(r => r.Day.DayOfWeek == day).Single();
+
+        restaurantSchedule = schedule;
+
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> UpdateContact(Guid adminId,
+    public ErrorOr<SuccessOperation> UpdateContact(Guid adminId,
         string email = "",
         string whatsapp = "",
         string facebook = "",
@@ -458,7 +479,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         RestaurantContact = restaurantContact;
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
     public ErrorOr<RestaurantAdministration> AddAdministration(string name,
@@ -488,7 +509,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return restaurantAdministration;
     }
 
-    public ErrorOr<Unit> DeleteAdministrator(Guid administratorId, Guid adminId)
+    public ErrorOr<SuccessOperation> DeleteAdministrator(Guid administratorId, Guid adminId)
     {
         var canDeleteAdmin = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, adminId));
 
@@ -508,10 +529,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         _restaurantAdministrations.Remove(restaurantAdministrator!);
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<Unit> UpdateAdministrator(Guid administratorId,
+    public ErrorOr<SuccessOperation> UpdateAdministrator(Guid administratorId,
         string name,
         string administratorTitle,
         Guid adminId)
@@ -533,7 +554,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
                 .SingleOrDefault()!
                 .Update(name, administratorId, administratorTitle);
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
     private Restaurant(
@@ -543,7 +564,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantInformation restaurantInformation, 
         RestaurantLocalization restaurantLocalization, 
         RestaurantScheduleStatus restaurantScheduleStatus, 
-        RestaurantSchedule restaurantSchedule, 
+        List<RestaurantSchedule> restaurantSchedule, 
         RestaurantContact restaurantContact,
         List<RestaurantRatingId> ratingIds,
         List<RestaurantClient> restaurantClients,
@@ -557,7 +578,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantInformation = restaurantInformation;
         RestaurantLocalization = restaurantLocalization;
         RestaurantScheduleStatus = restaurantScheduleStatus;
-        RestaurantSchedule = restaurantSchedule;
+        _restaurantSchedules = restaurantSchedule;
         RestaurantContact = restaurantContact;
         PostedAt = postedAt;
 
@@ -571,7 +592,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         int numberOfTables,
         RestaurantInformation restaurantInformation,
         RestaurantLocalization restaurantLocalization,
-        RestaurantSchedule restaurantSchedule,
+        List<RestaurantSchedule> restaurantSchedules,
         RestaurantContact restaurantContact,
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
@@ -582,9 +603,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         NumberOfTables = numberOfTables;
         RestaurantInformation = restaurantInformation;
         RestaurantLocalization = restaurantLocalization;
-        RestaurantSchedule = restaurantSchedule;
         RestaurantContact = restaurantContact;
 
+        _restaurantSchedules = restaurantSchedules;
         _restaurantClients = restaurantClients;
         _restaurantTables = restaurantTables;
         _restaurantAdministrations = restaurantAdministrations;
@@ -598,7 +619,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     private AvailableTablesStatus UpdateAvailableTablesStatus()
     {
         int reservedTables = _restaurantTables
-            .Where(r => r.IsOccuppied == true)
+            .Where(r => r.IsOccupied == true)
             .Count();
 
         int percentageOfReservedTables = reservedTables % 100;
@@ -618,11 +639,14 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
     private RestaurantScheduleStatus SetRestaurantScheduleStatus()
     {
-        var startHour = RestaurantSchedule.HoursOfOperation.Start.Hours;
+        var currentDaySchedule = RestaurantSchedules.Where(r => r.Day.DayOfWeek == DateTime.Now.DayOfWeek)
+            .Single();
 
-        var endHour = RestaurantSchedule.HoursOfOperation.End.Hours;
+        var startHour = currentDaySchedule.HoursOfOperation.Start;
 
-        if (DateTime.UtcNow.Hour > startHour && DateTime.UtcNow.Hour < endHour)
+        var endHour = currentDaySchedule.HoursOfOperation.End;
+
+        if (DateTime.Now > startHour && DateTime.Now < endHour)
         {
             return RestaurantScheduleStatus.Opened;
         }
