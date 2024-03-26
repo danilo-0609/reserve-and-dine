@@ -28,8 +28,8 @@ internal sealed class ModifyRestaurantScheduleCommandHandler : ICommandHandler<M
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<Unit> modifySchedule = restaurant.ModifySchedule(_executionContextAccessor.UserId, 
-            request.Days, 
+        var modifySchedule = restaurant.ModifySchedule(_executionContextAccessor.UserId, 
+            request.Day, 
             request.Start, 
             request.End);
     

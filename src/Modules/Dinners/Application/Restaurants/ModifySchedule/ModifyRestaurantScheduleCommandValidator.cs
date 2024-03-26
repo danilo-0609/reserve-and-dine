@@ -9,7 +9,7 @@ internal sealed class ModifyRestaurantScheduleCommandValidator : AbstractValidat
         RuleFor(r => r.RestaurantId)
             .NotEmpty().NotNull();
 
-        RuleFor(r => r.Days)
+        RuleFor(r => r.Day)
             .NotEmpty().NotNull();
 
         RuleFor(r => r.Start)
