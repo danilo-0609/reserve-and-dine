@@ -26,7 +26,7 @@ internal sealed class AddMenuImageCommandHandler : ICommandHandler<AddMenuImageC
             return MenuErrorCodes.NotFound;
         }
 
-        Uri imageUrl = await _blobService.UploadFileBlobAsync(request.FilePath, request.FormFile.FileName);
+        string imageUrl = await _blobService.UploadFileBlobAsync(request.FilePath, request.FormFile.FileName);
 
         menu.MenuDetails.AddImage(imageUrl);
 
