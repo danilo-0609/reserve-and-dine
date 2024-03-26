@@ -43,7 +43,7 @@ public sealed record RestaurantTable
 
     public void Reserve(DateTime reservedTime, TimeRange reservationTimeRange)
     {
-        _reservedHours.Add(new ReservedHour(reservedTime, reservationTimeRange, Number));
+        _reservedHours.Add(new ReservedHour(reservedTime, reservationTimeRange, Number, RestaurantId));
     }
 
     public void OccupyTable()
