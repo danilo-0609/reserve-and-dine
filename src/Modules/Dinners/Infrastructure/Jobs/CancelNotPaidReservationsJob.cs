@@ -12,19 +12,16 @@ internal sealed class CancelNotPaidReservationsJob : IJob
     private readonly DinnersDbContext _dbContext;
     private readonly ILogger<CancelNotPaidReservationsJob> _logger;
     private readonly IReservationRepository _reservationRepository;
-    private readonly CancellationToken _cancellationToken;
     private readonly IUnitOfWork _unitOfWork;
 
     public CancelNotPaidReservationsJob(DinnersDbContext dbContext,
         ILogger<CancelNotPaidReservationsJob> logger,
         IReservationRepository reservationRepository,
-        CancellationToken cancellationToken,
         IUnitOfWork unitOfWork)
     {
         _dbContext = dbContext;
         _logger = logger;
         _reservationRepository = reservationRepository;
-        _cancellationToken = cancellationToken;
         _unitOfWork = unitOfWork;
     }
 
@@ -47,9 +44,9 @@ internal sealed class CancelNotPaidReservationsJob : IJob
         {
             reservation.Cancel("Reservation must have been paid up to 2 hours after reservation's request");
 
-            await _reservationRepository.UpdateAsync(reservation, _cancellationToken);
+            await _reservationRepository.UpdateAsync(reservation, CancellationToken.None);
         }
 
-        await _unitOfWork.SaveChangesAsync(_cancellationToken);
+        await _unitOfWork.SaveChangesAsync();
     }
 }
