@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.AggregateRoots;
+using BuildingBlocks.Domain.Results;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Reservations.DomainEvents;
 using Dinners.Domain.Reservations.Errors;
@@ -80,7 +81,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return reservation;
     }
 
-    public ErrorOr<Unit> Cancel(string causeOfCancellation = "")
+    public ErrorOr<SuccessOperation> Cancel(string causeOfCancellation = "")
     {
         var canCancelReservation = CheckRule(new CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule(ReservationStatus));
 
@@ -89,7 +90,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             return canCancelReservation.FirstError;
         }
 
-        if (ReservationStatus == ReservationStatus.Payed)
+        if (ReservationStatus == ReservationStatus.Paid)
         {
             Refund refund = Refund.Payback(
                 Id,
@@ -110,7 +111,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             CancelledAt = DateTime.UtcNow;
             ReservationStatus = ReservationStatus.Cancelled;
 
-            return Unit.Value;
+            return SuccessOperation.Code;
         }
 
         AddDomainEvent(new ReservationCancelledDomainEvent(
@@ -125,11 +126,18 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         CancelledAt = DateTime.UtcNow;
         ReservationStatus = ReservationStatus.Cancelled;
 
-        return Unit.Value;
+        return SuccessOperation.Code;
     }
 
     public ErrorOr<ReservationPaymentId> Pay()
     {
+        var cannotPayWhenStatusIsNotRequested = CheckRule(new CannotPayWhenReservationStatusIsNotRequestedRule(ReservationStatus));
+
+        if (cannotPayWhenStatusIsNotRequested.IsError)
+        {
+            return cannotPayWhenStatusIsNotRequested.FirstError;
+        }
+
         var payment = ReservationPayment.PayFromReservation(
             ReservationAttendees.ClientId,
             Id,
@@ -142,19 +150,19 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             return payment.FirstError;
         }
 
-        ReservationStatus = ReservationStatus.Payed;
+        ReservationStatus = ReservationStatus.Paid;
         PaidAt = DateTime.UtcNow;
 
         return payment.Value.Id;
     }
 
-    public ErrorOr<ReservationStatus> Visit()
+    public ErrorOr<SuccessOperation> Visit()
     {
-        var cannotVisitWhenReservationStatusIsNotPayedRule = CheckRule(new CannotAssistWhenReservationStatusIsNotPayedRule(ReservationStatus));
+        var cannotVisitWhenReservationStatusIsNotPaidRule = CheckRule(new CannotAssistWhenReservationStatusIsNotPaidRule(ReservationStatus));
 
-        if (cannotVisitWhenReservationStatusIsNotPayedRule.IsError)
+        if (cannotVisitWhenReservationStatusIsNotPaidRule.IsError)
         {
-            return cannotVisitWhenReservationStatusIsNotPayedRule.FirstError;
+            return cannotVisitWhenReservationStatusIsNotPaidRule.FirstError;
         }
 
         AddDomainEvent(new ReservationVisitedDomainEvent(Guid.NewGuid(),
@@ -164,10 +172,12 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             _menuIds,
             DateTime.UtcNow));
 
-        return ReservationStatus.Visiting;
+        ReservationStatus = ReservationStatus.Visiting;
+
+        return SuccessOperation.Code;
     }
 
-    public ErrorOr<ReservationStatus> Finish()
+    public ErrorOr<SuccessOperation> Finish()
     {
         var statusMustBeVisited = CheckRule(new CannotFinishAReservationWhenReservationStatusIsNotVisitedRule(ReservationStatus));
     
@@ -183,7 +193,9 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             ReservationInformation.ReservedTable,
             DateTime.UtcNow));
 
-        return ReservationStatus.Finished;
+        ReservationStatus = ReservationStatus.Finished;
+
+        return SuccessOperation.Code;
     }
 
     public Reservation Update(ReservationInformation reservationInformation,
