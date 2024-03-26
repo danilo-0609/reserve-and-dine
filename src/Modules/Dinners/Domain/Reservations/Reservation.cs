@@ -33,7 +33,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
     public DateTime RequestedAt { get; private set; }
 
-    public DateTime? PayedAt { get; private set; }
+    public DateTime? PaidAt { get; private set; }
 
     public DateTime? CancelledAt { get; private set; }
 
@@ -143,7 +143,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         }
 
         ReservationStatus = ReservationStatus.Payed;
-        PayedAt = DateTime.UtcNow;
+        PaidAt = DateTime.UtcNow;
 
         return payment.Value.Id;
     }
@@ -202,7 +202,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             reservationPaymentId,
             refundId,
             RequestedAt,
-            PayedAt,
+            PaidAt,
             CancelledAt);
     }
 
@@ -256,7 +256,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         ReservationStatus = reservationStatus;
 
         RequestedAt = requestedAt;
-        PayedAt = payedAt;
+        PaidAt = payedAt;
         CancelledAt = cancelledAt;
 
         _menuIds = menuIds;
@@ -271,7 +271,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         ReservationPaymentId? reservationPaymentId,
         RefundId? refundId,
         DateTime requestedAt,
-        DateTime? payedAt = null,
+        DateTime? paidAt = null,
         DateTime? cancelledAt = null)
     {
         Id = id;
@@ -284,7 +284,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         RefundId = refundId;
 
         RequestedAt = requestedAt;
-        PayedAt = payedAt;
+        PaidAt = paidAt;
         CancelledAt = cancelledAt;
     }
 

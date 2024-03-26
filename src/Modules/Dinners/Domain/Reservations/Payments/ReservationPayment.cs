@@ -14,7 +14,7 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
 
     public Price Price { get; private set; }
 
-    public DateTime PayedAt { get; private set; }
+    public DateTime PaidAt { get; private set; }
 
     internal static ErrorOr<ReservationPayment> PayFromReservation(
         Guid payerId, 
@@ -62,7 +62,7 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
         Id = id;
         PayerId = payerId;
         Price = price;
-        PayedAt = payedAt;;
+        PaidAt = payedAt;;
     }
 
     private ReservationPayment() { }
