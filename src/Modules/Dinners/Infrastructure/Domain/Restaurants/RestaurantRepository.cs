@@ -70,7 +70,8 @@ internal sealed class RestaurantRepository : IRestaurantRepository
         return await _dbContext
         .Restaurants
         .Where(r => r.Id == restaurantId)
-        .SelectMany(x => x.RestaurantInformation.RestaurantImagesUrl.Select(r => r.AbsoluteUri))
+        .SelectMany(x => x.RestaurantInformation.RestaurantImagesUrl
+            .Select(r => r.Value))
         .ToListAsync(cancellationToken);
     }
 
@@ -104,7 +105,7 @@ internal sealed class RestaurantRepository : IRestaurantRepository
                 .SetProperty(r => r.RestaurantInformation, restaurant.RestaurantInformation)
                 .SetProperty(r => r.RestaurantLocalization, restaurant.RestaurantLocalization)
                 .SetProperty(r => r.RestaurantScheduleStatus, restaurant.RestaurantScheduleStatus)
-                .SetProperty(r => r.RestaurantSchedule, restaurant.RestaurantSchedule)
+                .SetProperty(r => r.RestaurantSchedules, restaurant.RestaurantSchedules)
                 .SetProperty(r => r.RestaurantContact, restaurant.RestaurantContact)
                 .SetProperty(r => r.RestaurantRatingIds, restaurant.RestaurantRatingIds)
                 .SetProperty(r => r.RestaurantClients, restaurant.RestaurantClients)

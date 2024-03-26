@@ -1,4 +1,5 @@
 ﻿using Dinners.Domain.Menus;
+using Dinners.Domain.Menus.Dishes;
 using Dinners.Domain.Menus.MenuReviews;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +32,8 @@ internal sealed class MenuRepository : IMenuRepository
         return await _dbContext
             .Menus
             .Where(r => r.Id == menuId)
-            .SelectMany(x => x.MenuDetails.MenuImagesUrl.Select(r => r.AbsoluteUri))
+            .SelectMany(x => x.MenuDetails.MenuImagesUrl
+                .Select(r => r.Value))
             .ToListAsync(cancellationToken);
     }
 
@@ -52,7 +54,7 @@ internal sealed class MenuRepository : IMenuRepository
         {
             await _dbContext
                 .Menus
-                .Where(x => x.DishSpecification.Ingredients.Contains(ingredient))
+                .Where(x => x.DishSpecification.Ingredients.Contains(new Ingredient(ingredient)))
                 .SingleOrDefaultAsync();
         }
 

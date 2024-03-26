@@ -1,5 +1,4 @@
-﻿using Dinners.Domain.Menus;
-using Dinners.Domain.Reservations;
+﻿using Dinners.Domain.Reservations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dinners.Infrastructure.Domain.Reservations;
@@ -50,7 +49,7 @@ internal sealed class ReservationRepository : IReservationRepository
                  .SetProperty(r => r.ReservationPaymentId, reservation.ReservationPaymentId)
                  .SetProperty(r => r.RefundId, reservation.RefundId)
                  .SetProperty(r => r.RequestedAt, reservation.RequestedAt)
-                 .SetProperty(r => r.PayedAt, reservation.PayedAt)
+                 .SetProperty(r => r.PaidAt, reservation.PaidAt)
                  .SetProperty(r => r.CancelledAt, reservation.CancelledAt));
     }
 }
