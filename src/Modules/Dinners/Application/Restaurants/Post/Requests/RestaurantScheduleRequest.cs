@@ -1,5 +1,5 @@
 ﻿namespace Dinners.Application.Restaurants.Post.Requests;
 
-public sealed record RestaurantScheduleRequest(List<DayOfWeek> Days,
-    TimeSpan Start,
-    TimeSpan End);
+public sealed record RestaurantScheduleRequest(DayOfWeek Day,
+    DateTime Start,
+    DateTime End);

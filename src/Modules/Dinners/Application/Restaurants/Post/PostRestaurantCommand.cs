@@ -6,7 +6,7 @@ namespace Dinners.Application.Restaurants.Post;
 
 public sealed record PostRestaurantCommand(RestaurantInformationRequest RestaurantInformation,
     RestaurantLocalizationRequest RestaurantLocalization,
-    RestaurantScheduleRequest RestaurantSchedule,
+    List<RestaurantScheduleRequest> RestaurantSchedules,
     List<RestaurantTableRequest> RestaurantTables,
     List<RestaurantAdministrationRequest> RestaurantAdministrations,
     RestaurantContactRequest RestaurantContact) : ICommand<ErrorOr<Guid>>;

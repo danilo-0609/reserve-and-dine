@@ -20,12 +20,14 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
 
     public async Task<ErrorOr<Guid>> Handle(PostRestaurantCommand request, CancellationToken cancellationToken)
     {
+        var restaurantId = RestaurantId.CreateUnique();
+
         var restaurantInformation = RestaurantInformation.Create(request.RestaurantInformation.Title,
             request.RestaurantInformation.Description,
             request.RestaurantInformation.Type,
             request.RestaurantInformation.Chefs,
             request.RestaurantInformation.Specialties,
-            new List<Uri>());
+            new List<string>());
 
         var restaurantLocalization = RestaurantLocalization.Create(request.RestaurantLocalization.Country,
             request.RestaurantLocalization.City,
@@ -34,9 +36,10 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
             request.RestaurantLocalization.Addresss,
             request.RestaurantLocalization.LocalizationDetails);
 
-        var restaurantSchedule = RestaurantSchedule.Create(request.RestaurantSchedule.Days,
-            request.RestaurantSchedule.Start,
-            request.RestaurantSchedule.End);
+        var restaurantSchedules = request.RestaurantSchedules.ConvertAll(schedule =>
+        {
+            return RestaurantSchedule.Create(schedule.Day, schedule.Start, schedule.End);
+        });
 
         var restaurantContact = RestaurantContact.Create(request.RestaurantContact.Email,
             request.RestaurantContact.Whatsapp,
@@ -49,10 +52,11 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
 
         var restaurantTables = request.RestaurantTables.ConvertAll(table =>
         {
-            return RestaurantTable.Create(table.Number, 
+            return RestaurantTable.Create(restaurantId,
+                table.Number, 
                 table.Seats, 
                 table.IsPremium, 
-                table.ReservedHours);
+                new List<ReservedHour>());
         });
 
         var restaurantAdministrations = request.RestaurantAdministrations.ConvertAll(admin =>
@@ -62,9 +66,10 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
             admin.AdministratorTitle);
         });
 
-        Restaurant restaurant = Restaurant.Post(restaurantInformation,
+        Restaurant restaurant = Restaurant.Post(restaurantId,
+            restaurantInformation,
             restaurantLocalization,
-            restaurantSchedule,
+            restaurantSchedules,
             restaurantContact,
             restaurantTables,
             restaurantAdministrations,
