@@ -6,22 +6,19 @@ using ErrorOr;
 
 namespace Dinners.Domain.Restaurants.Rules;
 
-internal sealed class TableCannotReserveWhenRestaurantIsClosedRule : IBusinessRule
+internal sealed class CannotReserveWhenTimeOfReservationIsOutOfScheduleRule : IBusinessRule
 {
     private readonly RestaurantSchedule _restaurantSchedule;
     private readonly TimeRange _reservationTimeRangeRequested;
-    private readonly DateTime _reservationDateTimeRequested;
 
-    public TableCannotReserveWhenRestaurantIsClosedRule(RestaurantSchedule restaurantSchedule, 
-        TimeRange reservationTimeRangeRequested, 
-        DateTime reservationDateTimeRequested)
+    public CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(RestaurantSchedule restaurantSchedule, 
+        TimeRange reservationTimeRangeRequested)
     {
         _restaurantSchedule = restaurantSchedule;
         _reservationTimeRangeRequested = reservationTimeRangeRequested;
-        _reservationDateTimeRequested = reservationDateTimeRequested;
     }
 
-    public Error Error => RestaurantErrorCodes.CannotReserveWhenRestaurantIsClosed;
+    public Error Error => RestaurantErrorCodes.CannotReserveWhenTimeOfReservationIsOutOfSchedule;
 
     public bool IsBroken()
     {
@@ -35,7 +32,7 @@ internal sealed class TableCannotReserveWhenRestaurantIsClosedRule : IBusinessRu
 
     public bool IsRestaurantOpenForReservation()
     {
-        if (_restaurantSchedule.Days.Contains(_reservationDateTimeRequested.DayOfWeek)
+        if (_restaurantSchedule.Day.DayOfWeek == _reservationTimeRangeRequested.Start.DayOfWeek
             && _restaurantSchedule.HoursOfOperation.Start <= _reservationTimeRangeRequested.Start
             && _restaurantSchedule.HoursOfOperation.End > _reservationTimeRangeRequested.End)
         {
@@ -45,5 +42,5 @@ internal sealed class TableCannotReserveWhenRestaurantIsClosedRule : IBusinessRu
         return false;
     }
 
-    public static string Message => "Cannot reserve when restaurant is closed";
+    public static string Message => "Cannot reserve when time requested is out of restaurant schedule, because the restaurant will be closed";
 }

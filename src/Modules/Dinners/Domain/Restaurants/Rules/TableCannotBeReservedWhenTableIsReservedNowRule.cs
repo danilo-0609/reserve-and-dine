@@ -16,7 +16,7 @@ internal sealed class TableCannotBeReservedWhenTableIsReservedNowRule : IBusines
 
     public Error Error => RestaurantErrorCodes.CannotReserveIfTableIsReserved;
 
-    public bool IsBroken() => _restaurantTable.IsOccuppied == true;
+    public bool IsBroken() => _restaurantTable.IsOccupied == true;
 
     public static string Message => "Table cannot be reserved when table is reserved now";
 }
