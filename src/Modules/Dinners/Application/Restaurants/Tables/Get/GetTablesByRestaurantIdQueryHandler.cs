@@ -32,7 +32,7 @@ internal sealed class GetTablesByRestaurantIdQueryHandler : IQueryHandler<GetTab
                 new RestaurantTableResponse(table.Number, 
                     table.Seats, 
                     table.IsPremium, 
-                    table.IsOccuppied, 
+                    table.IsOccupied, 
                     table.ReservedHours));
     }
 }
