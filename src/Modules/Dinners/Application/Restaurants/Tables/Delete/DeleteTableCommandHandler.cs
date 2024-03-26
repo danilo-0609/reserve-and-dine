@@ -28,7 +28,7 @@ internal sealed class DeleteTableCommandHandler : ICommandHandler<DeleteTableCom
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<Unit> deleteTable = restaurant.DeleteTable(_executionContextAccessor.UserId, request.Number);
+        var deleteTable = restaurant.DeleteTable(_executionContextAccessor.UserId, request.Number);
         
         if (deleteTable.IsError)
         {

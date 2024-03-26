@@ -28,7 +28,7 @@ internal sealed class AddTableCommandHandler : ICommandHandler<AddTableCommand, 
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<Unit> addTable = restaurant.AddTable(_executionContextAccessor.UserId, 
+        var addTable = restaurant.AddTable(_executionContextAccessor.UserId, 
             request.Number, 
             request.Seats, 
             request.IsPremium);
