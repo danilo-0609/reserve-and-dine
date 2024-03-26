@@ -15,14 +15,17 @@ public static class ReservationErrorsCodes
         Error.Validation("Reservation.CannotBeMadeWhenTableIsNotAvailable", ReservationCannotBeMadeWhenTableIsNotAvailableRule.Message);
 
     public static Error ReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved =>
-        Error.Validation("Reservation.ReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved", CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule.Message);
+        Error.Validation("Reservation.CannotReserveWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved", CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule.Message);
 
-    public static Error CancelWhenReservationStatusIsAsisted =>
-        Error.Validation("Reservation.CancelWhenReservationStatusIsAsisted", CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule.Message);
+    public static Error CancelWhenReservationStatusIsAssisted =>
+        Error.Validation("Reservation.CancelWhenReservationStatusIsAssisted", CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule.Message);
 
-    public static Error AssistWhenReservationStatusIsNotPayed =>
-        Error.Validation("Reservation.AssistWhenReservationStatusIsNotPayed", CannotAssistWhenReservationStatusIsNotPayedRule.Message);
+    public static Error AssistWhenReservationStatusIsNotPaid =>
+        Error.Validation("Reservation.AssistWhenReservationStatusIsNotPaid", CannotAssistWhenReservationStatusIsNotPaidRule.Message);
 
     public static Error MenuNotFound =>
         Error.NotFound("Reservation.MenuNotFound", "The menu in the reservation was not found");
+
+    public static Error CannotPayWhenReservationStatusIsNotRequested =>
+        Error.Validation("Reservation.CannotPayWhenReservationStatusIsNotRequested", CannotPayWhenReservationStatusIsNotRequestedRule.Message);
 }
