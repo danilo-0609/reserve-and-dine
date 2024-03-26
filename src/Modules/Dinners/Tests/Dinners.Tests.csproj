@@ -28,7 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ArchTests\" />
+    <Folder Include="ArchTests\Domain\" />
+    <Folder Include="ArchTests\Application\" />
+    <Folder Include="IntegrationTests\Menus\" />
+    <Folder Include="IntegrationTests\Reservations\" />
+    <Folder Include="IntegrationTests\Restaurants\" />
   </ItemGroup>
 
 </Project>
