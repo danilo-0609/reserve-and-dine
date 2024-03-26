@@ -28,13 +28,17 @@ internal sealed class UpdateInformationCommandHandler : ICommandHandler<UpdateIn
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<Unit> updateInformation = restaurant.UpdateInformation(_executionContextAccessor.UserId,
+        var updateInformation = restaurant.UpdateInformation(_executionContextAccessor.UserId,
             request.Title,
             request.Description,
             request.Type,
             request.Chefs,
             request.Specialties,
-            restaurant.RestaurantInformation.RestaurantImagesUrl.ToList());
+            restaurant
+            .RestaurantInformation
+            .RestaurantImagesUrl
+            .ToList()
+            .ConvertAll(image => image.Value));
     
         if (updateInformation.IsError)
         {
