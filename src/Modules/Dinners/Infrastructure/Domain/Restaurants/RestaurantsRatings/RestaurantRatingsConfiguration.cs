@@ -1,4 +1,5 @@
-﻿using Dinners.Domain.Restaurants;
+﻿using Dinners.Domain.Menus;
+using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantRatings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

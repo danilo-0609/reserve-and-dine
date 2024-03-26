@@ -28,7 +28,7 @@ internal sealed class ReservationConfiguration : IEntityTypeConfiguration<Reserv
             x.Property(p => p.ReservedTable).ValueGeneratedNever().HasColumnName("ReservedTable");
             x.OwnsOne(p => p.ReservationPrice, r =>
             {
-                r.Property(t => t.Amount).HasColumnName("MoneyAmount");
+                r.Property(t => t.Amount).HasColumnName("MoneyAmount").HasColumnType("decimal").HasPrecision(10, 2); ;
                 r.Property(t => t.Currency).HasColumnName("MoneyCurrency");
             });
 
@@ -43,7 +43,8 @@ internal sealed class ReservationConfiguration : IEntityTypeConfiguration<Reserv
         });
 
         builder.HasMany(r => r.MenuIds)
-            .WithMany().UsingEntity<ReservationMenus>();
+            .WithMany()
+            .UsingEntity<ReservationMenus>();
 
         builder.Property(r => r.RestaurantId)
             .HasConversion(
@@ -56,7 +57,7 @@ internal sealed class ReservationConfiguration : IEntityTypeConfiguration<Reserv
         {
             x.Property(g => g.ClientId).HasColumnName("ClientId");
             x.Property(g => g.Name).HasColumnName("Name");
-            x.Property(g => g.NumberOfAttendees);
+            x.Property(g => g.NumberOfAttendees).HasColumnName("NumberOfAttendees");
         });
 
         builder.OwnsOne(r => r.ReservationStatus, x =>
@@ -85,9 +86,9 @@ internal sealed class ReservationConfiguration : IEntityTypeConfiguration<Reserv
         builder.Property(r => r.RequestedAt)
             .HasColumnName("RequestedAt");
 
-        builder.Property(r => r.PayedAt)
+        builder.Property(r => r.PaidAt)
             .IsRequired(false)
-            .HasColumnName("RequestedAt");
+            .HasColumnName("PaidAt");
 
         builder.Property(r => r.CancelledAt)
             .IsRequired(false)

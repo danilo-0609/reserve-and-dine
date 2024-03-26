@@ -3,6 +3,9 @@ using Dinners.Domain.Restaurants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Dinners.Infrastructure.Domain.Menus.MenuReviews;
+using Dinners.Domain.Menus.Schedules;
+using Dinners.Domain.Menus.Dishes;
+using Dinners.Domain.Menus.Details;
 
 namespace Dinners.Infrastructure.Domain.Menus;
 
@@ -34,22 +37,26 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
             x.OwnsOne(p => p.MenuType).Property(p => p.Value).HasColumnName("MenuType");
             x.OwnsOne(p => p.Price, t =>
             {
-                t.Property(f => f.Amount).HasColumnName("PriceAmount");
+                t.Property(f => f.Amount).HasColumnName("PriceAmount").HasColumnType("decimal").HasPrecision(10, 2); ;
                 t.Property(f => f.Currency).HasColumnName("PriceCurrency");
             });
-            x.Property(p => p.Discount).HasColumnName("Discount");
+            x.Property(p => p.Discount).HasColumnName("Discount").HasColumnType("decimal").HasPrecision(10, 2);
             x.Property(p => p.DiscountTerms).HasColumnName("DiscountTerms");
 
-            x.OwnsMany(p => p.MenuImagesUrl.Select(r => r.AbsoluteUri), x =>
+            x.OwnsMany(p => p.MenuImagesUrl, j =>
             {
-                x.WithOwner().HasForeignKey("MenuId");
-                x.ToTable("MenuImagesUrl", "dinners");
+                j.Property(t => t.Value).HasColumnName("MenuImageUrl");
+
+                j.WithOwner().HasForeignKey("MenuId");
+                j.ToTable("MenuImagesUrl", "dinners");
             });
 
-            x.OwnsMany(p => p.Tags, x =>
+            x.OwnsMany(p => p.Tags, h =>
             {
-                x.WithOwner().HasForeignKey("MenuId");
-                x.ToTable("Tags", "dinners");
+                h.Property(p => p.Value).HasColumnName("Tag");
+
+                h.WithOwner().HasForeignKey("MenuId");
+                h.ToTable("Tags", "dinners");
             });
 
             x.Property(p => p.IsVegetarian).HasColumnName("IsVegetarian");
@@ -59,10 +66,12 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
 
         builder.OwnsOne<DishSpecification>("DishSpecification", x =>
         {
-            x.OwnsMany(p => p.Ingredients, x =>
+            x.OwnsMany(p => p.Ingredients, t =>
             {
-                x.WithOwner().HasForeignKey("MenuId");
-                x.ToTable("Ingredients", "dinners");
+                t.Property(r => r.Value).HasColumnName("Ingredient");
+
+                t.WithOwner().HasForeignKey("MenuId");
+                t.ToTable("Ingredients", "dinners");
             });
 
             x.Property(p => p.MainCourse).HasColumnName("MainCourse");
@@ -80,8 +89,10 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
 
         builder.OwnsOne<MenuSchedule>("MenuSchedule", x =>
         {
-            x.OwnsMany(r => r.Days.Select(r => r.ToString()).ToList(), t =>
+            x.OwnsMany(r => r.Days, t =>
             {
+                t.Property(p => p.DayOfWeek).HasColumnName("DayAvailable");
+
                 t.WithOwner().HasForeignKey("MenuId");
                 t.ToTable("DaysAvailable", "dinners");
             });

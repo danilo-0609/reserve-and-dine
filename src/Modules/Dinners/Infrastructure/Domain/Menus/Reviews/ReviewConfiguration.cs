@@ -20,7 +20,9 @@ internal sealed class ReviewConfiguration : IEntityTypeConfiguration<MenuReview>
             .HasColumnName("MenuReviewId");
 
         builder.Property(p => p.Rate)
-            .HasColumnName("Rate");
+            .HasColumnName("Rate")
+            .HasColumnType("decimal")
+            .HasPrecision(5, 2); ;
 
         builder.Property(p => p.ClientId)
             .HasColumnName("ClientId");

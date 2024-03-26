@@ -23,11 +23,11 @@ internal sealed class RefundConfiguration : IEntityTypeConfiguration<Refund>
 
         builder.OwnsOne(r => r.RefundedMoney, x =>
         {
-            x.Property(r => r.Amount).HasColumnName("MoneyRefunded");
+            x.Property(r => r.Amount).HasColumnName("MoneyRefunded").HasColumnType("decimal").HasPrecision(10, 2); ;
             x.Property(r => r.Currency).HasColumnName("MoneyCurrency");
         });
 
         builder.Property(r => r.RefundedAt)
-            .HasColumnName("PayedAt");
+            .HasColumnName("RefundedAt");
     }
 }

@@ -37,20 +37,26 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
 
             x.OwnsMany(p => p.Chefs, x =>
             {
+                x.Property(r => r.Value).HasColumnName("Chef");
+
                 x.WithOwner().HasForeignKey("RestaurantId");
                 x.ToTable("Chefs", "dinners");
             });
 
             x.OwnsMany(p => p.Specialties, x =>
             {
+                x.Property(r => r.Value).HasColumnName("Speciality");
+
                 x.WithOwner().HasForeignKey("RestaurantId");
                 x.ToTable("Specialties", "dinners");
             });
 
-            x.OwnsMany(p => p.RestaurantImagesUrl.Select(r => r.AbsoluteUri), x =>
+            x.OwnsMany(p => p.RestaurantImagesUrl, c =>
             {
-                x.WithOwner().HasForeignKey("RestaurantId");
-                x.ToTable("RestaurantImagesUrl", "dinners");
+                c.Property(f => f.Value).HasColumnName("RestaurantImageUrl"); 
+
+                c.WithOwner().HasForeignKey("RestaurantId");
+                c.ToTable("RestaurantImagesUrl", "dinners");
             });
         });
 
@@ -69,19 +75,22 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
             x.Property(r => r.Value).HasColumnName("RestaurantScheduleStatus");
         });
 
-        builder.OwnsOne(r => r.RestaurantSchedule, x =>
+        builder.OwnsMany(r => r.RestaurantSchedules, x =>
         {
-            x.OwnsMany(r => r.Days.Select(r => r.ToString()).ToList(), t =>
+            x.OwnsOne(r => r.Day, g =>
             {
-                t.WithOwner().HasForeignKey("RestaurantId");
-                t.ToTable("DaysOfService", "dinners");
+                g.Property(r => r.DayOfWeek).HasColumnName("DayOfWeek");
             });
 
-            x.OwnsOne(p => p.HoursOfOperation, x =>
+            x.OwnsOne(r => r.HoursOfOperation, s =>
             {
-                x.Property(r => r.Start).HasColumnName("OpeningTime");
-                x.Property(r => r.End).HasColumnName("ClosingTime");
+                s.Property(r => r.Start).HasColumnName("OpenTime");
+                s.Property(r => r.End).HasColumnName("CloseTime");
             });
+
+            x.Property(t => t.ReopeningTime)
+                .HasColumnName("ReopeningTime")
+                .IsRequired(false);
         });
 
         builder.OwnsOne(r => r.RestaurantContact, x =>
@@ -114,24 +123,36 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
             x.WithOwner().HasForeignKey("RestaurantId");
             x.ToTable("RestaurantTables", "dinners");
 
-            x.Property(r => r.Number).HasColumnName("Number").ValueGeneratedNever();
+            x.Property(p => p.RestaurantId)
+                .HasConversion(restaurantId => restaurantId.Value,
+                               value => RestaurantId.Create(value))
+                .HasColumnName("RestaurantId");
+            
+
+            x.Property(r => r.Number).HasColumnName("NumberOfTable").ValueGeneratedNever();
             x.Property(r => r.Seats).HasColumnName("Seats");
             x.Property(r => r.IsPremium).HasColumnName("IsPremium");
-            x.Property(r => r.IsOccuppied).HasColumnName("IsOccuppied");
+            x.Property(r => r.IsOccupied).HasColumnName("IsOccupied");
 
 
-            x.OwnsMany(r => r.ReservedHours.ToDictionary().Select(r => new { r.Value, r.Key }), x =>
+            x.OwnsMany(r => r.ReservedHours, t =>
             {
-                x.WithOwner().HasForeignKey("RestaurantId");
-                x.ToTable("ReservedHours", "dinners");
-
-                x.Property(r => r.Key).HasColumnName("ReservedHourDateTime");
-
-                x.OwnsOne(p => p.Value, x =>
+                t.Property(p => p.ReservationDateTime).HasColumnName("ReservationDateTime");
+                t.OwnsOne(o => o.ReservationTimeRange, k =>
                 {
-                    x.Property(r => r.Start).HasColumnName("ReservationStartTime");
-                    x.Property(r => r.End).HasColumnName("ReservationEndTime");
+                    k.Property(r => r.Start).HasColumnName("StartReservationTimeRange");
+                    k.Property(r => r.End).HasColumnName("EndReservationTimeRange");
                 });
+
+                t.Property(p => p.NumberOfTable).HasColumnName("NumberOfTable");
+ 
+                t.Property(p => p.RestaurantId)
+                    .HasConversion(restaurantId => restaurantId.Value,
+                        value => RestaurantId.Create(value))
+                    .HasColumnName("RestaurantId");
+
+                x.WithOwner().HasForeignKey("NumberOfTable");
+                x.ToTable("ReservedHours");
             });
         });
 

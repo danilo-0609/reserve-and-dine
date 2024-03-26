@@ -24,11 +24,11 @@ internal sealed class PaymentConfiguration : IEntityTypeConfiguration<Reservatio
 
         builder.OwnsOne(r => r.Price, x =>
         {
-            x.Property(r => r.Amount).HasColumnName("MoneyPaid");
+            x.Property(r => r.Amount).HasColumnName("MoneyPaid").HasColumnType("decimal").HasPrecision(10, 2);
             x.Property(r => r.Currency).HasColumnName("MoneyCurrency");
         });
 
-        builder.Property(r => r.PayedAt)
-            .HasColumnName("PayedAt");
+        builder.Property(r => r.PaidAt)
+            .HasColumnName("PaidAt");
     }
 }
