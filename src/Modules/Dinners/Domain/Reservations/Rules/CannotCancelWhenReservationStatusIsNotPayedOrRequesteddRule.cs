@@ -13,9 +13,19 @@ internal sealed class CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRul
         _reservationStatus = reservationStatus;
     }
 
-    public Error Error => ReservationErrorsCodes.CancelWhenReservationStatusIsAsisted;
+    public Error Error => ReservationErrorsCodes.CancelWhenReservationStatusIsAssisted;
 
-    public bool IsBroken() => _reservationStatus != ReservationStatus.Payed && _reservationStatus != ReservationStatus.Requested;
+    public bool IsBroken() => !CanCancelReservation(_reservationStatus);
 
-    public static string Message => "Cannot cancel when reservation status is asisted";
+    private bool CanCancelReservation(ReservationStatus reservationStatus)
+    {
+        if (reservationStatus == ReservationStatus.Paid || reservationStatus == ReservationStatus.Requested)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static string Message => "Cannot cancel when reservation status is assisted";
 }
