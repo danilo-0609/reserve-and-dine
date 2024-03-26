@@ -10,17 +10,15 @@ using Dinners.Infrastructure.Domain.Restaurants.RestaurantsRatings;
 using Dinners.Infrastructure.Outbox;
 using Domain.Restaurants;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Dinners.Infrastructure;
 
 internal sealed class DinnersDbContext : DbContext, IApplicationDbContext
 {
-    private readonly IConfiguration _configuration;
 
-    public DinnersDbContext(IConfiguration configuration)
+    public DinnersDbContext(DbContextOptions<DinnersDbContext> options) 
+        : base(options)
     {
-        _configuration = configuration;
     }
 
     public DbSet<Menu> Menus { get; set; }
@@ -48,12 +46,12 @@ internal sealed class DinnersDbContext : DbContext, IApplicationDbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
-
-        optionsBuilder.UseSqlServer(_configuration.GetConnectionString("Database"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DinnersDbContext).Assembly);
     }
+
+    public DinnersDbContext() { }
 }
