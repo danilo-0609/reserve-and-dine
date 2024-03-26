@@ -1,6 +1,7 @@
 ﻿using Dinners.Application.Common;
 using Dinners.Domain.Common;
 using Dinners.Domain.Menus;
+using Dinners.Domain.Menus.Details;
 using Dinners.Domain.Menus.Errors;
 using ErrorOr;
 using MediatR;
@@ -32,7 +33,7 @@ internal sealed class UpdateMenuDetailsCommandHandler : ICommandHandler<UpdateMe
             menuType,
             new Price(request.Money, request.Currency),
             request.Discount,
-            menu.MenuDetails.MenuImagesUrl,
+            menu.MenuDetails.MenuImagesUrl.ConvertAll(r => r.Value),
             request.Tags!,
             request.IsVegetarian,
             request.PrimaryChefName,

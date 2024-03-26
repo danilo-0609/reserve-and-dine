@@ -1,6 +1,9 @@
 ﻿using Dinners.Application.Common;
 using Dinners.Domain.Common;
 using Dinners.Domain.Menus;
+using Dinners.Domain.Menus.Details;
+using Dinners.Domain.Menus.Dishes;
+using Dinners.Domain.Menus.Schedules;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using ErrorOr;
@@ -34,7 +37,7 @@ internal sealed class PublishMenuCommandHandler : ICommandHandler<PublishMenuCom
             menuType,
             new Price(request.Price, request.Currency),
             request.Discount,
-            new List<Uri>(),
+            new List<string>(),
             request.Tags,
             request.IsVegetarian,
             request.PrimaryChefName,
