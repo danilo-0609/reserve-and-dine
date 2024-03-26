@@ -4,7 +4,9 @@ namespace Dinners.Domain.Restaurants.RestaurantTables;
 
 public sealed record RestaurantTable
 {
-    private readonly Dictionary<DateTime, TimeRange> _reservedHours = new();
+    private readonly List<ReservedHour> _reservedHours = new();
+
+    public RestaurantId RestaurantId { get; private set; }
 
     public int Number { get; private set; }
 
@@ -12,52 +14,61 @@ public sealed record RestaurantTable
 
     public bool IsPremium { get; private set; }
 
-    public bool IsOccuppied { get; private set; }
+    public bool IsOccupied { get; private set; }
 
-    public IReadOnlyDictionary<DateTime, TimeRange> ReservedHours => _reservedHours.AsReadOnly();
+    public IReadOnlyList<ReservedHour> ReservedHours => _reservedHours.AsReadOnly();
 
-    public static RestaurantTable Create(int number,
+    public static RestaurantTable Create(RestaurantId restaurantId,
+        int number,
         int seats,
         bool isPremium,
-        Dictionary<DateTime, TimeRange> reservedHours)
+        List<ReservedHour> reservedHours)
     {
-        return new RestaurantTable(number, seats, isPremium, reservedHours);
+        return new RestaurantTable(restaurantId, number, seats, isPremium, reservedHours);
     }
 
     public RestaurantTable Upgrade(int number,
         int seats,
         bool isPremium)
     {
-        return new RestaurantTable(number, seats, isPremium, _reservedHours);
+        return new RestaurantTable(RestaurantId, number, seats, isPremium, _reservedHours);
     }
 
     public void CancelReservation(DateTime reservedTime)
     {
-        _reservedHours.Remove(reservedTime);
+        var reservedHour = _reservedHours.Where(r => r.ReservationDateTime == reservedTime).Single();
+
+        _reservedHours.Remove(reservedHour); 
     }
 
     public void Reserve(DateTime reservedTime, TimeRange reservationTimeRange)
     {
-        _reservedHours.Add(reservedTime, reservationTimeRange);
+        _reservedHours.Add(new ReservedHour(reservedTime, reservationTimeRange, Number));
     }
 
     public void OccupyTable()
     {
-        IsOccuppied = true;
+        IsOccupied = true;
     }
 
     public void FreeTable()
     {
-        IsOccuppied = false;
+        IsOccupied = false;
     }
 
 
-    private RestaurantTable(int number, int seats, bool isPremium, Dictionary<DateTime, TimeRange> reservedHours)
+    private RestaurantTable(
+        RestaurantId restaurantId,
+        int number, 
+        int seats, 
+        bool isPremium, 
+        List<ReservedHour> reservedHours)
     {
+        RestaurantId = restaurantId;
         Number = number;
         Seats = seats;
         IsPremium = isPremium;
-        IsOccuppied = false;
+        IsOccupied = false;
 
         _reservedHours = reservedHours;
     }
