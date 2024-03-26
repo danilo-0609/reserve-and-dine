@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Dinners.Application.Restaurants.RestaurantImages.Remove;
 
-internal sealed record RemoveRestaurantImageCommand(Guid Id, Uri RestaurantImageUrl) : ICommand<ErrorOr<Unit>>;
+internal sealed record RemoveRestaurantImageCommand(Guid Id, string RestaurantImageUrl) : ICommand<ErrorOr<Unit>>;
