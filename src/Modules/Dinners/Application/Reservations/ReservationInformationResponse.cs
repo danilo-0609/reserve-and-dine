@@ -4,5 +4,5 @@ namespace Dinners.Application.Reservations;
 
 public sealed record ReservationInformationResponse(int ReservedTable,
     Price ReservationPrice,
-    TimeRange TimeOfReservation,
+    Domain.Reservations.TimeRange TimeOfReservation,
     DateTime ReservationDateTime);
