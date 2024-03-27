@@ -1,3 +1,5 @@
+Reserve & Dine
+
 Restaurant reservations backend application
 
 Simple restaurant reservations backend application building using ASP.NET Core web API, .NET Core 8.0, Entity framework 8.0, docker-compose and SQL Server.
