@@ -1,13 +1,14 @@
 ﻿using Dinners.Domain.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantInformations;
+using Dinners.Domain.Restaurants.RestaurantRatings;
 using Dinners.Domain.Restaurants.RestaurantSchedules;
 using Dinners.Domain.Restaurants.RestaurantTables;
 using Dinners.Domain.Restaurants.RestaurantUsers;
 using Domain.Restaurants;
 using System.ComponentModel.DataAnnotations;
 
-namespace Dinners.Tests.UnitTests.Domain.Restaurants;
+namespace Dinners.Tests.UnitTests.Restaurants;
 
 public sealed class RestaurantTests
 {
@@ -240,9 +241,9 @@ public sealed class RestaurantTests
 
         var closeRestaurant = restaurant.Close(Guid.NewGuid());
 
-        bool isErrorCannotChangeRestaurantScheduleStatus = closeRestaurant.FirstError.Code == "Restaurant.CannotChangeRestaurantScheduleStatus";
+        bool isErrorCannotChangeRestaurantProperties = closeRestaurant.FirstError.Code == "Restaurant.CannotChangeRestaurantProperties";
 
-        Assert.True(isErrorCannotChangeRestaurantScheduleStatus);
+        Assert.True(isErrorCannotChangeRestaurantProperties);
     }
 
     [Fact]
@@ -297,11 +298,11 @@ public sealed class RestaurantTests
 
         var openRestaurant = restaurant.Open(Guid.NewGuid());
 
-        bool isErrorCannotChangeRestaurantScheduleStatus = openRestaurant
+        bool isErrorCannotChangeRestaurantProperties = openRestaurant
             .FirstError
-            .Code == "Restaurant.CannotChangeRestaurantScheduleStatus";
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
 
-        Assert.True(isErrorCannotChangeRestaurantScheduleStatus);
+        Assert.True(isErrorCannotChangeRestaurantProperties);
     }
 
     [Fact]
@@ -364,11 +365,11 @@ public sealed class RestaurantTests
 
         var addTable = restaurant.AddTable(Guid.NewGuid(), 3, 4, true);
 
-        bool isErrorCannotChangeRestaurantScheduleStatus = addTable
+        bool isErrorCannotChangeRestaurantProperties = addTable
             .FirstError
-            .Code == "Restaurant.CannotChangeRestaurantScheduleStatus";
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
 
-        Assert.True(isErrorCannotChangeRestaurantScheduleStatus);
+        Assert.True(isErrorCannotChangeRestaurantProperties);
     }
 
     [Fact]
@@ -439,11 +440,11 @@ public sealed class RestaurantTests
 
         var deleteTable = restaurant.DeleteTable(Guid.NewGuid(), 1);
 
-        bool isErrorCannotChangeRestaurantScheduleStatus = deleteTable
+        bool isErrorCannotChangeRestaurantProperties = deleteTable
             .FirstError
-            .Code == "Restaurant.CannotChangeRestaurantScheduleStatus";
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
 
-        Assert.True(isErrorCannotChangeRestaurantScheduleStatus);
+        Assert.True(isErrorCannotChangeRestaurantProperties);
     }
 
     [Fact]
@@ -499,11 +500,11 @@ public sealed class RestaurantTests
 
         var upgradeTable = restaurant.UpgradeTable(Guid.NewGuid(), 1, 5, true);
 
-        bool isErrorCannotChangeRestaurantScheduleStatus = upgradeTable
+        bool isErrorCannotChangeRestaurantProperties = upgradeTable
             .FirstError
-            .Code == "Restaurant.CannotChangeRestaurantScheduleStatus";
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
 
-        Assert.True(isErrorCannotChangeRestaurantScheduleStatus);
+        Assert.True(isErrorCannotChangeRestaurantProperties);
     }
 
     [Fact]
@@ -886,11 +887,178 @@ public sealed class RestaurantTests
             new List<string>(),
             new List<string>());
 
-        bool isErrorCannotChangeRestaurantScheduleStatus = updateInformation
+        bool isErrorCannotChangeRestaurantProperties = updateInformation
             .FirstError
-            .Code == "Restaurant.CannotChangeRestaurantScheduleStatus";
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
 
-        Assert.True(isErrorCannotChangeRestaurantScheduleStatus);
+        Assert.True(isErrorCannotChangeRestaurantProperties);
+    }
+
+    [Fact]
+    public void Rate_Should_ReturnAnError_WhenUserRatingIsAnAdministrator()
+    {
+        var restaurant = CreateRestaurant();
+
+        var rating = restaurant.Rate(stars: 5,
+            clientId: restaurant.RestaurantAdministrations.First().AdministratorId,
+            "some comment");
+
+        bool isErrorRateWhenUserIsAdministrator = rating
+            .FirstError
+            .Code == "Restaurant.RateWhenUserIsAdministrator";
+
+        Assert.True(isErrorRateWhenUserIsAdministrator);
+    }
+
+    [Fact]
+    public void Rate_Should_ReturnAnError_WhenClientHasNotVisitedTheRestaurantYet()
+    {
+        var restaurant = CreateRestaurant();
+
+        var rating = restaurant.Rate(stars: 5,
+            clientId: Guid.NewGuid(),
+            "some comment");
+
+        bool isErrorCannotRate = rating
+            .FirstError
+            .Code == "RestaurantRatings.CannotRate";
+
+        Assert.True(isErrorCannotRate);
+    }
+
+    [Fact]
+    public void Rate_Should_ReturnARestaurantRatingEntity_WhenSuccessful()
+    {
+        var restaurant = CreateRestaurant();
+
+        var clientId = Guid.NewGuid();
+
+        //Add restaurant client after a reservation
+        restaurant.AddRestaurantClient(clientId);
+
+        var rating = restaurant.Rate(stars: 5,
+            clientId: clientId,
+            "some comment");
+
+        bool isReturningARestaurantRatingEntity = rating
+            .Value
+            .GetType() == typeof(RestaurantRating);
+
+        Assert.True(isReturningARestaurantRatingEntity);
+    }
+
+    [Fact]
+    public void ChangeLocalization_Should_ReturnAnError_WhenUserIsNotAdministrator()
+    {
+        var restaurant = CreateRestaurant();
+
+        var changeLocalization = restaurant.ChangeLocalization(Guid.NewGuid(),
+            "Restaurant country",
+            "Restaurant city",
+            "Restaurant region",
+            "Restaurant neighborhood",
+            "Restaurant address",
+            "Restaurant localization details");
+
+        bool isErrorCannotChangeWhenUserIsNotAdministrator = changeLocalization
+            .FirstError
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
+
+        Assert.True(isErrorCannotChangeWhenUserIsNotAdministrator);
+    }
+
+    [Fact]
+    public void ModifySchedule_Should_ReturnAnError_WhenUserIsNotAdministrator()
+    {
+        var restaurant = CreateRestaurant();
+
+        var modifySchedule = restaurant.ModifySchedule(Guid.NewGuid(),
+            DateTime.Now.DayOfWeek,
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0),
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.AddHours(7).Hour, DateTime.Now.AddHours(7).Minute, 0));
+
+        bool isErrorCannotChangeWhenUserIsNotAdministrator = modifySchedule
+            .FirstError
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
+
+        Assert.True(isErrorCannotChangeWhenUserIsNotAdministrator);
+    }
+
+    [Fact]
+    public void UpdateContact_Should_ReturnAnError_WhenUserIsNotAdministrator()
+    {
+        var restaurant = CreateRestaurant();
+
+        var updateContact = restaurant.UpdateContact(Guid.NewGuid(),
+            "Restaurant email",
+            "Restaurant whatsapp",
+            "Restaurant facebook",
+            "Restaurant phone number",
+            "Restaurant instagram",
+            "Restaurant twitter",
+            "Restaurant tik tok",
+            "Restaurant website");
+
+        bool isErrorCannotChangeWhenUserIsNotAdministrator = updateContact
+            .FirstError
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
+
+        Assert.True(isErrorCannotChangeWhenUserIsNotAdministrator);
+    }
+
+    [Fact]
+    public void AddAdministrator_Should_ReturnAnError_WhenUserIsNotAdministrator()
+    {
+        var restaurant = CreateRestaurant();
+
+        var noAdminUser = Guid.NewGuid();
+
+        var addAdministrator = restaurant.AddAdministrator("Admin name",
+            noAdminUser,
+            "Admin title",
+            Guid.NewGuid());
+
+        bool isErrorCannotChangeWhenUserIsNotAdministrator = addAdministrator
+            .FirstError
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
+
+        Assert.True(isErrorCannotChangeWhenUserIsNotAdministrator);
+    }
+
+    [Fact]
+    public void UpdateAdministrator_Should_ReturnAnError_WhenUserIsNotAdministrator()
+    {
+        var restaurant = CreateRestaurant();
+
+        var noAdminUser = Guid.NewGuid();
+
+        var updateAdministrator = restaurant.UpdateAdministrator(noAdminUser,
+            "Admin name",
+            "Admin title",
+            Guid.NewGuid());
+
+        bool isErrorCannotChangeWhenUserIsNotAdministrator = updateAdministrator
+            .FirstError
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
+
+        Assert.True(isErrorCannotChangeWhenUserIsNotAdministrator);
+    }
+
+    [Fact]
+    public void DeleteAdministrator_Should_ReturnAnError_WhenUserIsNotAdministrator()
+    {
+        var restaurant = CreateRestaurant();
+
+        var noAdminUser = Guid.NewGuid();
+
+        var updateAdministrator = restaurant.DeleteAdministrator(noAdminUser,
+            Guid.NewGuid());
+
+        bool isErrorCannotChangeWhenUserIsNotAdministrator = updateAdministrator
+            .FirstError
+            .Code == "Restaurant.CannotChangeRestaurantProperties";
+
+        Assert.True(isErrorCannotChangeWhenUserIsNotAdministrator);
     }
 }
 

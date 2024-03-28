@@ -6,7 +6,7 @@ using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Restaurants;
 using Dinners.Tests.UnitTests.Domain.Restaurants;
 
-namespace Dinners.Tests.UnitTests.Domain.Reservations;
+namespace Dinners.Tests.UnitTests.Reservations;
 
 public sealed class ReservationTests
 {
@@ -174,7 +174,7 @@ public sealed class ReservationTests
         bool hasRefundedMoney = reservation
             .Value
             .RefundId is not null;
-    
+
         Assert.True(hasRefundedMoney);
     }
 
@@ -382,5 +382,22 @@ public sealed class ReservationTests
             .Code == "Reservation.CannotReserveWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved";
 
         Assert.True(isErrorCannotReserveWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved);
+    }
+
+    [Fact]
+    public void DeleteMenu_Should_ReturnAnError_WhenMenuDoesNotExistWithinTheReservationMenus()
+    {
+        var reservation = Reservation.Request(_reservationInformation,
+            new List<int>() { 1, 2, 3 },
+            4,
+            RestaurantId.CreateUnique(),
+            _reservationAttendees,
+            new List<MenuId>());
+
+        var deleteMenu = reservation.Value.DeleteMenu(MenuId.CreateUnique());
+
+        bool isErrorMenuDoesNotExist = deleteMenu.FirstError.Code == "Reservation.MenuNotFound";
+
+        Assert.True(isErrorMenuDoesNotExist);
     }
 }
