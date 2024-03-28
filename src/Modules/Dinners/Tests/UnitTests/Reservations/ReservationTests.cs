@@ -1,10 +1,8 @@
 ﻿using Dinners.Domain.Menus;
 using Dinners.Domain.Reservations;
 using Dinners.Domain.Reservations.DomainEvents;
-using Dinners.Domain.Reservations.Refunds.Events;
-using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Restaurants;
-using Dinners.Tests.UnitTests.Domain.Restaurants;
+using Dinners.Tests.UnitTests.Restaurants;
 
 namespace Dinners.Tests.UnitTests.Reservations;
 

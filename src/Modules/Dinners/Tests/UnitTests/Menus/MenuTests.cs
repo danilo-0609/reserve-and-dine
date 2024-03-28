@@ -11,6 +11,7 @@ namespace Dinners.Tests.UnitTests.Menus;
 
 public sealed class MenuTests
 {
+
     private readonly MenuDetails _menuDetails = MenuDetails.Create("Menu title",
         "Menu description",
         MenuType.Breakfast,

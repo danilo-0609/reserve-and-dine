@@ -6,12 +6,12 @@ using Dinners.Domain.Restaurants.RestaurantSchedules;
 using Dinners.Domain.Restaurants.RestaurantTables;
 using Dinners.Domain.Restaurants.RestaurantUsers;
 using Domain.Restaurants;
-using System.ComponentModel.DataAnnotations;
 
 namespace Dinners.Tests.UnitTests.Restaurants;
 
 public sealed class RestaurantTests
 {
+
     public static RestaurantId RestaurantId { get; set; } = RestaurantId.CreateUnique();
 
     private RestaurantInformation RestaurantInformation = RestaurantInformation.Create("Restaurant name",
