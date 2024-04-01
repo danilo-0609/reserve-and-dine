@@ -6,7 +6,6 @@ namespace Dinners.Domain.Menus;
 
 public sealed record MenuId : AggregateRootId<Guid>
 {
-    [Key]
     public override Guid Value { get ; protected set; }
 
     public static MenuId CreateUnique() => new MenuId(Guid.NewGuid());
