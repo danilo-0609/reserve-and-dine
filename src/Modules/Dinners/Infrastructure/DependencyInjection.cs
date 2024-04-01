@@ -7,6 +7,7 @@ using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantRatings;
 using Dinners.Infrastructure.Blobs;
+using Dinners.Infrastructure.Cache.Menus;
 using Dinners.Infrastructure.Domain.Menus;
 using Dinners.Infrastructure.Domain.Menus.Reviews;
 using Dinners.Infrastructure.Domain.Reservations;
@@ -53,7 +54,7 @@ public static class DependencyInjection
         services.AddTransient<IEventBus, EventBus>();
 
         services.AddScoped<IMenuRepository, MenuRepository>();
-        services.Decorate<IMenuRepository, MenuRepository>();
+        services.Decorate<IMenuRepository, CacheMenuRepository>();
 
         services.AddScoped<IMenuReviewRepository, ReviewRepository>();
         services.AddScoped<IReservationRepository, ReservationRepository>();
