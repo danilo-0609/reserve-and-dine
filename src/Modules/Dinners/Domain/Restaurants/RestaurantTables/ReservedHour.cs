@@ -1,23 +1,27 @@
-﻿using Dinners.Domain.Common;
+﻿using BuildingBlocks.Domain.Entities;
+using Dinners.Domain.Common;
 
 namespace Dinners.Domain.Restaurants.RestaurantTables;
 
-public sealed record ReservedHour
+public sealed class ReservedHour : Entity<ReservedHourId, Guid>
 {
-    public DateTime ReservationDateTime { get; private set; }
-
-    public TimeRange ReservationTimeRange { get; private set; }
-
-    public int NumberOfTable {  get; private set; }
+    public new ReservedHourId Id { get; private set; }
 
     public RestaurantId RestaurantId { get; private set; }
 
-    public ReservedHour(DateTime reservationDateTime, TimeRange reservationTimeRange, int numberOfTable, RestaurantId restaurantId)
+    public RestaurantTableId RestaurantTableId { get; private set; }
+
+    public DateTime ReservationDateTime { get; private set; }
+
+    public TimeRange ReservationTimeRange { get; private set; }
+       
+    public ReservedHour(ReservedHourId id, RestaurantId restaurantId, RestaurantTableId restaurantTableId, DateTime reservationDateTime, TimeRange reservationTimeRange)
     {
+        Id = id;
+        RestaurantId = restaurantId;
+        RestaurantTableId = restaurantTableId;
         ReservationDateTime = reservationDateTime;
         ReservationTimeRange = reservationTimeRange;
-        NumberOfTable = numberOfTable;
-        RestaurantId = restaurantId;
     }
 
     private ReservedHour() { }  

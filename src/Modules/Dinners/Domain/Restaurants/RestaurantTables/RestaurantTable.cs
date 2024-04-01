@@ -1,10 +1,13 @@
-﻿using Dinners.Domain.Common;
+﻿using BuildingBlocks.Domain.Entities;
+using Dinners.Domain.Common;
 
 namespace Dinners.Domain.Restaurants.RestaurantTables;
 
-public sealed record RestaurantTable
+public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
 {
     private readonly List<ReservedHour> _reservedHours = new();
+
+    public new RestaurantTableId Id { get; private set; }
 
     public RestaurantId RestaurantId { get; private set; }
 
@@ -24,14 +27,14 @@ public sealed record RestaurantTable
         bool isPremium,
         List<ReservedHour> reservedHours)
     {
-        return new RestaurantTable(restaurantId, number, seats, isPremium, reservedHours);
+        return new RestaurantTable(RestaurantTableId.CreateUnique() ,restaurantId, number, seats, isPremium, reservedHours);
     }
 
     public RestaurantTable Upgrade(int number,
         int seats,
         bool isPremium)
     {
-        return new RestaurantTable(RestaurantId, number, seats, isPremium, _reservedHours);
+        return new RestaurantTable(base.Id, RestaurantId, number, seats, isPremium, _reservedHours);
     }
 
     public void CancelReservation(DateTime reservedTime)
@@ -43,7 +46,7 @@ public sealed record RestaurantTable
 
     public void Reserve(DateTime reservedTime, TimeRange reservationTimeRange)
     {
-        _reservedHours.Add(new ReservedHour(reservedTime, reservationTimeRange, Number, RestaurantId));
+        _reservedHours.Add(new ReservedHour(ReservedHourId.CreateUnique(), RestaurantId, base.Id, reservedTime, reservationTimeRange));
     }
 
     public void OccupyTable()
@@ -58,12 +61,14 @@ public sealed record RestaurantTable
 
 
     private RestaurantTable(
+        RestaurantTableId restaurantTableId,
         RestaurantId restaurantId,
         int number, 
         int seats, 
         bool isPremium, 
         List<ReservedHour> reservedHours)
     {
+        Id = restaurantTableId;
         RestaurantId = restaurantId;
         Number = number;
         Seats = seats;
