@@ -4,6 +4,8 @@ using ErrorOr;
 using MediatR;
 using Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
+using Dinners.Domain.Restaurants.RestaurantInformations;
+using Dinners.Domain.Restaurants.RestaurantUsers;
 
 namespace Dinners.Application.Restaurants.RestaurantImages.Insert;
 
@@ -29,7 +31,7 @@ internal sealed class InsertRestaurantImagesCommandHandler : ICommandHandler<Ins
 
         string imageUrl = await _blobService.UploadFileBlobAsync(request.FilePath, request.FormFile.FileName);
         
-        restaurant.RestaurantInformation.AddImage(imageUrl);
+        restaurant.AddImage(imageUrl, RestaurantImageUrlId.CreateUnique());
 
         await _restaurantRepository.UpdateAsync(restaurant);
 

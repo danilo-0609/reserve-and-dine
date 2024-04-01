@@ -27,14 +27,18 @@ internal sealed class RemoveRestaurantImageCommandHandler : ICommandHandler<Remo
             return RestaurantErrorCodes.NotFound;
         }
 
-        if (!restaurant.RestaurantInformation.RestaurantImagesUrl.Any(r => r.Value == request.RestaurantImageUrl))
+        if (!restaurant.RestaurantImagesUrl.Any(r => r.Value == request.RestaurantImageUrl))
         {
             return Error.NotFound("Restaurant.ImageNotFound", "Restaurant was not found");
         }
 
+        var restaurantImageUrl = restaurant.RestaurantImagesUrl
+            .Where(r => r.Value == request.RestaurantImageUrl)
+            .Single();
+
         await _blobService.DeleteBlobAsync(request.RestaurantImageUrl);
 
-        restaurant.RestaurantInformation.RemoveImage(request.RestaurantImageUrl);
+        restaurant.RemoveImage(request.RestaurantImageUrl, restaurantImageUrl.Id);
 
         await _restaurantRepository.UpdateAsync(restaurant);
 
