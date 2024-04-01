@@ -10,7 +10,7 @@ public sealed record RestaurantId : AggregateRootId<Guid>
 
     public static RestaurantId CreateUnique() => new RestaurantId(Guid.NewGuid());
 
-    private RestaurantId(Guid value)
+    private RestaurantId(Guid value) : base(value)  
     {
         Value = value;
     }
