@@ -43,8 +43,11 @@ internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuComma
         var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
             menu.MenuDetails,
             menu.DishSpecification,
-            menu.MenuSchedule,
             menu.MenuConsumers.ToList(),
+            menu.MenuImagesUrl.ToList(),
+            menu.Tags.ToList(),
+            menu.MenuSchedules.ToList(),
+            menu.Ingredients.ToList(),
             DateTime.UtcNow);
 
         await _menuReviewRepository.AddAsync(review.Value);
