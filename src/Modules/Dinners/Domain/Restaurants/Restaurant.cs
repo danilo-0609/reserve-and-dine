@@ -11,7 +11,6 @@ using Dinners.Domain.Restaurants.RestaurantTables;
 using Dinners.Domain.Restaurants.RestaurantUsers;
 using Dinners.Domain.Restaurants.Rules;
 using ErrorOr;
-using MediatR;
 using System.Data;
 
 namespace Domain.Restaurants;
@@ -23,6 +22,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     private readonly List<RestaurantTable> _restaurantTables = new();
     private readonly List<RestaurantAdministration> _restaurantAdministrations = new();
     private readonly List<RestaurantSchedule> _restaurantSchedules = new();
+    private readonly List<Chef> _chefs = new();
+    private readonly List<Speciality> _specialties = new();
+    private readonly List<RestaurantImageUrl> _restaurantImagesUrl = new();
+
 
     public new RestaurantId Id { get; private set; }
 
@@ -38,15 +41,21 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
     public RestaurantContact RestaurantContact { get; private set; }
 
-    public IReadOnlyList<RestaurantSchedule> RestaurantSchedules => _restaurantSchedules.AsReadOnly();
+    public List<RestaurantSchedule> RestaurantSchedules => _restaurantSchedules;
 
-    public IReadOnlyList<RestaurantRatingId> RestaurantRatingIds => _ratingIds.AsReadOnly();
+    public List<RestaurantRatingId> RestaurantRatingIds => _ratingIds;
 
-    public IReadOnlyList<RestaurantClient> RestaurantClients => _restaurantClients.AsReadOnly();
+    public List<RestaurantClient> RestaurantClients => _restaurantClients;
 
-    public IReadOnlyList<RestaurantTable> RestaurantTables => _restaurantTables.AsReadOnly();
+    public List<RestaurantTable> RestaurantTables => _restaurantTables;
+        
+    public List<RestaurantAdministration> RestaurantAdministrations => _restaurantAdministrations;
 
-    public IReadOnlyList<RestaurantAdministration> RestaurantAdministrations => _restaurantAdministrations.AsReadOnly();
+    public List<Speciality> Specialities => _specialties;
+
+    public List<Chef> Chefs => _chefs;
+
+    public List<RestaurantImageUrl> RestaurantImagesUrl => _restaurantImagesUrl;
 
     public DateTime PostedAt { get; private set; }
 
@@ -58,6 +67,8 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantContact restaurantContact,
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
+        List<string> specialities,
+        List<string> chefs,
         DateTime postedAt)
     {
         var restaurant = new Restaurant(restaurantId,
@@ -69,6 +80,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             restaurantTables,
             restaurantAdministrations,
             new List<RestaurantClient>(),
+            specialities.ConvertAll(speciality => new Speciality(SpecialityId.CreateUnique(), restaurantId, speciality)),
+            chefs.ConvertAll(chef => new Chef(ChefId.CreateUnique(), restaurantId, chef)),
+            new List<RestaurantImageUrl>(), 
             postedAt);
 
         restaurant.AddDomainEvent(new NewRestaurantPostedDomainEvent(
@@ -90,7 +104,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         List<RestaurantRatingId> ratingIds,
         List<RestaurantClient> restaurantClients,
         List<RestaurantTable> restaurantTables,
-        List<RestaurantAdministration> restaurantAdministrations)
+        List<RestaurantAdministration> restaurantAdministrations,
+        List<Speciality> specialities,
+        List<Chef> chefs,
+        List<RestaurantImageUrl> restaurantImageUrls)
     {
         return new Restaurant(Id,
             numberOfTables,
@@ -104,6 +121,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             restaurantClients,
             restaurantTables,
             restaurantAdministrations,
+            specialities,
+            chefs,
+            restaurantImageUrls,
             PostedAt);
     }
 
@@ -387,10 +407,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     public ErrorOr<SuccessOperation> UpdateInformation(Guid userId,
         string title,
         string description,
-        string type,
-        List<string> chefs,
-        List<string> specialties,
-        List<string> imagesUrl)
+        string type)
     {
         var canUpdateInformation = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
         
@@ -399,8 +416,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return canUpdateInformation.FirstError;
         }
 
-        RestaurantInformation restaurantInformation = RestaurantInformation
-            .Create(title, description, type, chefs, specialties, imagesUrl);
+        RestaurantInformation restaurantInformation = RestaurantInformation.Create(title, description, type);
 
         RestaurantInformation = restaurantInformation;
 
@@ -442,7 +458,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return canChangeProperty.FirstError;
         }
 
-        RestaurantSchedule schedule = RestaurantSchedule.Create(day, start, end);
+        RestaurantSchedule schedule = RestaurantSchedule.Create(Id, day, start, end);
 
         var restaurantSchedule = _restaurantSchedules.Where(r => r.Day.DayOfWeek == day).Single();
 
@@ -482,7 +498,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return SuccessOperation.Code;
     }
 
-    public ErrorOr<RestaurantAdministration> AddAdministration(string name,
+    public ErrorOr<RestaurantAdministration> AddAdministrator(string name,
         Guid newAdministratorId,
         string administratorTitle,
         Guid adminId)
@@ -499,7 +515,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return Error.Validation("RestaurantAdministration.AdministratorExists", "The administrator already exists");
         }
 
-        var restaurantAdministration = RestaurantAdministration.Create(
+        var restaurantAdministration = RestaurantAdministration.Create(Id,
             name,
             newAdministratorId,
             administratorTitle);
@@ -557,6 +573,16 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return SuccessOperation.Code;
     }
 
+    public void AddImage(string imageUrl, RestaurantImageUrlId id)
+    {
+        _restaurantImagesUrl.Add(new RestaurantImageUrl(id, Id, imageUrl));
+    }
+
+    public void RemoveImage(string imageUrl, RestaurantImageUrlId id)
+    {
+        _restaurantImagesUrl.Remove(new RestaurantImageUrl(id, Id, imageUrl));
+    }
+
     private Restaurant(
         RestaurantId id, 
         int numberOfTables, 
@@ -570,7 +596,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         List<RestaurantClient> restaurantClients,
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
-        DateTime postedAt)
+        List<Speciality> specialities,
+        List<Chef> chefs,
+        List<RestaurantImageUrl> restaurantImagesUrl,
+        DateTime postedAt) : base(id)
     {
         Id = id;
         NumberOfTables = numberOfTables;
@@ -586,6 +615,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         _restaurantClients = restaurantClients;
         _restaurantTables = restaurantTables;
         _restaurantAdministrations = restaurantAdministrations;
+        _specialties = specialities;
+        _chefs = chefs;
+        _restaurantImagesUrl = restaurantImagesUrl;
     }
 
     private Restaurant(RestaurantId id,
@@ -597,7 +629,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
         List<RestaurantClient> restaurantClients,
-        DateTime postedAt)
+        List<Speciality> specialities,
+        List<Chef> chefs,
+        List<RestaurantImageUrl> restaurantImagesUrl,
+        DateTime postedAt) : base(id)
     {
         Id = id;
         NumberOfTables = numberOfTables;
@@ -609,6 +644,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         _restaurantClients = restaurantClients;
         _restaurantTables = restaurantTables;
         _restaurantAdministrations = restaurantAdministrations;
+        _specialties = specialities;
+        _chefs = chefs;
+        _restaurantImagesUrl = restaurantImagesUrl;
 
         RestaurantScheduleStatus = SetRestaurantScheduleStatus();
         AvailableTablesStatus = UpdateAvailableTablesStatus();
