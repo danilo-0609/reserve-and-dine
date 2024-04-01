@@ -6,13 +6,13 @@ internal sealed class SetMenuScheduleCommandValidator : AbstractValidator<SetMen
 {
     public SetMenuScheduleCommandValidator()
     {
-        RuleFor(r => r.DayOfWeeks)
+        RuleFor(r => r.Day)
             .NotNull().NotEmpty();
 
-        RuleFor(r => r.Open)
+        RuleFor(r => r.Start)
             .NotEmpty().NotNull();
 
-        RuleFor(r => r.Close)
+        RuleFor(r => r.End)
             .NotEmpty().NotNull();
     }
 }

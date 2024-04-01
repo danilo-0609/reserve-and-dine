@@ -1,7 +1,6 @@
 ﻿using Dinners.Application.Common;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.Errors;
-using Dinners.Domain.Menus.Schedules;
 using ErrorOr;
 using MediatR;
 
@@ -25,13 +24,16 @@ internal sealed class SetMenuScheduleCommandHandler : ICommandHandler<SetMenuSch
             return MenuErrorCodes.NotFound;
         }
 
-        MenuSchedule menuSchedule = menu.SetMenuSchedule(request.DayOfWeeks, request.Open, request.Close);
+        menu.SetMenuSchedule(request.Day, request.Start, request.End);
 
         var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
             menu.MenuDetails,
             menu.DishSpecification,
-            menuSchedule,
             menu.MenuConsumers.ToList(),
+            menu.MenuImagesUrl.ToList(),
+            menu.Tags.ToList(),
+            menu.MenuSchedules.ToList(),
+            menu.Ingredients.ToList(),
             DateTime.UtcNow);
 
         await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
