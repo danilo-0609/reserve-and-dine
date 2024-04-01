@@ -22,7 +22,7 @@ internal sealed class MenusReviewsConfiguration : IEntityTypeConfiguration<Menus
 
         builder.Property(r => r.MenuReviewId)
             .HasConversion(
-                reviewId => reviewId.Value,
+                menuReviewId => menuReviewId.Value,
                 value => MenuReviewId.Create(value))
             .ValueGeneratedNever()
             .HasColumnName("MenuReviewId");
