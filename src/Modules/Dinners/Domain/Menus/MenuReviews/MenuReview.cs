@@ -1,11 +1,11 @@
-﻿using BuildingBlocks.Domain.Entities;
+﻿using BuildingBlocks.Domain.AggregateRoots;
 using Dinners.Domain.Menus.MenuReviews.Events;
 using Dinners.Domain.Menus.MenuReviews.Rules;
 using ErrorOr;
 
 namespace Dinners.Domain.Menus.MenuReviews;
 
-public sealed class MenuReview : Entity<MenuReviewId, Guid>
+public sealed class MenuReview : AggregateRoot<MenuReviewId, Guid>
 {
     public new MenuReviewId Id { get; private set; }
 
