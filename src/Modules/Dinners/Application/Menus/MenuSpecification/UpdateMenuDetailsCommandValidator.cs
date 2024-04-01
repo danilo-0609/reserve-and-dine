@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Dinners.Domain.Menus.Details;
+using FluentValidation;
 
 namespace Dinners.Application.Menus.MenuSpecification;
 
@@ -21,9 +22,7 @@ internal sealed class UpdateMenuDetailsCommandValidator : AbstractValidator<Upda
             .NotNull();
 
         RuleFor(r => r.MenuType)
-            .Equal("Breakfast")
-            .Equal("Lunch")
-            .Equal("Dinner")
+            .Must(value => Enum.TryParse(value, out MenuType menuType))
             .WithMessage("Menu type must be a valid value")
             .NotEmpty();
 
@@ -32,15 +31,13 @@ internal sealed class UpdateMenuDetailsCommandValidator : AbstractValidator<Upda
 
         RuleFor(r => r.Currency)
             .NotEmpty()
-            .Equal("COP")
-            .Equal("USD")
+            .Must(value => Enum.TryParse(value, out Currency currency))
             .WithMessage("Currency must be COP or USD");
 
         RuleFor(r => r.Discount)
-            .NotEmpty();
+            .NotNull();
 
         RuleFor(r => r.Tags)
-            .NotEmpty()
             .NotNull();
 
         RuleFor(r => r.IsVegetarian)
@@ -54,5 +51,18 @@ internal sealed class UpdateMenuDetailsCommandValidator : AbstractValidator<Upda
         RuleFor(r => r.HasAlcohol)
             .NotEmpty()
             .NotNull();
+    }
+
+    private enum MenuType
+    {
+        Breakfast,
+        Lunch,
+        Dinner
+    }
+
+    private enum Currency
+    {
+        USD,
+        COP
     }
 }
