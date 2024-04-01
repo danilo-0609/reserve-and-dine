@@ -1,21 +1,31 @@
-﻿namespace Dinners.Domain.Menus.Schedules;
+﻿using BuildingBlocks.Domain.Entities;
 
-public sealed record MenuSchedule
+namespace Dinners.Domain.Menus.Schedules;
+
+public sealed class MenuSchedule : Entity<MenuScheduleId, Guid>
 {
-    public List<DayAvailable> Days { get; private set; }
+    public new MenuScheduleId Id { get; private set; }
 
-    public TimeRange AvailableMenuHours { get; private set; }
+    public MenuId MenuId { get; private set; }
 
-    public static MenuSchedule Create(List<DayOfWeek> days, TimeSpan start, TimeSpan end)
+    public DayOfWeek Day { get; private set; }
+
+    public TimeSpan StartTimeSpan { get; private set; }
+
+    public TimeSpan EndTimeSpan { get; private set; }
+
+    public static MenuSchedule Create(DayOfWeek day, TimeSpan startTimeSpan, TimeSpan endTimeSpan, MenuId menuId)
     {
-        return new MenuSchedule(days.ConvertAll(day => new DayAvailable(day)), new TimeRange(start, end));
+        return new MenuSchedule(MenuScheduleId.CreateUnique(), day, startTimeSpan, endTimeSpan, menuId);
     }
 
-
-    private MenuSchedule(List<DayAvailable> days, TimeRange availableMenuHours)
+    private MenuSchedule(MenuScheduleId id, DayOfWeek day, TimeSpan startTimeSpan, TimeSpan endTimeSpan, MenuId menuId)
     {
-        Days = days;
-        AvailableMenuHours = availableMenuHours;
+        Id = id;
+        MenuId = menuId;
+        Day = day;
+        StartTimeSpan = startTimeSpan;
+        EndTimeSpan = endTimeSpan;
     }
 
     private MenuSchedule() { }
