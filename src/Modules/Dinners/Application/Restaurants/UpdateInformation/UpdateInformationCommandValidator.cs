@@ -17,11 +17,5 @@ internal sealed class UpdateInformationCommandValidator : AbstractValidator<Upda
 
         RuleFor(r => r.Type)
             .NotNull().NotEmpty();
-
-        RuleFor(r => r.Chefs)
-            .NotNull();
-
-        RuleFor(r => r.Specialties)
-            .NotNull();
     }
 }

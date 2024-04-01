@@ -31,14 +31,7 @@ internal sealed class UpdateInformationCommandHandler : ICommandHandler<UpdateIn
         var updateInformation = restaurant.UpdateInformation(_executionContextAccessor.UserId,
             request.Title,
             request.Description,
-            request.Type,
-            request.Chefs,
-            request.Specialties,
-            restaurant
-            .RestaurantInformation
-            .RestaurantImagesUrl
-            .ToList()
-            .ConvertAll(image => image.Value));
+            request.Type);
     
         if (updateInformation.IsError)
         {

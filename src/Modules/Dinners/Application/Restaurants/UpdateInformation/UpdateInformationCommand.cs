@@ -7,6 +7,4 @@ namespace Dinners.Application.Restaurants.UpdateInformation;
 public sealed record UpdateInformationCommand(Guid RestaurantId,
     string Title,
     string Description,
-    string Type,
-    List<string>Chefs,
-    List<string> Specialties) : ICommand<ErrorOr<Unit>>;
+    string Type) : ICommand<ErrorOr<Unit>>;
