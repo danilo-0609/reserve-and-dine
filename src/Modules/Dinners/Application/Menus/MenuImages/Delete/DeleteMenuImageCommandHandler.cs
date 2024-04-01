@@ -26,14 +26,16 @@ internal sealed class DeleteMenuImageCommandHandler : ICommandHandler<DeleteMenu
             return MenuErrorCodes.NotFound;
         }
 
-        if (!menu.MenuDetails.MenuImagesUrl.Any(r => r.Value == request.MenuImageUrl))
+        if (!menu.MenuImagesUrl.Any(r => r.Value == request.MenuImageUrl))
         {
             return Error.NotFound("Menu.ImageNotFound", "Image was not found");
         }
 
         await _blobService.DeleteBlobAsync(request.MenuImageUrl);
 
-        menu.MenuDetails.DeleteImage(request.MenuImageUrl);
+        var menuImageUrl = menu.MenuImagesUrl.Where(r => r.Value == request.MenuImageUrl).Single();
+
+        menu.DeleteImage(request.MenuImageUrl, menuImageUrl.Id);
     
         await _menuRepository.UpdateAsync(menu, cancellationToken);
 

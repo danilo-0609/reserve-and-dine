@@ -28,7 +28,7 @@ internal sealed class AddMenuImageCommandHandler : ICommandHandler<AddMenuImageC
 
         string imageUrl = await _blobService.UploadFileBlobAsync(request.FilePath, request.FormFile.FileName);
 
-        menu.MenuDetails.AddImage(imageUrl);
+        menu.AddImage(imageUrl);
 
         await _menuRepository.UpdateAsync(menu, cancellationToken);
 
