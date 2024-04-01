@@ -8,7 +8,6 @@ using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Reservations.Rules;
 using Dinners.Domain.Restaurants;
 using ErrorOr;
-using MediatR;
 
 namespace Dinners.Domain.Reservations;
 
@@ -20,7 +19,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
     public ReservationInformation ReservationInformation { get; private set; }
 
-    public IReadOnlyList<MenuId> MenuIds => _menuIds.AsReadOnly();
+    public List<MenuId> MenuIds => _menuIds;
 
     public RestaurantId RestaurantId { get; private set; }
 
