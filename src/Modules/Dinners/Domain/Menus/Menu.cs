@@ -14,6 +14,10 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 {
     private readonly List<MenuReviewId> _menuReviewIds = new();
     private readonly List<MenuConsumer> _menuConsumers = new();
+    private readonly List<MenuImageUrl> _menuImagesUrl = new();
+    private readonly List<Tag> _tags = new();
+    private readonly List<Ingredient> _ingredients = new();
+    private readonly List<MenuSchedule> _menuSchedules = new();
 
     public new MenuId Id { get; private set; }
 
@@ -23,31 +27,43 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
     public DishSpecification DishSpecification { get; private set; }
 
-    public IReadOnlyList<MenuReviewId> MenuReviewIds => _menuReviewIds.AsReadOnly();
+    public List<MenuReviewId> MenuReviewIds => _menuReviewIds;
 
-    public MenuSchedule MenuSchedule { get; private set; }
+    public List<MenuImageUrl> MenuImagesUrl => _menuImagesUrl;
 
-    public IReadOnlyList<MenuConsumer> MenuConsumers => _menuConsumers.AsReadOnly();
+    public List<Tag> Tags => _tags;
+
+    public List<Ingredient> Ingredients => _ingredients;
+
+    public List<MenuSchedule> MenuSchedules => _menuSchedules;
+
+    public List<MenuConsumer> MenuConsumers => _menuConsumers;
 
     public DateTime CreatedOn { get; private set; }
 
     public DateTime? UpdatedOn { get; private set; }
 
 
-
-    public static Menu Publish(RestaurantId restaurantId,
+    public static Menu Publish(MenuId menuId,
+        RestaurantId restaurantId,
         MenuDetails menuDetails,
         DishSpecification dishSpecification,
-        MenuSchedule menuSchedule,
+        List<string> imagesUrl,
+        List<string> tags,
+        List<string> ingredients,
+        List<MenuSchedule> menuSchedules,
         DateTime createdOn)
     {
         Menu menu = new Menu(new List<MenuReviewId>(),
-            MenuId.CreateUnique(),
+            menuId,
             restaurantId,
             menuDetails,
             dishSpecification,
-            menuSchedule,
             new List<MenuConsumer>(),
+            imagesUrl.ConvertAll(image => new MenuImageUrl(MenuImageUrlId.CreateUnique(), image, menuId)),
+            tags.ConvertAll(tag => new Tag(TagId.CreateUnique(), tag, menuId)),
+            menuSchedules,
+            ingredients.ConvertAll(ingredient => new Ingredient(IngredientId.CreateUnique(), ingredient, menuId)),
             createdOn,
             null);
 
@@ -63,8 +79,6 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         MenuType menuType,
         Price price,
         decimal discount,
-        List<string> menuImagesUrl,
-        List<string> tags,
         bool isVegetarian,
         string primaryChefName,
         bool hasAlcohol,
@@ -75,8 +89,6 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             menuType,
             price,
             discount,
-            menuImagesUrl,
-            tags,
             isVegetarian,
             primaryChefName,
             hasAlcohol,
@@ -103,8 +115,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         return menuReview;
     }
 
-    public DishSpecification UpdateDishSpecification(List<string> ingredients,
-        string mainCourse = "",
+    public DishSpecification UpdateDishSpecification(string mainCourse = "",
         string sideDishes = "",
         string appetizers = "",
         string beverages = "",
@@ -114,7 +125,6 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         string coffee = "")
     {
         return DishSpecification.Create(
-            ingredients,
             mainCourse,
             sideDishes,
             appetizers,
@@ -125,18 +135,47 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             coffee);
     }
 
-    public MenuSchedule SetMenuSchedule(List<DayOfWeek> days, 
-        TimeSpan start, 
+    public MenuSchedule SetMenuSchedule(DayOfWeek day,
+        TimeSpan start,
         TimeSpan end)
     {
-        return MenuSchedule.Create(days, start, end);
+        var menuSchedule = MenuSchedule.Create(day, start, end, Id);
+
+        _menuSchedules.Add(menuSchedule);
+
+        return menuSchedule;
+    }
+
+    public void ModifyMenuSchedule(DayOfWeek day,
+        TimeSpan start,
+        TimeSpan end)
+    {
+        var menuSchedule = _menuSchedules
+            .Where(r => r.Day == day)
+            .Single();
+
+        _menuSchedules.Remove(menuSchedule);
+
+        _menuSchedules.Add(MenuSchedule.Create(day, start, end, Id));
+    }
+
+    public void DeleteMenuSchedule(DayOfWeek day)
+    {
+        var menuSchedule = _menuSchedules
+            .Where(r => r.Day == day)
+            .Single();
+
+        _menuSchedules.Remove(menuSchedule);
     }
 
     public Menu Update(List<MenuReviewId> menuReviewIds,
         MenuDetails menuSpecification,
         DishSpecification dishSpecification,
-        MenuSchedule menuSchedule,
         List<MenuConsumer> menuConsumers,
+        List<MenuImageUrl> menuImageUrls,
+        List<Tag> tags,
+        List<MenuSchedule> menuSchedules,
+        List<Ingredient> ingredients,
         DateTime? updatedOn)
     {
         return new Menu(menuReviewIds,
@@ -144,8 +183,11 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             RestaurantId,
             menuSpecification,
             dishSpecification,
-            menuSchedule,
             menuConsumers,
+            menuImageUrls,
+            tags,
+            menuSchedules,
+            ingredients,
             CreatedOn,
             updatedOn);
     }
@@ -166,25 +208,61 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
         return menuConsumer;
     }
-        
+
+    public void AddImage(string imageUrl)
+    {
+        _menuImagesUrl.Add(new MenuImageUrl(MenuImageUrlId.CreateUnique(), imageUrl, Id));
+    }
+
+    public void DeleteImage(string imageUrl, MenuImageUrlId menuImageUrlId)
+    {
+        _menuImagesUrl.Remove(new MenuImageUrl(menuImageUrlId, imageUrl, Id));
+    }
+
+    public void AddTag(string tag)
+    {
+        _tags.Add(new Tag(TagId.CreateUnique(), tag, Id));
+    }
+
+    public void DeleteTag(string tag, TagId tagId)
+    {
+        _tags.Remove(new Tag(tagId, tag, Id));
+    }
+
+    public void AddIngredient(string ingredient)
+    {
+        _ingredients.Add(new Ingredient(IngredientId.CreateUnique(), ingredient, Id));
+    }
+
+    public void DeleteIngredient(string ingredient, IngredientId ingredientId)
+    {
+        _ingredients.Remove(new Ingredient(ingredientId, ingredient, Id));
+    }
+
     private Menu(List<MenuReviewId> menuReviewIds, 
         MenuId id, 
         RestaurantId restaurantId,
         MenuDetails menuSpecification, 
-        DishSpecification dishSpecification, 
-        MenuSchedule menuSchedule,
+        DishSpecification dishSpecification,
         List<MenuConsumer> menuConsumers,
+        List<MenuImageUrl> imagesUrl,
+        List<Tag> tags,
+        List<MenuSchedule> menuSchedules,
+        List<Ingredient> ingredients,
         DateTime createdOn, 
         DateTime? updatedOn)
     {
         _menuReviewIds = menuReviewIds;
         _menuConsumers = menuConsumers;
+        _menuImagesUrl = imagesUrl;
+        _tags = tags;
+        _menuSchedules = menuSchedules;
+        _ingredients = ingredients;
 
         Id = id;
         RestaurantId = restaurantId;
         MenuDetails = menuSpecification;
         DishSpecification = dishSpecification;
-        MenuSchedule = menuSchedule;
         CreatedOn = createdOn;
         UpdatedOn = updatedOn;
     }
