@@ -73,11 +73,14 @@ internal sealed class ReservationVisitedDomainEventHandler : IDomainEventHandler
         menus.ForEach(async menu =>
         {
             var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
-                menu.MenuDetails,
-                menu.DishSpecification,
-                menu.MenuSchedule,
-                menu.MenuConsumers.ToList(),
-                DateTime.UtcNow);
+                    menu.MenuDetails,
+                    menu.DishSpecification,
+                    menu.MenuConsumers.ToList(),
+                    menu.MenuImagesUrl.ToList(),
+                    menu.Tags.ToList(),
+                    menu.MenuSchedules.ToList(),
+                    menu.Ingredients.ToList(),
+                    DateTime.UtcNow);
 
             await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
         });
