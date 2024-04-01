@@ -28,14 +28,14 @@ internal sealed class GetMenuByIdQueryHandler : IQueryHandler<GetMenuByIdQuery, 
             menu.MenuDetails.MenuType.Value,
             menu.MenuDetails.Price,
             menu.MenuDetails.Discount,
-            menu.MenuDetails.Tags.ConvertAll(tag => tag.Value)!,
+            menu.Tags.ToList().ConvertAll(tag => tag.Value),
             menu.MenuDetails.IsVegetarian,
             menu.MenuDetails.PrimaryChefName,
             menu.MenuDetails.HasAlcohol,
             menu.MenuDetails.DiscountTerms);
 
         var dishSpecificationResponse = new DishSpecificationResponse(
-            menu.DishSpecification.Ingredients.ConvertAll(ingredient => ingredient.Value)!,
+            menu.Ingredients.ToList().ConvertAll(ingredient => ingredient.Value),
             menu.DishSpecification.MainCourse,
             menu.DishSpecification.SideDishes,
             menu.DishSpecification.Appetizers,
@@ -45,15 +45,18 @@ internal sealed class GetMenuByIdQueryHandler : IQueryHandler<GetMenuByIdQuery, 
             menu.DishSpecification.Condiments,
             menu.DishSpecification.Coffee);
 
-        var menuScheduleResponse = new MenuScheduleResponse(menu.MenuSchedule.Days.ConvertAll(value => value.DayOfWeek),
-            menu.MenuSchedule.AvailableMenuHours.Start,
-            menu.MenuSchedule.AvailableMenuHours.End);
+        List<MenuScheduleResponse> menuSchedulesResponse = menu
+            .MenuSchedules
+            .ToList()
+            .ConvertAll(schedule => new MenuScheduleResponse(schedule.Day, 
+                schedule.StartTimeSpan, 
+                schedule.EndTimeSpan));
 
         var menuResponse = new MenuResponse(menu.Id.Value,
             menu.RestaurantId.Value,
             menuDetailsResponse,
             dishSpecificationResponse,
-            menuScheduleResponse,
+            menuSchedulesResponse,
             menu.CreatedOn,
             menu.UpdatedOn);
 
