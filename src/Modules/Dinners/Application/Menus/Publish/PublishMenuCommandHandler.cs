@@ -37,16 +37,13 @@ internal sealed class PublishMenuCommandHandler : ICommandHandler<PublishMenuCom
             menuType,
             new Price(request.Price, request.Currency),
             request.Discount,
-            new List<string>(),
-            request.Tags,
             request.IsVegetarian,
             request.PrimaryChefName,
             request.HasAlcohol,
             request.DiscountTerms);
 
 
-        DishSpecification dishSpecification = DishSpecification.Create(request.Ingredients,
-            request.MainCourse,
+        DishSpecification dishSpecification = DishSpecification.Create(request.MainCourse,
             request.SideDishes,
             request.Appetizers,
             request.Beverages,
@@ -55,15 +52,14 @@ internal sealed class PublishMenuCommandHandler : ICommandHandler<PublishMenuCom
             request.Condiments,
             request.Coffee);
 
-        MenuSchedule menuSchedule = MenuSchedule.Create(request.DayOfWeeks,
-            request.Start,
-            request.End);
-
-        Menu menu = Menu.Publish(
+        Menu menu = Menu.Publish(MenuId.CreateUnique(),
             RestaurantId.Create(request.RestaurantId),
             menuDetails,
             dishSpecification,
-            menuSchedule,
+            new List<string>(),
+            request.Tags,
+            request.Ingredients,
+            new List<MenuSchedule>(),
             DateTime.UtcNow);
 
         await _menuRepository.AddAsync(menu, cancellationToken);
