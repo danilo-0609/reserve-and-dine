@@ -59,17 +59,10 @@ internal sealed class RatingRepository : IRestaurantRatingRepository
         return ratingsResponse.ToList();
     }
 
-    public async Task UpdateAsync(RestaurantRating rating, CancellationToken cancellationToken)
+    public Task UpdateAsync(RestaurantRating rating, CancellationToken cancellationToken)
     {
-        await _dbContext
-           .Ratings
-           .ExecuteUpdateAsync(x =>
-               x.SetProperty(r => r.Id, rating.Id)
-                .SetProperty(r => r.ClientId, rating.ClientId)
-                .SetProperty(r => r.Stars, rating.Stars)
-                .SetProperty(r => r.Comment, rating.Comment)
-                .SetProperty(r => r.RatedAt, rating.RatedAt)
-                .SetProperty(r => r.UpdatedAt, rating.UpdatedAt), 
-                cancellationToken);
+        _dbContext.Ratings.Update(rating);
+
+        return Task.CompletedTask;
     }
 }

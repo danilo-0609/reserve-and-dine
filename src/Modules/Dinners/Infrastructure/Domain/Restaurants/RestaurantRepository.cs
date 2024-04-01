@@ -1,9 +1,7 @@
-﻿using Dinners.Domain.Menus;
-using Dinners.Domain.Restaurants;
+﻿using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantTables;
 using Domain.Restaurants;
 using Microsoft.EntityFrameworkCore;
-using System.Drawing;
 
 namespace Dinners.Infrastructure.Domain.Restaurants;
 
@@ -21,12 +19,11 @@ internal sealed class RestaurantRepository : IRestaurantRepository
         await _dbContext.Restaurants.AddAsync(restaurant, cancellationToken);
     }
 
-    public async Task DeleteAsync(RestaurantId restaurant, CancellationToken cancellationToken)
+    public Task DeleteAsync(RestaurantId restaurant, CancellationToken cancellationToken)
     {
-        await _dbContext
-            .Restaurants
-            .Where(r => r.Id == restaurant)
-            .ExecuteDeleteAsync();
+         _dbContext.Restaurants.Where(r => r.Id == restaurant).ExecuteDelete();
+
+        return Task.CompletedTask;
     }
 
     public async Task<bool> ExistsAsync(RestaurantId restaurantId)
@@ -70,7 +67,7 @@ internal sealed class RestaurantRepository : IRestaurantRepository
         return await _dbContext
         .Restaurants
         .Where(r => r.Id == restaurantId)
-        .SelectMany(x => x.RestaurantInformation.RestaurantImagesUrl
+        .SelectMany(x => x.RestaurantImagesUrl
             .Select(r => r.Value))
         .ToListAsync(cancellationToken);
     }
@@ -94,23 +91,10 @@ internal sealed class RestaurantRepository : IRestaurantRepository
         return tables!.ToList();
     }
 
-    public async Task UpdateAsync(Restaurant restaurant)
+    public Task UpdateAsync(Restaurant restaurant)
     {
-        await _dbContext
-           .Restaurants
-           .ExecuteUpdateAsync(x =>
-               x.SetProperty(r => r.Id, restaurant.Id)
-                .SetProperty(r => r.NumberOfTables, restaurant.NumberOfTables)
-                .SetProperty(r => r.AvailableTablesStatus, restaurant.AvailableTablesStatus)
-                .SetProperty(r => r.RestaurantInformation, restaurant.RestaurantInformation)
-                .SetProperty(r => r.RestaurantLocalization, restaurant.RestaurantLocalization)
-                .SetProperty(r => r.RestaurantScheduleStatus, restaurant.RestaurantScheduleStatus)
-                .SetProperty(r => r.RestaurantSchedules, restaurant.RestaurantSchedules)
-                .SetProperty(r => r.RestaurantContact, restaurant.RestaurantContact)
-                .SetProperty(r => r.RestaurantRatingIds, restaurant.RestaurantRatingIds)
-                .SetProperty(r => r.RestaurantClients, restaurant.RestaurantClients)
-                .SetProperty(r => r.RestaurantTables, restaurant.RestaurantTables)
-                .SetProperty(r => r.RestaurantAdministrations, restaurant.RestaurantAdministrations)
-                .SetProperty(r => r.PostedAt, restaurant.PostedAt));
+        _dbContext.Restaurants.Update(restaurant);
+
+        return Task.CompletedTask;
     }
 }

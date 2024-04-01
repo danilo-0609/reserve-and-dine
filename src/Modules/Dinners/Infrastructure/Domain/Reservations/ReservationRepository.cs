@@ -35,21 +35,10 @@ internal sealed class ReservationRepository : IReservationRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task UpdateAsync(Reservation reservation, CancellationToken cancellationToken)
+    public Task UpdateAsync(Reservation reservation, CancellationToken cancellationToken)
     {
-        await _dbContext
-            .Reservations
-            .ExecuteUpdateAsync(x =>
-                x.SetProperty(r => r.Id, reservation.Id)
-                 .SetProperty(r => r.ReservationInformation, reservation.ReservationInformation)
-                 .SetProperty(r => r.MenuIds, reservation.MenuIds)
-                 .SetProperty(r => r.RestaurantId, reservation.RestaurantId)
-                 .SetProperty(r => r.ReservationAttendees, reservation.ReservationAttendees)
-                 .SetProperty(r => r.ReservationStatus, reservation.ReservationStatus)
-                 .SetProperty(r => r.ReservationPaymentId, reservation.ReservationPaymentId)
-                 .SetProperty(r => r.RefundId, reservation.RefundId)
-                 .SetProperty(r => r.RequestedAt, reservation.RequestedAt)
-                 .SetProperty(r => r.PaidAt, reservation.PaidAt)
-                 .SetProperty(r => r.CancelledAt, reservation.CancelledAt));
+        _dbContext.Reservations.Update(reservation);
+
+        return Task.CompletedTask;
     }
 }

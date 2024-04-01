@@ -1,5 +1,4 @@
 ﻿using Dinners.Domain.Menus;
-using Dinners.Domain.Menus.Dishes;
 using Dinners.Domain.Menus.MenuReviews;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +31,7 @@ internal sealed class MenuRepository : IMenuRepository
         return await _dbContext
             .Menus
             .Where(r => r.Id == menuId)
-            .SelectMany(x => x.MenuDetails.MenuImagesUrl
+            .SelectMany(x => x.MenuImagesUrl
                 .Select(r => r.Value))
             .ToListAsync(cancellationToken);
     }
@@ -54,7 +53,7 @@ internal sealed class MenuRepository : IMenuRepository
         {
             await _dbContext
                 .Menus
-                .Where(x => x.DishSpecification.Ingredients.Contains(new Ingredient(ingredient)))
+                .Where(x => x.Ingredients.Any(r => r.Value == ingredient))
                 .SingleOrDefaultAsync();
         }
 
@@ -79,7 +78,7 @@ internal sealed class MenuRepository : IMenuRepository
                  .SetProperty(r => r.MenuDetails, menu.MenuDetails)
                  .SetProperty(r => r.DishSpecification, menu.DishSpecification)
                  .SetProperty(r => r.MenuReviewIds, menu.MenuReviewIds)
-                 .SetProperty(r => r.MenuSchedule, menu.MenuSchedule)
+                 .SetProperty(r => r.MenuSchedules, menu.MenuSchedules)
                  .SetProperty(r => r.MenuConsumers, menu.MenuConsumers)
                  .SetProperty(r => r.CreatedOn, menu.CreatedOn)
                  .SetProperty(r => r.UpdatedOn, menu.UpdatedOn));

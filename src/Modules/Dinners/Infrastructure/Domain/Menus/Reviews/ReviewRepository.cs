@@ -25,16 +25,10 @@ internal sealed class ReviewRepository : IMenuReviewRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task UpdateAsync(MenuReview menuReview)
+    public Task UpdateAsync(MenuReview menuReview)
     {
-        await _dbContext
-            .Reviews
-            .ExecuteUpdateAsync(x =>
-                x.SetProperty(r => r.Id, menuReview.Id)
-                 .SetProperty(r => r.Rate, menuReview.Rate)
-                 .SetProperty(r => r.ClientId, menuReview.ClientId)
-                 .SetProperty(r => r.Comment, menuReview.Comment)
-                 .SetProperty(r => r.ReviewedAt, menuReview.ReviewedAt)
-                 .SetProperty(r => r.UpdatedAt, menuReview.UpdatedAt));
+        _dbContext.Reviews.Update(menuReview);
+
+        return Task.CompletedTask;
     }
 }
