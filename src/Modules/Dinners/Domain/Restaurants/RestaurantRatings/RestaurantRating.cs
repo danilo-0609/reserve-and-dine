@@ -1,11 +1,11 @@
-﻿using BuildingBlocks.Domain.Entities;
+﻿using BuildingBlocks.Domain.AggregateRoots;
 using Dinners.Domain.Restaurants.RestaurantRatings.Events;
 using Dinners.Domain.Restaurants.RestaurantRatings.Rules;
 using ErrorOr;
 
 namespace Dinners.Domain.Restaurants.RestaurantRatings;
 
-public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
+public sealed class RestaurantRating : AggregateRoot<RestaurantRatingId, Guid>
 {
     public new RestaurantRatingId Id { get; private set; }
 
@@ -33,8 +33,6 @@ public sealed class RestaurantRating : Entity<RestaurantRatingId, Guid>
         RatedAt = ratedAt;
         UpdatedAt = updatedAt;
     }
-
-
 
     public static ErrorOr<RestaurantRating> GiveRating(RestaurantId restaurantId,
         string restaurantTitle,

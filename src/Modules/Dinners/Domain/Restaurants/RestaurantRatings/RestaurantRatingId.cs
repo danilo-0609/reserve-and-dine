@@ -1,11 +1,9 @@
-﻿using BuildingBlocks.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using BuildingBlocks.Domain.AggregateRoots;
 
 namespace Dinners.Domain.Restaurants.RestaurantRatings;
 
-public sealed record RestaurantRatingId : EntityId<Guid>
+public sealed record RestaurantRatingId : AggregateRootId<Guid>
 {
-    [Key]
     public override Guid Value { get; protected set; }
 
     public static RestaurantRatingId Create(Guid value) => new RestaurantRatingId(value);
