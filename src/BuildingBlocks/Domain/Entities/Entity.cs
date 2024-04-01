@@ -9,7 +9,6 @@ public abstract class Entity<TId, TIdType> : IEquatable<Entity<TId, TIdType>>, I
     where TId : EntityId<TIdType>
     where TIdType : notnull
 {
-
     private readonly List<IDomainEvent> _domainEvents = new();
 
     public TId Id { get; }
@@ -49,7 +48,17 @@ public abstract class Entity<TId, TIdType> : IEquatable<Entity<TId, TIdType>>, I
 
     public override bool Equals(object? obj)
     {
-        return obj is Entity<TId, TIdType> entity && Id.Equals(entity.Id);
+        if (obj is null || !(obj is Entity<TId, TIdType> entity))
+        {
+            return false;
+        }
+
+        if (Id is null && entity.Id is null)
+        {
+            return false;
+        }
+
+        return ((IEquatable<EntityId<TId>>)Id).Equals(entity.Id);
     }
 
     public static bool operator ==(Entity<TId, TIdType> left, Entity<TId, TIdType> right)
