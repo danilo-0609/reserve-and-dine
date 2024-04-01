@@ -28,7 +28,7 @@ internal sealed class AddAdministrationCommandHandler : ICommandHandler<AddAdmin
             return RestaurantErrorCodes.NotFound;
         }
 
-        ErrorOr<RestaurantAdministration> administrator = restaurant.AddAdministration(request.Name,
+        ErrorOr<RestaurantAdministration> administrator = restaurant.AddAdministrator(request.Name,
             request.NewAdministratorId, 
             request.AdministratorTitle,
             _executionContextAccessor.UserId);
