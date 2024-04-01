@@ -44,7 +44,7 @@ internal sealed class ReservationConfiguration : IEntityTypeConfiguration<Reserv
 
         builder.HasMany(r => r.MenuIds)
             .WithMany()
-            .UsingEntity<ReservationMenus>();
+           .UsingEntity<ReservationMenus>();
 
         builder.Property(r => r.RestaurantId)
             .HasConversion(

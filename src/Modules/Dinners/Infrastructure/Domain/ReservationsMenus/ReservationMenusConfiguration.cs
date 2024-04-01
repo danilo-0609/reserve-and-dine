@@ -17,6 +17,7 @@ internal sealed class ReservationMenusConfiguration : IEntityTypeConfiguration<R
             .HasConversion(
                 menuId => menuId.Value,
                 value => MenuId.Create(value))
+            .ValueGeneratedNever()
             .HasColumnName("MenuId");
 
         builder.Property(p => p.ReservationId)

@@ -3,9 +3,9 @@ using Dinners.Domain.Restaurants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Dinners.Infrastructure.Domain.Menus.MenuReviews;
-using Dinners.Domain.Menus.Schedules;
 using Dinners.Domain.Menus.Dishes;
 using Dinners.Domain.Menus.Details;
+using Dinners.Domain.Menus.Schedules;
 
 namespace Dinners.Infrastructure.Domain.Menus;
 
@@ -14,7 +14,7 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
     public void Configure(EntityTypeBuilder<Menu> builder)
     {
         builder.ToTable("Menus", "dinners");
-        
+
         builder.HasKey(k => k.Id);
     
         builder.Property(p => p.Id)
@@ -43,22 +43,6 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
             x.Property(p => p.Discount).HasColumnName("Discount").HasColumnType("decimal").HasPrecision(10, 2);
             x.Property(p => p.DiscountTerms).HasColumnName("DiscountTerms");
 
-            x.OwnsMany(p => p.MenuImagesUrl, j =>
-            {
-                j.Property(t => t.Value).HasColumnName("MenuImageUrl");
-
-                j.WithOwner().HasForeignKey("MenuId");
-                j.ToTable("MenuImagesUrl", "dinners");
-            });
-
-            x.OwnsMany(p => p.Tags, h =>
-            {
-                h.Property(p => p.Value).HasColumnName("Tag");
-
-                h.WithOwner().HasForeignKey("MenuId");
-                h.ToTable("Tags", "dinners");
-            });
-
             x.Property(p => p.IsVegetarian).HasColumnName("IsVegetarian");
             x.Property(p => p.PrimaryChefName).HasColumnName("PrimaryChefName");
             x.Property(p => p.HasAlcohol).HasColumnName("HasAlcohol");
@@ -66,14 +50,6 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
 
         builder.OwnsOne<DishSpecification>("DishSpecification", x =>
         {
-            x.OwnsMany(p => p.Ingredients, t =>
-            {
-                t.Property(r => r.Value).HasColumnName("Ingredient");
-
-                t.WithOwner().HasForeignKey("MenuId");
-                t.ToTable("Ingredients", "dinners");
-            });
-
             x.Property(p => p.MainCourse).HasColumnName("MainCourse");
             x.Property(p => p.SideDishes).HasColumnName("SideDishes");
             x.Property(p => p.Appetizers).HasColumnName("Appetizers");
@@ -85,29 +61,105 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
         });
 
         builder.HasMany(r => r.MenuReviewIds)
-            .WithMany().UsingEntity<MenusReviews>();
+            .WithMany()
+            .UsingEntity<MenusReviews>();
 
-        builder.OwnsOne<MenuSchedule>("MenuSchedule", x =>
+        builder.OwnsMany(r => r.MenuImagesUrl, x =>
         {
-            x.OwnsMany(r => r.Days, t =>
-            {
-                t.Property(p => p.DayOfWeek).HasColumnName("DayAvailable");
+            x.WithOwner().HasForeignKey("MenuId");
+            x.HasKey(x => x.Id);
+            x.ToTable("MenuImagesUrl", "dinners");
 
-                t.WithOwner().HasForeignKey("MenuId");
-                t.ToTable("DaysAvailable", "dinners");
-            });
+            x.Property(r => r.Id)
+                .HasConversion(
+                    menuImageUrlId => menuImageUrlId.Value,
+                    value => MenuImageUrlId.Create(value))
+                .HasColumnName("MenuImageUrlId");
 
-            x.OwnsOne(p => p.AvailableMenuHours, x =>
-            {
-                x.Property(r => r.Start).HasColumnName("Open");
-                x.Property(r => r.End).HasColumnName("Close");
-            });
+
+            x.Property(r => r.Value).HasColumnName("MenuImageUrl");
+            x.Property(r => r.MenuId).HasColumnName("MenuId")
+                .HasConversion(
+                    menuId => menuId.Value,
+                    value => MenuId.Create(value))
+                .ValueGeneratedNever();
+        });
+
+        builder.OwnsMany(r => r.Tags, x =>
+        {
+            x.WithOwner().HasForeignKey("MenuId");
+            x.HasKey(x => x.Id);
+            x.ToTable("Tags", "dinners");
+
+            x.Property(r => r.Id)
+                .HasConversion(
+                    tagId => tagId.Value,
+                    value => TagId.Create(value))
+                .HasColumnName("TagId");
+
+            x.Property(r => r.Value).HasColumnName("Tag");
+            x.Property(r => r.MenuId).HasColumnName("MenuId")
+                .HasConversion(
+                    menuId => menuId.Value,
+                    value => MenuId.Create(value))
+                .ValueGeneratedNever(); ;
+        });
+
+        builder.OwnsMany(r => r.Ingredients, x =>
+        {
+            x.WithOwner().HasForeignKey("MenuId");
+            x.HasKey(x => x.Id);
+            x.ToTable("Ingredients", "dinners");
+
+            x.Property(r => r.Id)
+                .HasConversion(
+                    ingredientId => ingredientId.Value,
+                    value => IngredientId.Create(value))
+                .HasColumnName("IngredientId");
+
+            x.Property(r => r.Value).HasColumnName("Ingredient"); 
+            x.Property(r => r.MenuId).HasColumnName("MenuId")
+                .HasConversion(
+                    menuId => menuId.Value,
+                    value => MenuId.Create(value))
+                .ValueGeneratedNever(); ;
+        });
+
+        builder.OwnsMany(r => r.MenuSchedules, x =>
+        {
+            x.WithOwner().HasForeignKey("MenuId");
+            x.HasKey(x => x.Id);
+
+            x.Property(r => r.Id)
+                .HasConversion(
+                    menuScheduleId => menuScheduleId.Value,
+                    value => MenuScheduleId.Create(value))
+                .HasColumnName("MenuScheduleId");
+
+            x.Property(x => x.MenuId).HasColumnName("MenuId")
+                .HasConversion(
+                    menuId => menuId.Value,
+                    value => MenuId.Create(value))
+                .ValueGeneratedNever();
+
+            x.Property(r => r.Day).HasColumnName("DayOfWeek");
+            x.Property(r => r.StartTimeSpan).HasColumnName("StartTimeSpan");
+            x.Property(r => r.EndTimeSpan).HasColumnName("EndTimeSpan");
         });
 
         builder.OwnsMany(r => r.MenuConsumers, x =>
         {
             x.WithOwner().HasForeignKey("MenuId");
+            x.HasKey(x => x.MenuId);
             x.ToTable("MenuConsumers", "dinners");
+
+            x.Property(r => r.MenuId).HasColumnName("MenuId")
+                .HasConversion(
+                    menuId => menuId.Value,
+                    value => MenuId.Create(value))
+                .ValueGeneratedNever();
+
+            x.Property(r => r.ClientId).HasColumnName("ClientId");
         });
 
         builder.Property(r => r.CreatedOn).HasColumnName("CreatedOn");
