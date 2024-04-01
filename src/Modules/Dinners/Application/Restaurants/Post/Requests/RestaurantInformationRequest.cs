@@ -2,6 +2,4 @@
 
 public sealed record RestaurantInformationRequest(string Title,
     string Description,
-    string Type,
-    List<string> Chefs,
-    List<string> Specialties);
+    string Type);
