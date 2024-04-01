@@ -5,7 +5,6 @@ using MediatR;
 namespace Dinners.Application.Menus.DishSpecifications;
 
 public sealed record UpdateDishSpecificationCommand(Guid MenuId,
-    List<string> Ingredients,
     string MainCourse,
     string SideDishes,
     string Appetizers,

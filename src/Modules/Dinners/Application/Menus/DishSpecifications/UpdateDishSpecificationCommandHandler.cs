@@ -24,8 +24,7 @@ internal sealed class UpdateDishSpecificationCommandHandler : ICommandHandler<Up
             return MenuErrorCodes.NotFound;
         }
 
-        menu.UpdateDishSpecification(request.Ingredients,
-            request.MainCourse,
+        menu.UpdateDishSpecification(request.MainCourse,
             request.SideDishes,
             request.Appetizers,
             request.Beverages,
