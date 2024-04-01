@@ -18,7 +18,7 @@ public static class RestaurantErrorCodes
         Error.Unauthorized("Restaurant.CannotAccessToAdministrationContent", "Cannot access to administration content if user is not a restaurant administrator");
 
     public static Error CannotChangeRestaurantProperties =>
-        Error.Unauthorized("Restaurant.CannotChangeRestaurantScheduleStatus", CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule.Message);
+        Error.Unauthorized("Restaurant.CannotChangeRestaurantProperties", CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule.Message);
 
     public static Error CannotAddTableWithDuplicateNumber =>
         Error.Validation("Restaurant.CannotAddTableWithDuplicateNumber", "Cannot add table when there's another table with that number");
