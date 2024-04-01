@@ -1,11 +1,19 @@
-﻿namespace Dinners.Domain.Restaurants.RestaurantInformations;
+﻿using BuildingBlocks.Domain.Entities;
 
-public sealed record Chef
+namespace Dinners.Domain.Restaurants.RestaurantInformations;
+
+public sealed class Chef : Entity<ChefId, Guid>
 {
+    public new ChefId Id { get; private set; }
+
+    public RestaurantId RestaurantId { get; private set; }
+
     public string Value { get; private set; }
 
-    public Chef(string value)
+    public Chef(ChefId id, RestaurantId restaurantId, string value)
     {
+        Id = id;
+        RestaurantId = restaurantId;
         Value = value;
     }
 
