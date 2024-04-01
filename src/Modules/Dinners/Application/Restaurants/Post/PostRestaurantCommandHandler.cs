@@ -24,10 +24,7 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
 
         var restaurantInformation = RestaurantInformation.Create(request.RestaurantInformation.Title,
             request.RestaurantInformation.Description,
-            request.RestaurantInformation.Type,
-            request.RestaurantInformation.Chefs,
-            request.RestaurantInformation.Specialties,
-            new List<string>());
+            request.RestaurantInformation.Type);
 
         var restaurantLocalization = RestaurantLocalization.Create(request.RestaurantLocalization.Country,
             request.RestaurantLocalization.City,
@@ -38,7 +35,7 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
 
         var restaurantSchedules = request.RestaurantSchedules.ConvertAll(schedule =>
         {
-            return RestaurantSchedule.Create(schedule.Day, schedule.Start, schedule.End);
+            return RestaurantSchedule.Create(restaurantId, schedule.Day, schedule.Start, schedule.End);
         });
 
         var restaurantContact = RestaurantContact.Create(request.RestaurantContact.Email,
@@ -61,7 +58,8 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
 
         var restaurantAdministrations = request.RestaurantAdministrations.ConvertAll(admin =>
         {
-        return RestaurantAdministration.Create(admin.Name, 
+        return RestaurantAdministration.Create(restaurantId,
+            admin.Name, 
             admin.AdministratorId, 
             admin.AdministratorTitle);
         });
@@ -73,6 +71,8 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
             restaurantContact,
             restaurantTables,
             restaurantAdministrations,
+            request.Specialties,
+            request.Chefs,
             DateTime.UtcNow);   
     
         await _restaurantRepository.AddAsync(restaurant, cancellationToken);

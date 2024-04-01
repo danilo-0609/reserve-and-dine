@@ -9,4 +9,6 @@ public sealed record PostRestaurantCommand(RestaurantInformationRequest Restaura
     List<RestaurantScheduleRequest> RestaurantSchedules,
     List<RestaurantTableRequest> RestaurantTables,
     List<RestaurantAdministrationRequest> RestaurantAdministrations,
-    RestaurantContactRequest RestaurantContact) : ICommand<ErrorOr<Guid>>;
+    RestaurantContactRequest RestaurantContact,
+    List<string> Chefs,
+    List<string> Specialties) : ICommand<ErrorOr<Guid>>;
