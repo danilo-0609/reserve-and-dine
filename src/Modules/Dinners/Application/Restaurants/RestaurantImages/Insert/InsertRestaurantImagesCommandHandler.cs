@@ -5,7 +5,6 @@ using MediatR;
 using Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using Dinners.Domain.Restaurants.RestaurantInformations;
-using Dinners.Domain.Restaurants.RestaurantUsers;
 
 namespace Dinners.Application.Restaurants.RestaurantImages.Insert;
 
