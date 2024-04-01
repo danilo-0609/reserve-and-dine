@@ -11,12 +11,16 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="3.8.0" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\API\API.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Domain\BuildingBlocks.Domain.csproj" />
     <ProjectReference Include="..\Application\Dinners.Application.csproj" />
@@ -30,7 +34,6 @@
   <ItemGroup>
     <Folder Include="ArchTests\Domain\" />
     <Folder Include="ArchTests\Application\" />
-    <Folder Include="IntegrationTests\Menus\" />
     <Folder Include="IntegrationTests\Reservations\" />
     <Folder Include="IntegrationTests\Restaurants\" />
   </ItemGroup>
