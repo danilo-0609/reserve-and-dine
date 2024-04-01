@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.Rules;
+using Dinners.Domain.Menus.MenuReviews.Errors;
 using ErrorOr;
 
 namespace Dinners.Domain.Menus.MenuReviews.Rules;
@@ -12,7 +13,7 @@ internal sealed class MenuReviewMustBeANumberBetweenZeroToFiveRule : IBusinessRu
         _rate = rate;
     }
 
-    public Error Error => throw new NotImplementedException();
+    public Error Error => MenuReviewsErrorCodes.RateIsNotAValidNumber;
 
     public bool IsBroken() => _rate > 5 || _rate < 0;
 
