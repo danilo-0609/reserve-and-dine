@@ -3,7 +3,10 @@ using Dinners.Domain.Menus.MenuReviews;
 using Dinners.Domain.Reservations;
 using Dinners.Domain.Reservations.Refunds;
 using Dinners.Domain.Reservations.ReservationsPayments;
+using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantRatings;
+using Dinners.Domain.Restaurants.RestaurantSchedules;
+using Dinners.Domain.Restaurants.RestaurantTables;
 using Dinners.Infrastructure.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Domain.ReservationsMenus;
 using Dinners.Infrastructure.Domain.Restaurants.RestaurantsRatings;
@@ -13,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dinners.Infrastructure;
 
-internal sealed class DinnersDbContext : DbContext, IApplicationDbContext
+public sealed class DinnersDbContext : DbContext, IApplicationDbContext
 {
 
     public DinnersDbContext(DbContextOptions<DinnersDbContext> options) 
@@ -50,7 +53,17 @@ internal sealed class DinnersDbContext : DbContext, IApplicationDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Restaurant>().Ignore(e => e.RestaurantTables);
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DinnersDbContext).Assembly);
+
+        modelBuilder.Ignore<MenuId>();
+        modelBuilder.Ignore<MenuReviewId>();
+        modelBuilder.Ignore<RestaurantId>();
+        modelBuilder.Ignore<ReservationId>();
+        modelBuilder.Ignore<RestaurantRatingId>();
+        modelBuilder.Ignore<RestaurantTableId>();
+        modelBuilder.Ignore<RestaurantScheduleId>();
     }
 
     public DinnersDbContext() { }
