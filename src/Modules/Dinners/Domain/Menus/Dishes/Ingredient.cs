@@ -1,11 +1,19 @@
-﻿namespace Dinners.Domain.Menus.Dishes;
+﻿using BuildingBlocks.Domain.Entities;
 
-public sealed record Ingredient
+namespace Dinners.Domain.Menus.Dishes;
+
+public sealed class Ingredient : Entity<IngredientId, Guid>
 {
+    public new IngredientId Id { get; private set; }
+
+    public MenuId MenuId { get; private set; }  
+
     public string Value { get; private set; }
 
-    public Ingredient(string value)
+    public Ingredient(IngredientId id ,string value, MenuId menuId)
     {
+        Id = id;
+        MenuId = menuId;
         Value = value;
     }
 

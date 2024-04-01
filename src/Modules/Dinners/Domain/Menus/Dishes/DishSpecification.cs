@@ -2,8 +2,6 @@
 
 public sealed record DishSpecification
 {
-    public List<Ingredient> Ingredients { get; private set; }
-
     public string MainCourse { get; private set; }
 
     public string SideDishes { get; private set; }
@@ -21,8 +19,7 @@ public sealed record DishSpecification
     public string Coffee { get; private set; }
 
 
-    public static DishSpecification Create(List<string> ingredients,
-        string mainCourse = "",
+    public static DishSpecification Create(string mainCourse = "",
         string sideDishes = "",
         string appetizers = "",
         string beverages = "",
@@ -31,8 +28,7 @@ public sealed record DishSpecification
         string condiments = "",
         string coffee = "")
     {
-        return new DishSpecification(ingredients.ConvertAll(value => new Ingredient(value)),
-            mainCourse,
+        return new DishSpecification(mainCourse,
             sideDishes,
             appetizers,
             beverages,
@@ -42,8 +38,7 @@ public sealed record DishSpecification
             coffee);
     }
 
-    private DishSpecification(List<Ingredient> ingredients,
-        string mainCourse,
+    private DishSpecification(string mainCourse,
         string sideDishes,
         string appetizers,
         string beverages,
@@ -52,7 +47,6 @@ public sealed record DishSpecification
         string condiments,
         string coffee)
     {
-        Ingredients = ingredients;
         MainCourse = mainCourse;
         SideDishes = sideDishes;
         Appetizers = appetizers;
