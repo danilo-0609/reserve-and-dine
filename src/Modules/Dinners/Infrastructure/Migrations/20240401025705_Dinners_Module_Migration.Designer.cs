@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dinners.Infrastructure.Migrations
 {
     [DbContext(typeof(DinnersDbContext))]
-    [Migration("20240326202608_Dinners_Module_Migration")]
+    [Migration("20240401025705_Dinners_Module_Migration")]
     partial class Dinners_Module_Migration
     {
         /// <inheritdoc />
@@ -48,17 +48,6 @@ namespace Dinners.Infrastructure.Migrations
                     b.ToTable("Menus", "dinners");
                 });
 
-            modelBuilder.Entity("Dinners.Domain.Menus.MenuId", b =>
-                {
-                    b.Property<Guid>("Value")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Value");
-
-                    b.ToTable("MenuId");
-                });
-
             modelBuilder.Entity("Dinners.Domain.Menus.MenuReviews.MenuReview", b =>
                 {
                     b.Property<Guid>("Id")
@@ -90,17 +79,6 @@ namespace Dinners.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Reviews", "dinners");
-                });
-
-            modelBuilder.Entity("Dinners.Domain.Menus.MenuReviews.MenuReviewId", b =>
-                {
-                    b.Property<Guid>("Value")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Value");
-
-                    b.ToTable("MenuReviewId");
                 });
 
             modelBuilder.Entity("Dinners.Domain.Reservations.Refunds.Refund", b =>
@@ -208,17 +186,6 @@ namespace Dinners.Infrastructure.Migrations
                     b.ToTable("Ratings", "dinners");
                 });
 
-            modelBuilder.Entity("Dinners.Domain.Restaurants.RestaurantRatings.RestaurantRatingId", b =>
-                {
-                    b.Property<Guid>("Value")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Value");
-
-                    b.ToTable("RestaurantRatingId");
-                });
-
             modelBuilder.Entity("Dinners.Infrastructure.Domain.Menus.MenuReviews.MenusReviews", b =>
                 {
                     b.Property<Guid>("MenuId")
@@ -229,12 +196,7 @@ namespace Dinners.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("MenuReviewId");
 
-                    b.Property<Guid>("MenuReviewIdsValue")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("MenuId", "MenuReviewId");
-
-                    b.HasIndex("MenuReviewIdsValue");
 
                     b.ToTable("MenusReviews", "dinners");
                 });
@@ -249,12 +211,7 @@ namespace Dinners.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("MenuId");
 
-                    b.Property<Guid>("MenuIdsValue")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("ReservationId", "MenuId");
-
-                    b.HasIndex("MenuIdsValue");
 
                     b.ToTable("ReservationMenus", "dinners");
                 });
@@ -269,12 +226,7 @@ namespace Dinners.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("RatingId");
 
-                    b.Property<Guid>("RestaurantRatingIdsValue")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("RestaurantId", "RestaurantRatingId");
-
-                    b.HasIndex("RestaurantRatingIdsValue");
 
                     b.ToTable("RestaurantRatings", "dinners");
                 });
@@ -420,63 +372,61 @@ namespace Dinners.Infrastructure.Migrations
                                         .HasForeignKey("MenuDetailsMenuId");
                                 });
 
-                            b1.OwnsMany("Dinners.Domain.Menus.Details.MenuImageUrl", "MenuImagesUrl", b2 =>
-                                {
-                                    b2.Property<Guid>("MenuId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("MenuImageUrl");
-
-                                    b2.HasKey("MenuId", "Id");
-
-                                    b2.ToTable("MenuImagesUrl", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("MenuId");
-                                });
-
-                            b1.OwnsMany("Dinners.Domain.Menus.Details.Tag", "Tags", b2 =>
-                                {
-                                    b2.Property<Guid>("MenuId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("Tag");
-
-                                    b2.HasKey("MenuId", "Id");
-
-                                    b2.ToTable("Tags", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("MenuId");
-                                });
-
-                            b1.Navigation("MenuImagesUrl");
-
                             b1.Navigation("MenuType")
                                 .IsRequired();
 
                             b1.Navigation("Price")
                                 .IsRequired();
+                        });
 
-                            b1.Navigation("Tags");
+                    b.OwnsMany("Dinners.Domain.Menus.Details.MenuImageUrl", "MenuImagesUrl", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("MenuImageUrlId");
+
+                            b1.Property<Guid>("MenuId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("MenuId");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("MenuImageUrl");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("MenuId");
+
+                            b1.ToTable("MenuImagesUrl", "dinners");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MenuId");
+                        });
+
+                    b.OwnsMany("Dinners.Domain.Menus.Details.Tag", "Tags", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("TagId");
+
+                            b1.Property<Guid>("MenuId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("MenuId");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Tag");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("MenuId");
+
+                            b1.ToTable("Tags", "dinners");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MenuId");
                         });
 
                     b.OwnsOne("Dinners.Domain.Menus.Dishes.DishSpecification", "DishSpecification", b1 =>
@@ -530,49 +480,44 @@ namespace Dinners.Infrastructure.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("MenuId");
+                        });
 
-                            b1.OwnsMany("Dinners.Domain.Menus.Dishes.Ingredient", "Ingredients", b2 =>
-                                {
-                                    b2.Property<Guid>("MenuId")
-                                        .HasColumnType("uniqueidentifier");
+                    b.OwnsMany("Dinners.Domain.Menus.Dishes.Ingredient", "Ingredients", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("IngredientId");
 
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
+                            b1.Property<Guid>("MenuId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("MenuId");
 
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Ingredient");
 
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("Ingredient");
+                            b1.HasKey("Id");
 
-                                    b2.HasKey("MenuId", "Id");
+                            b1.HasIndex("MenuId");
 
-                                    b2.ToTable("Ingredients", "dinners");
+                            b1.ToTable("Ingredients", "dinners");
 
-                                    b2.WithOwner()
-                                        .HasForeignKey("MenuId");
-                                });
-
-                            b1.Navigation("Ingredients");
+                            b1.WithOwner()
+                                .HasForeignKey("MenuId");
                         });
 
                     b.OwnsMany("Dinners.Domain.Menus.MenuConsumer", "MenuConsumers", b1 =>
                         {
                             b1.Property<Guid>("MenuId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("MenuId");
 
                             b1.Property<Guid>("ClientId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("ClientId");
 
-                            b1.HasKey("MenuId", "Id");
+                            b1.HasKey("MenuId");
 
                             b1.ToTable("MenuConsumers", "dinners");
 
@@ -580,78 +525,53 @@ namespace Dinners.Infrastructure.Migrations
                                 .HasForeignKey("MenuId");
                         });
 
-                    b.OwnsOne("Dinners.Domain.Menus.Schedules.MenuSchedule", "MenuSchedule", b1 =>
+                    b.OwnsMany("Dinners.Domain.Menus.Schedules.MenuSchedule", "MenuSchedules", b1 =>
                         {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("MenuScheduleId");
+
+                            b1.Property<int>("Day")
+                                .HasColumnType("int")
+                                .HasColumnName("DayOfWeek");
+
+                            b1.Property<TimeSpan>("EndTimeSpan")
+                                .HasColumnType("time")
+                                .HasColumnName("EndTimeSpan");
+
                             b1.Property<Guid>("MenuId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("MenuId");
 
-                            b1.HasKey("MenuId");
+                            b1.Property<TimeSpan>("StartTimeSpan")
+                                .HasColumnType("time")
+                                .HasColumnName("StartTimeSpan");
 
-                            b1.ToTable("Menus", "dinners");
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("MenuId");
+
+                            b1.ToTable("MenuSchedule", "dinners");
 
                             b1.WithOwner()
                                 .HasForeignKey("MenuId");
-
-                            b1.OwnsMany("Dinners.Domain.Menus.Schedules.DayAvailable", "Days", b2 =>
-                                {
-                                    b2.Property<Guid>("MenuId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<int>("DayOfWeek")
-                                        .HasColumnType("int")
-                                        .HasColumnName("DayAvailable");
-
-                                    b2.HasKey("MenuId", "Id");
-
-                                    b2.ToTable("DaysAvailable", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("MenuId");
-                                });
-
-                            b1.OwnsOne("Dinners.Domain.Menus.Schedules.TimeRange", "AvailableMenuHours", b2 =>
-                                {
-                                    b2.Property<Guid>("MenuScheduleMenuId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<TimeSpan>("End")
-                                        .HasColumnType("time")
-                                        .HasColumnName("Close");
-
-                                    b2.Property<TimeSpan>("Start")
-                                        .HasColumnType("time")
-                                        .HasColumnName("Open");
-
-                                    b2.HasKey("MenuScheduleMenuId");
-
-                                    b2.ToTable("Menus", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("MenuScheduleMenuId");
-                                });
-
-                            b1.Navigation("AvailableMenuHours")
-                                .IsRequired();
-
-                            b1.Navigation("Days");
                         });
 
                     b.Navigation("DishSpecification")
                         .IsRequired();
+
+                    b.Navigation("Ingredients");
 
                     b.Navigation("MenuConsumers");
 
                     b.Navigation("MenuDetails")
                         .IsRequired();
 
-                    b.Navigation("MenuSchedule")
-                        .IsRequired();
+                    b.Navigation("MenuImagesUrl");
+
+                    b.Navigation("MenuSchedules");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Dinners.Domain.Reservations.Refunds.Refund", b =>
@@ -846,22 +766,10 @@ namespace Dinners.Infrastructure.Migrations
                         .HasForeignKey("MenuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Dinners.Domain.Menus.MenuReviews.MenuReviewId", null)
-                        .WithMany()
-                        .HasForeignKey("MenuReviewIdsValue")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Dinners.Infrastructure.Domain.ReservationsMenus.ReservationMenus", b =>
                 {
-                    b.HasOne("Dinners.Domain.Menus.MenuId", null)
-                        .WithMany()
-                        .HasForeignKey("MenuIdsValue")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Dinners.Domain.Reservations.Reservation", null)
                         .WithMany()
                         .HasForeignKey("ReservationId")
@@ -876,123 +784,33 @@ namespace Dinners.Infrastructure.Migrations
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Dinners.Domain.Restaurants.RestaurantRatings.RestaurantRatingId", null)
-                        .WithMany()
-                        .HasForeignKey("RestaurantRatingIdsValue")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Restaurants.Restaurant", b =>
                 {
-                    b.OwnsMany("Dinners.Domain.Restaurants.RestaurantTables.RestaurantTable", "RestaurantTables", b1 =>
+                    b.OwnsMany("Dinners.Domain.Restaurants.RestaurantInformations.Chef", "Chefs", b1 =>
                         {
-                            b1.Property<Guid>("NumberOfTable")
-                                .HasColumnType("uniqueidentifier");
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("ChefId");
 
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<bool>("IsOccupied")
-                                .HasColumnType("bit")
-                                .HasColumnName("IsOccupied");
-
-                            b1.Property<bool>("IsPremium")
-                                .HasColumnType("bit")
-                                .HasColumnName("IsPremium");
-
-                            b1.Property<int>("Number")
-                                .HasColumnType("int")
-                                .HasColumnName("NumberOfTable");
-
-                            b1.Property<Guid?>("RestaurantId")
+                            b1.Property<Guid>("RestaurantId")
                                 .HasColumnType("uniqueidentifier")
                                 .HasColumnName("RestaurantId");
 
-                            b1.Property<int>("Seats")
-                                .HasColumnType("int")
-                                .HasColumnName("Seats");
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Chef");
 
-                            b1.HasKey("NumberOfTable", "Id");
+                            b1.HasKey("Id", "RestaurantId");
 
-                            b1.ToTable("ReservedHours", "dinners", t =>
-                                {
-                                    t.Property("NumberOfTable")
-                                        .HasColumnName("NumberOfTable1");
-                                });
+                            b1.HasIndex("RestaurantId");
+
+                            b1.ToTable("Chefs", "dinners");
 
                             b1.WithOwner()
-                                .HasForeignKey("NumberOfTable");
-
-                            b1.OwnsMany("Dinners.Domain.Restaurants.RestaurantTables.ReservedHour", "ReservedHours", b2 =>
-                                {
-                                    b2.Property<Guid>("RestaurantTableNumberOfTable")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("RestaurantTableId")
-                                        .HasColumnType("int");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<int>("NumberOfTable")
-                                        .HasColumnType("int")
-                                        .HasColumnName("NumberOfTable");
-
-                                    b2.Property<DateTime>("ReservationDateTime")
-                                        .HasColumnType("datetime2")
-                                        .HasColumnName("ReservationDateTime");
-
-                                    b2.Property<Guid>("RestaurantId")
-                                        .HasColumnType("uniqueidentifier")
-                                        .HasColumnName("RestaurantId");
-
-                                    b2.HasKey("RestaurantTableNumberOfTable", "RestaurantTableId", "Id");
-
-                                    b2.ToTable("ReservedHour", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("RestaurantTableNumberOfTable", "RestaurantTableId");
-
-                                    b2.OwnsOne("Dinners.Domain.Common.TimeRange", "ReservationTimeRange", b3 =>
-                                        {
-                                            b3.Property<Guid>("ReservedHourRestaurantTableNumberOfTable")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<int>("ReservedHourRestaurantTableId")
-                                                .HasColumnType("int");
-
-                                            b3.Property<int>("ReservedHourId")
-                                                .HasColumnType("int");
-
-                                            b3.Property<DateTime>("End")
-                                                .HasColumnType("datetime2")
-                                                .HasColumnName("EndReservationTimeRange");
-
-                                            b3.Property<DateTime>("Start")
-                                                .HasColumnType("datetime2")
-                                                .HasColumnName("StartReservationTimeRange");
-
-                                            b3.HasKey("ReservedHourRestaurantTableNumberOfTable", "ReservedHourRestaurantTableId", "ReservedHourId");
-
-                                            b3.ToTable("ReservedHour", "dinners");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("ReservedHourRestaurantTableNumberOfTable", "ReservedHourRestaurantTableId", "ReservedHourId");
-                                        });
-
-                                    b2.Navigation("ReservationTimeRange")
-                                        .IsRequired();
-                                });
-
-                            b1.Navigation("ReservedHours");
+                                .HasForeignKey("RestaurantId");
                         });
 
                     b.OwnsOne("Dinners.Domain.Restaurants.RestaurantInformations.RestaurantContact", "RestaurantContact", b1 =>
@@ -1048,6 +866,31 @@ namespace Dinners.Infrastructure.Migrations
                                 .HasForeignKey("RestaurantId");
                         });
 
+                    b.OwnsMany("Dinners.Domain.Restaurants.RestaurantInformations.RestaurantImageUrl", "RestaurantImagesUrl", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantImageUrlId");
+
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantId");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("RestaurantImageUrl");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RestaurantId");
+
+                            b1.ToTable("RestaurantImagesUrl", "dinners");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RestaurantId");
+                        });
+
                     b.OwnsOne("Dinners.Domain.Restaurants.RestaurantInformations.RestaurantInformation", "RestaurantInformation", b1 =>
                         {
                             b1.Property<Guid>("RestaurantId")
@@ -1074,84 +917,6 @@ namespace Dinners.Infrastructure.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("RestaurantId");
-
-                            b1.OwnsMany("Dinners.Domain.Restaurants.RestaurantInformations.Chef", "Chefs", b2 =>
-                                {
-                                    b2.Property<Guid>("RestaurantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("Chef");
-
-                                    b2.HasKey("RestaurantId", "Id");
-
-                                    b2.ToTable("Chefs", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("RestaurantId");
-                                });
-
-                            b1.OwnsMany("Dinners.Domain.Restaurants.RestaurantInformations.RestaurantImageUrl", "RestaurantImagesUrl", b2 =>
-                                {
-                                    b2.Property<Guid>("RestaurantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("RestaurantImageUrl");
-
-                                    b2.HasKey("RestaurantId", "Id");
-
-                                    b2.ToTable("RestaurantImagesUrl", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("RestaurantId");
-                                });
-
-                            b1.OwnsMany("Dinners.Domain.Restaurants.RestaurantInformations.Speciality", "Specialties", b2 =>
-                                {
-                                    b2.Property<Guid>("RestaurantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("Speciality");
-
-                                    b2.HasKey("RestaurantId", "Id");
-
-                                    b2.ToTable("Specialties", "dinners");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("RestaurantId");
-                                });
-
-                            b1.Navigation("Chefs");
-
-                            b1.Navigation("RestaurantImagesUrl");
-
-                            b1.Navigation("Specialties");
                         });
 
                     b.OwnsOne("Dinners.Domain.Restaurants.RestaurantInformations.RestaurantLocalization", "RestaurantLocalization", b1 =>
@@ -1197,55 +962,75 @@ namespace Dinners.Infrastructure.Migrations
                                 .HasForeignKey("RestaurantId");
                         });
 
+                    b.OwnsMany("Dinners.Domain.Restaurants.RestaurantInformations.Speciality", "Specialities", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("SpecialityId");
+
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantId");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Speciality");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RestaurantId");
+
+                            b1.ToTable("Specialties", "dinners");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RestaurantId");
+                        });
+
                     b.OwnsMany("Dinners.Domain.Restaurants.RestaurantSchedules.RestaurantSchedule", "RestaurantSchedules", b1 =>
                         {
-                            b1.Property<Guid>("RestaurantId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantScheduleId");
 
                             b1.Property<DateTime?>("ReopeningTime")
                                 .HasColumnType("datetime2")
                                 .HasColumnName("ReopeningTime");
 
-                            b1.HasKey("RestaurantId", "Id");
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantId");
 
-                            b1.ToTable("RestaurantSchedule", "dinners");
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RestaurantId");
+
+                            b1.ToTable("RestaurantSchedules", "dinners");
 
                             b1.WithOwner()
                                 .HasForeignKey("RestaurantId");
 
                             b1.OwnsOne("Dinners.Domain.Restaurants.RestaurantSchedules.DayOfOperation", "Day", b2 =>
                                 {
-                                    b2.Property<Guid>("RestaurantScheduleRestaurantId")
+                                    b2.Property<Guid>("RestaurantScheduleId")
                                         .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("RestaurantScheduleId")
-                                        .HasColumnType("int");
 
                                     b2.Property<int>("DayOfWeek")
                                         .HasColumnType("int")
                                         .HasColumnName("DayOfWeek");
 
-                                    b2.HasKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
+                                    b2.HasKey("RestaurantScheduleId");
 
-                                    b2.ToTable("RestaurantSchedule", "dinners");
+                                    b2.ToTable("RestaurantSchedules", "dinners");
 
                                     b2.WithOwner()
-                                        .HasForeignKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
+                                        .HasForeignKey("RestaurantScheduleId");
                                 });
 
                             b1.OwnsOne("Dinners.Domain.Common.TimeRange", "HoursOfOperation", b2 =>
                                 {
-                                    b2.Property<Guid>("RestaurantScheduleRestaurantId")
+                                    b2.Property<Guid>("RestaurantScheduleId")
                                         .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("RestaurantScheduleId")
-                                        .HasColumnType("int");
 
                                     b2.Property<DateTime>("End")
                                         .HasColumnType("datetime2")
@@ -1255,12 +1040,12 @@ namespace Dinners.Infrastructure.Migrations
                                         .HasColumnType("datetime2")
                                         .HasColumnName("OpenTime");
 
-                                    b2.HasKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
+                                    b2.HasKey("RestaurantScheduleId");
 
-                                    b2.ToTable("RestaurantSchedule", "dinners");
+                                    b2.ToTable("RestaurantSchedules", "dinners");
 
                                     b2.WithOwner()
-                                        .HasForeignKey("RestaurantScheduleRestaurantId", "RestaurantScheduleId");
+                                        .HasForeignKey("RestaurantScheduleId");
                                 });
 
                             b1.Navigation("Day")
@@ -1306,16 +1091,101 @@ namespace Dinners.Infrastructure.Migrations
                                 .HasForeignKey("RestaurantId");
                         });
 
+                    b.OwnsMany("Dinners.Domain.Restaurants.RestaurantTables.RestaurantTable", "RestaurantTables", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantTableId");
+
+                            b1.Property<bool>("IsOccupied")
+                                .HasColumnType("bit")
+                                .HasColumnName("IsOccupied");
+
+                            b1.Property<bool>("IsPremium")
+                                .HasColumnType("bit")
+                                .HasColumnName("IsPremium");
+
+                            b1.Property<int>("Number")
+                                .HasColumnType("int")
+                                .HasColumnName("NumberOfTable");
+
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantId");
+
+                            b1.Property<int>("Seats")
+                                .HasColumnType("int")
+                                .HasColumnName("Seats");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RestaurantId");
+
+                            b1.ToTable("RestaurantTables", "dinners");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RestaurantId");
+
+                            b1.OwnsMany("Dinners.Domain.Restaurants.RestaurantTables.ReservedHour", "ReservedHours", b2 =>
+                                {
+                                    b2.Property<Guid>("Id")
+                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnName("ReservedHourId");
+
+                                    b2.Property<DateTime>("ReservationDateTime")
+                                        .HasColumnType("datetime2")
+                                        .HasColumnName("ReservationDateTime");
+
+                                    b2.Property<Guid>("RestaurantId")
+                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnName("RestaurantId");
+
+                                    b2.Property<Guid>("RestaurantTableId")
+                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnName("RestaurantTableId");
+
+                                    b2.HasKey("Id");
+
+                                    b2.HasIndex("RestaurantTableId");
+
+                                    b2.ToTable("ReservedHours", "dinners");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("RestaurantTableId");
+
+                                    b2.OwnsOne("Dinners.Domain.Common.TimeRange", "ReservationTimeRange", b3 =>
+                                        {
+                                            b3.Property<Guid>("ReservedHourId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<DateTime>("End")
+                                                .HasColumnType("datetime2")
+                                                .HasColumnName("EndReservationTimeRange");
+
+                                            b3.Property<DateTime>("Start")
+                                                .HasColumnType("datetime2")
+                                                .HasColumnName("StartReservationTimeRange");
+
+                                            b3.HasKey("ReservedHourId");
+
+                                            b3.ToTable("ReservedHours", "dinners");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("ReservedHourId");
+                                        });
+
+                                    b2.Navigation("ReservationTimeRange")
+                                        .IsRequired();
+                                });
+
+                            b1.Navigation("ReservedHours");
+                        });
+
                     b.OwnsMany("Dinners.Domain.Restaurants.RestaurantUsers.RestaurantAdministration", "RestaurantAdministrations", b1 =>
                         {
-                            b1.Property<Guid>("RestaurantId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantAdministrationId");
 
                             b1.Property<Guid>("AdministratorId")
                                 .HasColumnType("uniqueidentifier")
@@ -1331,7 +1201,13 @@ namespace Dinners.Infrastructure.Migrations
                                 .HasColumnType("nvarchar(max)")
                                 .HasColumnName("Name");
 
-                            b1.HasKey("RestaurantId", "Id");
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RestaurantId");
 
                             b1.ToTable("RestaurantAdministrations", "dinners");
 
@@ -1341,14 +1217,9 @@ namespace Dinners.Infrastructure.Migrations
 
                     b.OwnsMany("Dinners.Domain.Restaurants.RestaurantUsers.RestaurantClient", "RestaurantClients", b1 =>
                         {
-                            b1.Property<Guid>("RestaurantId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantClientId");
 
                             b1.Property<Guid>("ClientId")
                                 .HasColumnType("uniqueidentifier")
@@ -1358,7 +1229,13 @@ namespace Dinners.Infrastructure.Migrations
                                 .HasColumnType("int")
                                 .HasColumnName("NumberOfVisits");
 
-                            b1.HasKey("RestaurantId", "Id");
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("RestaurantId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RestaurantId");
 
                             b1.ToTable("RestaurantClients", "dinners");
 
@@ -1369,12 +1246,16 @@ namespace Dinners.Infrastructure.Migrations
                     b.Navigation("AvailableTablesStatus")
                         .IsRequired();
 
+                    b.Navigation("Chefs");
+
                     b.Navigation("RestaurantAdministrations");
 
                     b.Navigation("RestaurantClients");
 
                     b.Navigation("RestaurantContact")
                         .IsRequired();
+
+                    b.Navigation("RestaurantImagesUrl");
 
                     b.Navigation("RestaurantInformation")
                         .IsRequired();
@@ -1388,6 +1269,8 @@ namespace Dinners.Infrastructure.Migrations
                     b.Navigation("RestaurantSchedules");
 
                     b.Navigation("RestaurantTables");
+
+                    b.Navigation("Specialities");
                 });
 #pragma warning restore 612, 618
         }
