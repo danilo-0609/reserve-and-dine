@@ -1,11 +1,19 @@
-﻿namespace Dinners.Domain.Menus.Details;
+﻿using BuildingBlocks.Domain.Entities;
 
-public sealed record Tag
+namespace Dinners.Domain.Menus.Details;
+
+public sealed class Tag : Entity<TagId, Guid>
 {
+    public new TagId Id { get; private set; }   
+
+    public MenuId MenuId { get; private set; }
+
     public string Value { get; private set; }
 
-    public Tag(string value)
+    public Tag(TagId id, string value, MenuId menuId)
     {
+        Id = id;
+        MenuId = menuId;
         Value = value;
     }
 

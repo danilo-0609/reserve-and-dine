@@ -16,10 +16,6 @@ public sealed record MenuDetails
 
     public decimal Discount { get; private set; }
 
-    public List<MenuImageUrl> MenuImagesUrl { get; private set; }
-
-    public List<Tag> Tags { get; private set; }
-
     public bool IsVegetarian { get; private set; }
 
     public string PrimaryChefName { get; private set; }
@@ -32,8 +28,6 @@ public sealed record MenuDetails
         MenuType menuType,
         Price price,
         decimal discount,
-        List<string> menuImagesUrl,
-        List<string> tags,
         bool isVegetarian,
         string primaryChefName,
         bool hasAlcohol,
@@ -44,22 +38,10 @@ public sealed record MenuDetails
             menuType,
             price,
             discount,
-            menuImagesUrl.ConvertAll(url => new MenuImageUrl(url)),
-            tags.ConvertAll(value => new Tag(value)),
             isVegetarian,
             primaryChefName,
             hasAlcohol,
             discountTerms);
-    }
-
-    public void AddImage(string imageUrl)
-    {
-        MenuImagesUrl.Add(new MenuImageUrl(imageUrl));
-    }
-
-    public void DeleteImage(string imageUrl)
-    {
-        MenuImagesUrl.Remove(new MenuImageUrl(imageUrl));
     }
 
     private MenuDetails(string title,
@@ -67,8 +49,6 @@ public sealed record MenuDetails
         MenuType menuType,
         Price price,
         decimal discount,
-        List<MenuImageUrl> menuImagesUrl,
-        List<Tag> tags,
         bool isVegetarian,
         string primaryChefName,
         bool hasAlcohol,
@@ -79,8 +59,6 @@ public sealed record MenuDetails
         MenuType = menuType;
         DiscountTerms = discountTerms;
         Discount = discount;
-        MenuImagesUrl = menuImagesUrl;
-        Tags = tags;
         IsVegetarian = isVegetarian;
         PrimaryChefName = primaryChefName;
         HasAlcohol = hasAlcohol;
