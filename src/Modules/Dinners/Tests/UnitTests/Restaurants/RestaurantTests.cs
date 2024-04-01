@@ -16,10 +16,7 @@ public sealed class RestaurantTests
 
     private RestaurantInformation RestaurantInformation = RestaurantInformation.Create("Restaurant name",
         "Restaurant description",
-        "Fish restaurant",
-        new List<string>() { "Juan Carlos González" },
-        new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
-        new List<string>());
+        "Fish restaurant");
 
 
     private RestaurantLocalization RestaurantLocalization = RestaurantLocalization.Create("Colombia",
@@ -36,36 +33,38 @@ public sealed class RestaurantTests
         var restaurantSchedules = new List<RestaurantSchedule>
         {
             RestaurantSchedule.Create(
+                RestaurantId,
                 DayOfWeek.Monday,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
             RestaurantSchedule.Create(
+                RestaurantId,
                 DayOfWeek.Tuesday,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
-            RestaurantSchedule.Create(
+            RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Wednesday,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
-            RestaurantSchedule.Create(
+            RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Thursday,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
-            RestaurantSchedule.Create(
+            RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Friday,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
-            RestaurantSchedule.Create(
+            RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Saturday,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
-            RestaurantSchedule.Create(
+            RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Sunday,
                 startDateTime,
                 startDateTime.AddHours(8))
@@ -91,8 +90,8 @@ public sealed class RestaurantTests
 
     private List<RestaurantAdministration> RestaurantAdministrations = new List<RestaurantAdministration>()
     {
-        RestaurantAdministration.Create("Juan Camilo Orozco", Guid.NewGuid(), "Director de ventas"),
-        RestaurantAdministration.Create("Ana María Soto", Guid.NewGuid(), "Director de marketing"),
+        RestaurantAdministration.Create(RestaurantId, "Juan Camilo Orozco", Guid.NewGuid(), "Director de ventas"),
+        RestaurantAdministration.Create(RestaurantId, "Ana María Soto", Guid.NewGuid(), "Director de marketing"),
     };
 
     public Restaurant CreateRestaurant()
@@ -104,6 +103,24 @@ public sealed class RestaurantTests
             RestaurantContact,
             RestaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
+            DateTime.UtcNow);
+
+        return restaurant;
+    }
+
+    public Restaurant CreateRestaurant(RestaurantId restaurantId)
+    {
+        var restaurant = Restaurant.Post(restaurantId,
+            RestaurantInformation,
+            RestaurantLocalization,
+            RestaurantSchedules(),
+            RestaurantContact,
+            RestaurantTables,
+            RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         return restaurant;
@@ -150,11 +167,11 @@ public sealed class RestaurantTests
 
         List<RestaurantSchedule> restaurantSchedules = new()
         {
-            RestaurantSchedule.Create(DateTime.Now.DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
                 startDateTime,
                 startDateTime.AddMinutes(30)),
 
-            RestaurantSchedule.Create(DateTime.Now.AddDays(1).DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.AddDays(1).DayOfWeek,
                 startDateTime,
                 startDateTime.AddMinutes(30))
         };
@@ -166,6 +183,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             RestaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var reservationTable = restaurant.ReserveTable(1,
@@ -183,11 +202,11 @@ public sealed class RestaurantTests
 
         List<RestaurantSchedule> restaurantSchedules = new()
         {
-            RestaurantSchedule.Create(DateTime.Now.DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
-            RestaurantSchedule.Create(DateTime.Now.AddDays(1).DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.AddDays(1).DayOfWeek,
                 startDateTime,
                 startDateTime.AddHours(8))
         };
@@ -199,6 +218,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             RestaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         //Restaurant closed out of regular schedule
@@ -253,11 +274,12 @@ public sealed class RestaurantTests
 
         List<RestaurantSchedule> restaurantSchedules = new()
         {
-            RestaurantSchedule.Create(DateTime.Now.DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
                 startDateTime,
                 startDateTime),
 
-            RestaurantSchedule.Create(DateTime.Now.AddDays(1).DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId,
+                DateTime.Now.AddDays(1).DayOfWeek,
                 startDateTime,
                 startDateTime)
         };
@@ -269,6 +291,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             RestaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var restaurantClose = restaurant.Close(restaurant.RestaurantAdministrations.First().AdministratorId);
@@ -333,11 +357,11 @@ public sealed class RestaurantTests
 
         List<RestaurantSchedule> restaurantSchedules = new()
         {
-            RestaurantSchedule.Create(DateTime.Now.DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
                 startDateTime,
                 startDateTime.AddHours(8)),
 
-            RestaurantSchedule.Create(DateTime.Now.AddDays(1).DayOfWeek,
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.AddDays(1).DayOfWeek,
                 startDateTime,
                 startDateTime.AddHours(8))
         };
@@ -349,6 +373,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             RestaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         restaurant.Open(restaurant.RestaurantAdministrations.First().AdministratorId);
@@ -389,6 +415,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var addTable = restaurant.AddTable(restaurant.RestaurantAdministrations.First().AdministratorId,
@@ -420,6 +448,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var tableNumber = 3;
@@ -481,6 +511,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var deleteTable = restaurant.DeleteTable(restaurant.RestaurantAdministrations.First().AdministratorId,
@@ -545,6 +577,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var newAmountOfSeats = 6;
@@ -583,6 +617,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var cancelTableReservation = restaurant.CancelReservation(tableNumber, DateTime.Now);
@@ -611,6 +647,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var timeOfReservation = DateTime.Now.AddHours(1);
@@ -646,6 +684,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var tableNumber = 3;
@@ -676,6 +716,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         restaurant.OccupyTable(1);
@@ -706,6 +748,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         restaurant.OccupyTable(1);
@@ -736,6 +780,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var tableNumber = 3;
@@ -766,6 +812,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         var freeTable = restaurant.FreeTable(1);
@@ -794,6 +842,8 @@ public sealed class RestaurantTests
             RestaurantContact,
             restaurantTables,
             RestaurantAdministrations,
+            new List<string>() { "Juan Carlos González" },
+            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
         restaurant.OccupyTable(1);
@@ -882,10 +932,7 @@ public sealed class RestaurantTests
         var updateInformation = restaurant.UpdateInformation(Guid.NewGuid(),
             "Restaurant name",
             "Restaurant description",
-            "Restaurant type",
-            new List<string>(),
-            new List<string>(),
-            new List<string>());
+            "Restaurant type");
 
         bool isErrorCannotChangeRestaurantProperties = updateInformation
             .FirstError

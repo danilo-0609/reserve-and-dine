@@ -17,15 +17,11 @@ public sealed class MenuTests
         MenuType.Breakfast,
         new Price(15.60m, "USD"),
         0m,
-        new List<string>(),
-        new List<string>(),
         false,
         "Primary chef name",
         false);
 
-    private readonly DishSpecification _dishSpecification = DishSpecification.Create(
-        new List<string>(),
-        "Main course",
+    private readonly DishSpecification _dishSpecification = DishSpecification.Create("Main course",
         "Side dishes",
         "Appetizers",
         "Beverages",
@@ -34,15 +30,17 @@ public sealed class MenuTests
         "Condiments",
         "Coffee");
 
-    private readonly MenuSchedule _menuSchedule = MenuSchedule.Create(new List<DayOfWeek>(), TimeSpan.FromHours(7), TimeSpan.FromHours(19).Add(TimeSpan.FromMinutes(30)));
-
     [Fact]
     public void Publish_Should_RaiseAMenuPublishedDomainEvent_WhenSuccessful()
     {
-        var menu = Menu.Publish(RestaurantId.CreateUnique(),
+        var menu = Menu.Publish(MenuId.CreateUnique(),
+            RestaurantId.CreateUnique(),
             _menuDetails,
             _dishSpecification,
-            _menuSchedule,
+            new List<string>() { "www.image.com" },
+            new List<string>() { "#Delicious" },
+            new List<string>() { "Potato", "Tomato" },
+            new List<MenuSchedule>(),
             DateTime.Now);
 
         bool hasRaisedMenuPublishedDomainEvent = menu
@@ -55,10 +53,14 @@ public sealed class MenuTests
     [Fact]
     public void Review_Should_ReturnAnError_WhenUserHasNotConsumedTheMenu()
     {
-        var menu = Menu.Publish(RestaurantId.CreateUnique(),
+        var menu = Menu.Publish(MenuId.CreateUnique(),
+            RestaurantId.CreateUnique(),
             _menuDetails,
             _dishSpecification,
-            _menuSchedule,
+            new List<string>() { "www.image.com" },
+            new List<string>() { "#Delicious" },
+            new List<string>() { "Potato", "Tomato" },
+            new List<MenuSchedule>(),
             DateTime.Now);
 
         var clientId = Guid.NewGuid();
@@ -75,10 +77,14 @@ public sealed class MenuTests
     [Fact]
     public void Review_Should_ReturnAnError_WhenRateIsNotAValidNumber()
     {
-        var menu = Menu.Publish(RestaurantId.CreateUnique(),
+        var menu = Menu.Publish(MenuId.CreateUnique(), 
+            RestaurantId.CreateUnique(),
             _menuDetails,
             _dishSpecification,
-            _menuSchedule,
+            new List<string>() { "www.image.com" },
+            new List<string>() { "#Delicious" },
+            new List<string>() { "Potato", "Tomato" },
+            new List<MenuSchedule>(),
             DateTime.Now);
 
         var clientId = Guid.NewGuid();
@@ -99,10 +105,14 @@ public sealed class MenuTests
     [Fact]
     public void Review_Should_ReturnAMenuReviewEntity_WhenSuccessful()
     {
-        var menu = Menu.Publish(RestaurantId.CreateUnique(),
+        var menu = Menu.Publish(MenuId.CreateUnique(),
+            RestaurantId.CreateUnique(),
             _menuDetails,
             _dishSpecification,
-            _menuSchedule,
+            new List<string>() { "www.image.com" },
+            new List<string>() { "#Delicious" },
+            new List<string>() { "Potato", "Tomato" },
+            new List<MenuSchedule>(),
             DateTime.Now);
 
         var clientId = Guid.NewGuid();
