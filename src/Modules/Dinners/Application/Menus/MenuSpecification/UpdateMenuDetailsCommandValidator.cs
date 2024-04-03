@@ -37,19 +37,14 @@ internal sealed class UpdateMenuDetailsCommandValidator : AbstractValidator<Upda
         RuleFor(r => r.Discount)
             .NotNull();
 
-        RuleFor(r => r.Tags)
-            .NotNull();
-
         RuleFor(r => r.IsVegetarian)
-            .NotNull()
-            .NotEmpty();
+            .NotNull();
 
         RuleFor(r => r.PrimaryChefName)
             .NotEmpty()
             .NotNull();
 
         RuleFor(r => r.HasAlcohol)
-            .NotEmpty()
             .NotNull();
     }
 

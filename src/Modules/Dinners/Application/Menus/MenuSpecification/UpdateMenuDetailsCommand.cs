@@ -12,7 +12,6 @@ public sealed record UpdateMenuDetailsCommand(Guid MenuId,
     decimal Money,
     string Currency,
     decimal Discount,
-    List<string> Tags,
     bool IsVegetarian,
     string PrimaryChefName,
     bool HasAlcohol): ICommand<ErrorOr<Unit>>;
