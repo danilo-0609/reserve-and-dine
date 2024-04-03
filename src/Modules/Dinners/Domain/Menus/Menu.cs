@@ -94,6 +94,8 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             hasAlcohol,
             discountTerms);
 
+        MenuDetails = menuSpecification;
+
         return menuSpecification;
     }
 
@@ -124,7 +126,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         string condiments = "",
         string coffee = "")
     {
-        return DishSpecification.Create(
+        var dishSpecification = DishSpecification.Create(
             mainCourse,
             sideDishes,
             appetizers,
@@ -133,6 +135,10 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             sauces,
             condiments,
             coffee);
+
+        DishSpecification = dishSpecification;
+
+        return dishSpecification;            
     }
 
     public MenuSchedule SetMenuSchedule(DayOfWeek day,
