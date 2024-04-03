@@ -1,39 +1,55 @@
-﻿using Dinners.Application.Menus.MenuSpecification;
+﻿using API.Configuration;
+using BuildingBlocks.Application;
+using Dinners.Application.Menus.DishSpecifications;
+using Dinners.Application.Menus.MenuSpecification;
 using Dinners.Application.Menus.Publish;
 using Dinners.Application.Menus.Review;
 using Dinners.Domain.Common;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.Details;
 using Dinners.Domain.Menus.Dishes;
+using Dinners.Domain.Menus.MenuReviews;
 using Dinners.Domain.Menus.Schedules;
 using Dinners.Domain.Restaurants;
+using Dinners.Infrastructure.Domain.Menus;
+using Dinners.Infrastructure.Domain.Menus.Reviews;
+using Microsoft.EntityFrameworkCore;
+using NSubstitute;
 
 namespace Dinners.Tests.IntegrationTests.Menus;
 
 public sealed class MenuIntegrationTests : BaseIntegrationTest
 {
+    private readonly IMenuRepository _menuRepository;
+    private readonly IExecutionContextAccessor _executionContextAccessorMock;
+    private readonly IMenuReviewRepository _menuReviewRepository;
+
     public MenuIntegrationTests(IntegrationTestWebAppFactory factory) : base(factory)
     {
+        _menuReviewRepository = new ReviewRepository(DbContext);
+        _menuRepository = new MenuRepository(DbContext);
+
+        _executionContextAccessorMock = Substitute.For<IExecutionContextAccessor>();
     }
 
-    private readonly MenuDetails _menuDetails = MenuDetails.Create("Menu title",
-    "Menu description",
+    private readonly MenuDetails _menuDetails = MenuDetails.Create("Menu Details - Menu title",
+    "Menu Details -  description",
     MenuType.Breakfast,
     new Price(15.60m, "USD"),
     0m,
     false,
-    "Primary chef name",
+    "Menu Details - Primary chef name",
     false);
 
     private readonly DishSpecification _dishSpecification = DishSpecification.Create(
-        "Main course",
-        "Side dishes",
-        "Appetizers",
-        "Beverages",
-        "Desserts",
-        "Sauces",
-        "Condiments",
-        "Coffee");
+        "Menu - Main course",
+        "Menu - Side dishes",
+        "Menu - Appetizers",
+        "Menu - Beverages",
+        "Menu - Desserts",
+        "Menu - Sauces",
+        "Menu - Condiments",
+        "Menu - Coffee");
 
     [Fact]
     public async void Publish_Should_ReturnAnError_WhenRestaurantDoesNotExistInDatabase()
@@ -124,7 +140,6 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
             29.99m,
             "USD",
             0.0m,
-            new List<string>() { "#Lunch", "#Delicious" },
             false,
             "Primary chef name",
             false);
@@ -149,7 +164,6 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
             29.99m,
             "USD",
             0.0m,
-            new List<string>() { "#Lunch", "#Delicious" },
             false,
             "Primary chef name",
             false);
@@ -160,6 +174,63 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
             && result.FirstError.Description == "Menu type must be a valid value";
 
         Assert.True(isValidationError);
+    }
+
+    [Fact]
+    public async void UpdateMenuDetails_Should_UpdateMenuInDatabase_WhenSuccessful()
+    {
+        var menuId = MenuId.CreateUnique();
+
+        List<MenuSchedule> menuSchedules = new()
+        {
+            MenuSchedule.Create(DayOfWeek.Tuesday, TimeSpan.FromHours(7), TimeSpan.FromHours(19), menuId),
+            MenuSchedule.Create(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(19), menuId),
+        };
+
+        var menu = Menu.Publish(menuId,
+            RestaurantId.CreateUnique(),
+            _menuDetails,
+            _dishSpecification,
+            new List<string>(),
+            new List<string>(),
+            new List<string>(),
+            menuSchedules,
+            DateTime.Now);
+
+        await DbContext.Menus.AddAsync(menu);
+        await DbContext.SaveChangesAsync();
+
+        var menuDetails = MenuDetails.Create("Menu Title",
+            "Menu description",
+            MenuType.Dinner,
+            new Price(29.99m, "USD"),
+            0.0m,
+            false,
+            "Primary chef name",
+            false);
+
+        var command = new UpdateMenuDetailsCommand(menuId.Value,
+            menuDetails.Title,
+            menuDetails.Description,
+            menuDetails.MenuType.Value,
+            menuDetails.DiscountTerms,
+            menuDetails.Price.Amount,
+            menuDetails.Price.Currency,
+            menuDetails.Discount,
+            menuDetails.IsVegetarian,
+            menuDetails.PrimaryChefName,
+            menuDetails.HasAlcohol);
+
+        await Sender.Send(command);
+
+        var menuFromDatabase = await DbContext
+            .Menus
+            .Where(r => r.Id == menuId)
+            .SingleOrDefaultAsync();
+
+        bool isMenuDetailsUpdated = menuFromDatabase!.MenuDetails == menuDetails;
+
+        Assert.True(isMenuDetailsUpdated);
     }
 
     [Fact]
@@ -174,5 +245,121 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
         bool isErrorMenuDoesNotExist = result.FirstError.Code == "Menu.NotFound";
 
         Assert.True(isErrorMenuDoesNotExist);   
+    }
+
+    [Fact]
+    public async void Review_Should_ReturnAReviewId_WhenSuccessful()
+    {
+        var menuId = MenuId.CreateUnique();
+
+        List<MenuSchedule> menuSchedules = new()
+        {
+            MenuSchedule.Create(DayOfWeek.Tuesday, TimeSpan.FromHours(7), TimeSpan.FromHours(19), menuId),
+            MenuSchedule.Create(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(19), menuId),
+        };
+
+        var menu = Menu.Publish(menuId,
+            RestaurantId.CreateUnique(),
+            _menuDetails,
+            _dishSpecification,
+            new List<string>(),
+            new List<string>(),
+            new List<string>(),
+            menuSchedules,
+            DateTime.Now);
+
+        var clientId = Guid.NewGuid();
+
+        menu.Consume(clientId);
+
+        await DbContext.Menus.AddAsync(menu);
+        await DbContext.SaveChangesAsync();
+
+        _executionContextAccessorMock.UserId.Returns(clientId);
+
+        var command = new ReviewMenuCommand(menuId.Value,
+            4.5m,
+            "Comment");
+
+        var handler = new ReviewMenuCommandHandler(_menuReviewRepository, _menuRepository, _executionContextAccessorMock);
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.IsType<Guid>(result);
+    }
+
+    [Fact]
+    public async void UpdateDishSpecification_Should_ReturnAnError_WhenMenuDoesNotExist()
+    {
+        var command = new UpdateDishSpecificationCommand(Guid.NewGuid(),
+            "Main course",
+            "Side dishes",
+            "Appetizers",
+            "Menu beverages",
+            "Menu desserts",
+            "Sauces",
+            "Condiments",
+            "Menu Coffee");
+
+        var result = await Sender.Send(command);
+
+        bool isErrorMenuDoesNotExist = result.FirstError.Code == "Menu.NotFound";
+
+        Assert.True(isErrorMenuDoesNotExist);
+    }
+
+    [Fact]
+    public async void UpdateDishSpecification_Should_UpdateMenuInDatabase_WhenSuccessful()
+    {
+        var menuId = MenuId.CreateUnique();
+
+        List<MenuSchedule> menuSchedules = new()
+        {
+            MenuSchedule.Create(DayOfWeek.Tuesday, TimeSpan.FromHours(7), TimeSpan.FromHours(19), menuId),
+            MenuSchedule.Create(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(19), menuId),
+        };
+
+        var menu = Menu.Publish(menuId,
+            RestaurantId.CreateUnique(),
+            _menuDetails,
+            _dishSpecification,
+            new List<string>(),
+            new List<string>(),
+            new List<string>(),
+            menuSchedules,
+            DateTime.Now);
+
+        await DbContext.Menus.AddAsync(menu);
+        await DbContext.SaveChangesAsync();
+
+        var dishSpecification = DishSpecification.Create("Main course",
+            "Side dishes",
+            "Appetizers",
+            "Menu beverages",
+            "Menu desserts",
+            "Sauces",
+            "Condiments",
+            "Menu Coffee");
+
+        var command = new UpdateDishSpecificationCommand(menuId.Value,
+            dishSpecification.MainCourse,
+            dishSpecification.SideDishes,
+            dishSpecification.Appetizers,
+            dishSpecification.Beverages,
+            dishSpecification.Desserts,
+            dishSpecification.Sauces,
+            dishSpecification.Condiments,
+            dishSpecification.Coffee);
+
+        await Sender.Send(command);
+
+        var menuFromDatabase = await DbContext
+            .Menus
+            .Where(r => r.Id == menuId)
+            .SingleOrDefaultAsync();
+
+        bool isDishSpecificationUpdated = menuFromDatabase!.DishSpecification == dishSpecification;
+            
+        Assert.True(isDishSpecificationUpdated);
     }
 }
