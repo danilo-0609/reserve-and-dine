@@ -657,14 +657,14 @@ public sealed class RestaurantTests
 
         restaurant.CancelReservation(1, timeOfReservation);
 
-        bool isReservationTimeRemovedFromRestaurantTables = !restaurant
+        bool isReservationTimeInRestaurantTables = restaurant
             .RestaurantTables
             .Where(r => r.Number == 1)
             .Single()
             .ReservedHours
             .Any(r => r.ReservationDateTime == timeOfReservation);
 
-        Assert.True(isReservationTimeRemovedFromRestaurantTables);
+        Assert.False(isReservationTimeInRestaurantTables);
     }
 
     [Fact]
