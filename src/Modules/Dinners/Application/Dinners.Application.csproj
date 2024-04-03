@@ -17,4 +17,9 @@
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo
+			Include="Dinners.Tests"/>
+	</ItemGroup>
+	
 </Project>

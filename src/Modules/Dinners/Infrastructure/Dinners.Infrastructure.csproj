@@ -35,4 +35,9 @@
     <Folder Include="Cache\Reservations\" />
   </ItemGroup>
 
+  <ItemGroup>
+	  <InternalsVisibleTo 
+		  Include="Dinners.Tests"/>	
+  </ItemGroup>
+
 </Project>
