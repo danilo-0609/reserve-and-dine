@@ -13,7 +13,7 @@ public static class DependencyInjection
         //MediatR servicess
         services.AddMediatR(config =>
         {
-            config.RegisterServicesFromAssemblyContaining<AssemblyReference>();
+            config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
         });
 
         //Logging services
@@ -31,7 +31,7 @@ public static class DependencyInjection
             typeof(IPipelineBehavior<,>),
             typeof(UnitOfWorkBehavior<,>));
 
-        services.AddValidatorsFromAssembly(AssemblyReference.Assembly, includeInternalTypes: true);
+        services.AddValidatorsFromAssembly(ApplicationAssemblyReference.Assembly, includeInternalTypes: true);
 
         return services;
     }
