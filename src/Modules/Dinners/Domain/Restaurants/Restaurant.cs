@@ -240,9 +240,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        RestaurantTable? table = _restaurantTables.Where(r => r.Number == number).SingleOrDefault();
-
-        _restaurantTables.Remove(table!);
+        _restaurantTables.RemoveAll(table => table.Number == number);
 
         return SuccessOperation.Code;
     }

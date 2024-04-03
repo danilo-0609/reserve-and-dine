@@ -5,7 +5,7 @@ namespace Dinners.Domain.Restaurants.RestaurantTables;
 
 public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
 {
-    private readonly List<ReservedHour> _reservedHours = new();
+    private List<ReservedHour> _reservedHours = new();
 
     public new RestaurantTableId Id { get; private set; }
 
@@ -39,9 +39,7 @@ public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
 
     public void CancelReservation(DateTime reservedTime)
     {
-        var reservedHour = _reservedHours.Where(r => r.ReservationDateTime == reservedTime).Single();
-
-        _reservedHours.Remove(reservedHour); 
+        _reservedHours.RemoveAll(r => r.ReservationDateTime == reservedTime); 
     }
 
     public void Reserve(DateTime reservedTime, TimeRange reservationTimeRange)
