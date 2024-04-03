@@ -68,19 +68,10 @@ internal sealed class MenuRepository : IMenuRepository
             .ToListAsync();
     }
 
-    public async Task UpdateAsync(Menu menu, CancellationToken cancellationToken)
+    public Task UpdateAsync(Menu menu, CancellationToken cancellationToken)
     {
-        await _dbContext
-            .Menus
-            .ExecuteUpdateAsync(x =>
-                x.SetProperty(r => r.Id, menu.Id)
-                 .SetProperty(r => r.RestaurantId, menu.RestaurantId)
-                 .SetProperty(r => r.MenuDetails, menu.MenuDetails)
-                 .SetProperty(r => r.DishSpecification, menu.DishSpecification)
-                 .SetProperty(r => r.MenuReviewIds, menu.MenuReviewIds)
-                 .SetProperty(r => r.MenuSchedules, menu.MenuSchedules)
-                 .SetProperty(r => r.MenuConsumers, menu.MenuConsumers)
-                 .SetProperty(r => r.CreatedOn, menu.CreatedOn)
-                 .SetProperty(r => r.UpdatedOn, menu.UpdatedOn));
+        _dbContext.Menus.Update(menu);
+
+        return Task.CompletedTask;
     }
 }
