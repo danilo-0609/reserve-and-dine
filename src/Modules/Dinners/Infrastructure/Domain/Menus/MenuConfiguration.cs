@@ -30,12 +30,12 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
                 value => RestaurantId.Create(value))
             .HasColumnName("RestaurantId");
 
-        builder.OwnsOne<MenuDetails>("MenuDetails", x =>
+        builder.ComplexProperty<MenuDetails>("MenuDetails", x =>
         {
             x.Property(p => p.Title).HasColumnName("Title");
             x.Property(p => p.Description).HasColumnName("Description");
-            x.OwnsOne(p => p.MenuType).Property(p => p.Value).HasColumnName("MenuType");
-            x.OwnsOne(p => p.Price, t =>
+            x.ComplexProperty(p => p.MenuType).Property(p => p.Value).HasColumnName("MenuType");
+            x.ComplexProperty(p => p.Price, t =>
             {
                 t.Property(f => f.Amount).HasColumnName("PriceAmount").HasColumnType("decimal").HasPrecision(10, 2); ;
                 t.Property(f => f.Currency).HasColumnName("PriceCurrency");
@@ -48,7 +48,7 @@ internal sealed class MenuConfiguration : IEntityTypeConfiguration<Menu>
             x.Property(p => p.HasAlcohol).HasColumnName("HasAlcohol");
         });
 
-        builder.OwnsOne<DishSpecification>("DishSpecification", x =>
+        builder.ComplexProperty<DishSpecification>("DishSpecification", x =>
         {
             x.Property(p => p.MainCourse).HasColumnName("MainCourse");
             x.Property(p => p.SideDishes).HasColumnName("SideDishes");

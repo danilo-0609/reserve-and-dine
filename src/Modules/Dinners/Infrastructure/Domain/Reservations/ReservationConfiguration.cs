@@ -23,16 +23,16 @@ internal sealed class ReservationConfiguration : IEntityTypeConfiguration<Reserv
             .ValueGeneratedNever()
             .HasColumnName("ReservationId");
 
-        builder.OwnsOne(r => r.ReservationInformation, x =>
+        builder.ComplexProperty(r => r.ReservationInformation, x =>
         {
             x.Property(p => p.ReservedTable).ValueGeneratedNever().HasColumnName("ReservedTable");
-            x.OwnsOne(p => p.ReservationPrice, r =>
+            x.ComplexProperty(p => p.ReservationPrice, r =>
             {
                 r.Property(t => t.Amount).HasColumnName("MoneyAmount").HasColumnType("decimal").HasPrecision(10, 2); ;
                 r.Property(t => t.Currency).HasColumnName("MoneyCurrency");
             });
 
-            x.OwnsOne(r => r.TimeOfReservation, g =>
+            x.ComplexProperty(r => r.TimeOfReservation, g =>
             {
                 g.Property(x => x.Start).HasColumnName("ReservationStartTime");
                 g.Property(x => x.End).HasColumnName("ReservationEndTime");
@@ -53,14 +53,14 @@ internal sealed class ReservationConfiguration : IEntityTypeConfiguration<Reserv
             .ValueGeneratedNever()
             .HasColumnName("RestaurantId");
 
-        builder.OwnsOne(r => r.ReservationAttendees, x =>
+        builder.ComplexProperty(r => r.ReservationAttendees, x =>
         {
             x.Property(g => g.ClientId).HasColumnName("ClientId");
             x.Property(g => g.Name).HasColumnName("Name");
             x.Property(g => g.NumberOfAttendees).HasColumnName("NumberOfAttendees");
         });
 
-        builder.OwnsOne(r => r.ReservationStatus, x =>
+        builder.ComplexProperty(r => r.ReservationStatus, x =>
         {
             x.Property(r => r.Value).HasColumnName("ReservationStatus");
         });

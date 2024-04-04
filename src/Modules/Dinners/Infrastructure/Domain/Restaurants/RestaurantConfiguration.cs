@@ -28,19 +28,19 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
         builder.Property(r => r.NumberOfTables)
             .HasColumnName("NumberOfTables");
 
-        builder.OwnsOne(r => r.AvailableTablesStatus, x =>
+        builder.ComplexProperty(r => r.AvailableTablesStatus, x =>
         {
             x.Property(r => r.Value).HasColumnName("AvailableTableStatus");
         });
 
-        builder.OwnsOne(r => r.RestaurantInformation, x =>
+        builder.ComplexProperty(r => r.RestaurantInformation, x =>
         {
             x.Property(t => t.Title).HasColumnName("Title");
             x.Property(t => t.Description).HasColumnName("Description");
             x.Property(t => t.Type).HasColumnName("Type");
         });
 
-        builder.OwnsOne(r => r.RestaurantLocalization, x =>
+        builder.ComplexProperty(r => r.RestaurantLocalization, x =>
         {
             x.Property(r => r.Country).HasColumnName("Country");
             x.Property(r => r.City).HasColumnName("City");
@@ -50,7 +50,7 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
             x.Property(r => r.LocalizationDetails).HasColumnName("LocalizationDetails");
         });
 
-        builder.OwnsOne(r => r.RestaurantScheduleStatus, x =>
+        builder.ComplexProperty(r => r.RestaurantScheduleStatus, x =>
         {
             x.Property(r => r.Value).HasColumnName("RestaurantScheduleStatus");
         });
@@ -89,7 +89,7 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
                 .IsRequired(false);
         });
 
-        builder.OwnsOne(r => r.RestaurantContact, x =>
+        builder.ComplexProperty(r => r.RestaurantContact, x =>
         {
             x.Property(r => r.Email).HasColumnName("Email");
             x.Property(r => r.Whatsapp).HasColumnName("Whatsapp");
@@ -103,7 +103,8 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
 
 
         builder.HasMany(r => r.RestaurantRatingIds)
-            .WithMany().UsingEntity<RestaurantRatings>();
+            .WithMany()
+            .UsingEntity<RestaurantRatings>();
 
         builder.OwnsMany(r => r.RestaurantClients, x =>
         {
