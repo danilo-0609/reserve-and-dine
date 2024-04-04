@@ -22,6 +22,7 @@ internal sealed class MenuRepository : IMenuRepository
     {
         return await _dbContext
             .Menus
+            .AsNoTracking()
             .Where(r => r.Id == menuId)
             .SingleOrDefaultAsync();
     }
