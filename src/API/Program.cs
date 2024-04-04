@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddPresentation(await ConnectionsManager.GetAzureBlobStorageConnectionString());
 
 //Modules services
-builder.Services.AddDinners(await ConnectionsManager.GetDatabaseConnectionString());
+builder.Services.AddDinners(await ConnectionsManager.GetDatabaseConnectionString(), 
+    await ConnectionsManager.GetAzureRedisConnectionString());
 
 
 builder.Services.AddControllers();

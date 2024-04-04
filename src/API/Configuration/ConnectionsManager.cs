@@ -25,4 +25,11 @@ public static class ConnectionsManager
 
         return azureConnectionString.Value.Value;
     }
+
+    public static async Task<string> GetAzureRedisConnectionString()
+    {
+        var redisConnectionString = await _client.GetSecretAsync("AZUREREDISCONNECTIONSTRING");
+
+        return redisConnectionString.Value.Value;
+    }
 }
