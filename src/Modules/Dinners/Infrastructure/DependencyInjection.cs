@@ -9,6 +9,7 @@ using Dinners.Domain.Restaurants.RestaurantRatings;
 using Dinners.Infrastructure.Blobs;
 using Dinners.Infrastructure.Cache.Menus;
 using Dinners.Infrastructure.Domain.Menus;
+using Dinners.Infrastructure.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Domain.Menus.Reviews;
 using Dinners.Infrastructure.Domain.Reservations;
 using Dinners.Infrastructure.Domain.Reservations.Payments;
@@ -26,10 +27,14 @@ namespace Dinners.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string databaseConnectionString)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string databaseConnectionString, string redisConnectionString)
     {
 
         services.AddMemoryCache();
+        services.AddStackExchangeRedisCache(redisOptions =>
+        {
+            redisOptions.Configuration = redisConnectionString;
+        });
 
         services.AddQuartzHostedService();
         services.AddQuartz();
@@ -56,7 +61,8 @@ public static class DependencyInjection
         services.AddScoped<IMenuRepository, MenuRepository>();
         services.Decorate<IMenuRepository, CacheMenuRepository>();
 
-        services.AddScoped<IMenuReviewRepository, ReviewRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.AddScoped<IMenusReviewsRepository, MenusReviewsRepository>();
         services.AddScoped<IReservationRepository, ReservationRepository>();
         services.AddScoped<IReservationPaymentRepository, PaymentRepository>();
         services.AddScoped<IRefundRepository, RefundRepository>();
