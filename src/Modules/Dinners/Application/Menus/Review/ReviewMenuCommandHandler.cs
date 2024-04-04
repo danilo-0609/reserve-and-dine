@@ -9,15 +9,17 @@ namespace Dinners.Application.Menus.Review;
 
 internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuCommand, ErrorOr<Guid>>
 {
-    private readonly IMenuReviewRepository _menuReviewRepository;
+    private readonly IReviewRepository _reviewRepository;
     private readonly IMenuRepository _menuRepository;
+    private readonly IMenusReviewsRepository _menuReviewsRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
 
-    public ReviewMenuCommandHandler(IMenuReviewRepository menuReviewRepository, IMenuRepository menuRepository, IExecutionContextAccessor executionContextAccessor)
+    public ReviewMenuCommandHandler(IReviewRepository menuReviewRepository, IMenuRepository menuRepository, IExecutionContextAccessor executionContextAccessor, IMenusReviewsRepository menuReviewsRepository)
     {
-        _menuReviewRepository = menuReviewRepository;
+        _reviewRepository = menuReviewRepository;
         _menuRepository = menuRepository;
         _executionContextAccessor = executionContextAccessor;
+        _menuReviewsRepository = menuReviewsRepository;
     }
 
     public async Task<ErrorOr<Guid>> Handle(ReviewMenuCommand request, CancellationToken cancellationToken)
@@ -50,8 +52,9 @@ internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuComma
             menu.Ingredients.ToList(),
             DateTime.UtcNow);
 
-        await _menuReviewRepository.AddAsync(review.Value);
         await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
+        await _menuReviewsRepository.AddAsync(new MenusReviews(menu.Id, review.Value.Id), cancellationToken);
+        await _reviewRepository.AddAsync(review.Value);
 
         return review.Value.Id.Value;
     }
