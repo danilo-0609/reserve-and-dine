@@ -12,6 +12,7 @@ using Dinners.Domain.Menus.MenuReviews;
 using Dinners.Domain.Menus.Schedules;
 using Dinners.Domain.Restaurants;
 using Dinners.Infrastructure.Domain.Menus;
+using Dinners.Infrastructure.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Domain.Menus.Reviews;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -22,12 +23,14 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
 {
     private readonly IMenuRepository _menuRepository;
     private readonly IExecutionContextAccessor _executionContextAccessorMock;
-    private readonly IMenuReviewRepository _menuReviewRepository;
+    private readonly IReviewRepository _reviewRepository;
+    private readonly IMenusReviewsRepository _menusReviewsRepository;
 
     public MenuIntegrationTests(IntegrationTestWebAppFactory factory) : base(factory)
     {
-        _menuReviewRepository = new ReviewRepository(DbContext);
+        _reviewRepository = new ReviewRepository(DbContext);
         _menuRepository = new MenuRepository(DbContext);
+        _menusReviewsRepository = new MenusReviewsRepository(DbContext);
 
         _executionContextAccessorMock = Substitute.For<IExecutionContextAccessor>();
     }
@@ -200,6 +203,8 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
         await DbContext.Menus.AddAsync(menu);
         await DbContext.SaveChangesAsync();
 
+        DbContext.Entry(menu).State = EntityState.Detached;
+
         var menuDetails = MenuDetails.Create("Menu Title",
             "Menu description",
             MenuType.Dinner,
@@ -272,8 +277,10 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
 
         menu.Consume(clientId);
 
-        await DbContext.Menus.AddAsync(menu);
+        await _menuRepository.AddAsync(menu, CancellationToken.None);
         await DbContext.SaveChangesAsync();
+
+        DbContext.Entry(menu).State = EntityState.Detached;
 
         _executionContextAccessorMock.UserId.Returns(clientId);
 
@@ -281,11 +288,14 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
             4.5m,
             "Comment");
 
-        var handler = new ReviewMenuCommandHandler(_menuReviewRepository, _menuRepository, _executionContextAccessorMock);
+        var handler = new ReviewMenuCommandHandler(_reviewRepository, 
+            _menuRepository, 
+            _executionContextAccessorMock,
+            _menusReviewsRepository);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        Assert.IsType<Guid>(result);
+        Assert.IsType<Guid>(result.Value);
     }
 
     [Fact]
@@ -331,6 +341,8 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
 
         await DbContext.Menus.AddAsync(menu);
         await DbContext.SaveChangesAsync();
+
+        DbContext.Entry(menu).State = EntityState.Detached;
 
         var dishSpecification = DishSpecification.Create("Main course",
             "Side dishes",
