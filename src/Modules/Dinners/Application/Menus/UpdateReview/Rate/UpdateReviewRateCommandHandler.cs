@@ -8,9 +8,9 @@ namespace Dinners.Application.Menus.UpdateReview.Rate;
 
 internal sealed class UpdateReviewRateCommandHandler : ICommandHandler<UpdateReviewRateCommand, ErrorOr<Unit>>
 {
-    private readonly IMenuReviewRepository _menuReviewRepository;
+    private readonly IReviewRepository _menuReviewRepository;
 
-    public UpdateReviewRateCommandHandler(IMenuReviewRepository menuReviewRepository)
+    public UpdateReviewRateCommandHandler(IReviewRepository menuReviewRepository)
     {
         _menuReviewRepository = menuReviewRepository;
     }

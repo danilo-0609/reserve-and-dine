@@ -8,9 +8,9 @@ namespace Dinners.Application.Menus.UpdateReview.Comments;
 
 internal sealed class UpdateReviewCommentCommandHandler : ICommandHandler<UpdateReviewCommentCommand, ErrorOr<Unit>>
 {
-    private readonly IMenuReviewRepository _menuReviewRepository;
+    private readonly IReviewRepository _menuReviewRepository;
 
-    public UpdateReviewCommentCommandHandler(IMenuReviewRepository menuReviewRepository)
+    public UpdateReviewCommentCommandHandler(IReviewRepository menuReviewRepository)
     {
         _menuReviewRepository = menuReviewRepository;
     }

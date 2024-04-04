@@ -9,9 +9,9 @@ namespace Dinners.Application.Menus.GetReviewsByMenuId;
 internal sealed class GetMenuReviewsByMenuIdQueryHandler : IQueryHandler<GetMenuReviewsByMenuIdQuery, ErrorOr<List<MenuReviewResponse>>>
 {
     private readonly IMenuRepository _menuRepository;
-    private readonly IMenuReviewRepository _menuReviewRepository;
+    private readonly IReviewRepository _menuReviewRepository;
 
-    public GetMenuReviewsByMenuIdQueryHandler(IMenuRepository menuRepository, IMenuReviewRepository menuReviewRepository)
+    public GetMenuReviewsByMenuIdQueryHandler(IMenuRepository menuRepository, IReviewRepository menuReviewRepository)
     {
         _menuRepository = menuRepository;
         _menuReviewRepository = menuReviewRepository;

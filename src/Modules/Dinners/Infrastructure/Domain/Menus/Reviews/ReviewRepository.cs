@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dinners.Infrastructure.Domain.Menus.Reviews;
 
-internal sealed class ReviewRepository : IMenuReviewRepository
+internal sealed class ReviewRepository : IReviewRepository
 {
     private readonly DinnersDbContext _dbContext;
 

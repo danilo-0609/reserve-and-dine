@@ -1,6 +1,6 @@
 ﻿namespace Dinners.Domain.Menus.MenuReviews;
 
-public interface IMenuReviewRepository
+public interface IReviewRepository
 {
     Task AddAsync(MenuReview menuReview);
 
