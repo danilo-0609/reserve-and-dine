@@ -22,7 +22,6 @@ internal sealed class MenuRepository : IMenuRepository
     {
         return await _dbContext
             .Menus
-            .AsNoTracking()
             .Where(r => r.Id == menuId)
             .SingleOrDefaultAsync();
     }
@@ -46,17 +45,12 @@ internal sealed class MenuRepository : IMenuRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Menu>> GetMenusByIngredientAsync(List<string> ingredients, CancellationToken cancellationToken)
+    public async Task<List<Menu>> GetMenusByIngredientAsync(string ingredient, CancellationToken cancellationToken)
     {
-        List<Menu> menus = new();
-    
-        foreach(var ingredient in ingredients)
-        {
-            await _dbContext
-                .Menus
-                .Where(x => x.Ingredients.Any(r => r.Value == ingredient))
-                .SingleOrDefaultAsync();
-        }
+        var menus = await _dbContext
+            .Menus
+            .Where(r => r.Ingredients.Any(t => t.Value == ingredient) == true)
+            .ToListAsync();
 
         return menus;
     }
