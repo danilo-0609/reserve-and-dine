@@ -32,11 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Cache\Restaurants\" />
-    <Folder Include="Cache\Reservations\" />
-  </ItemGroup>
-
-  <ItemGroup>
 	  <InternalsVisibleTo Include="Dinners.Tests" />	
   </ItemGroup>
 
