@@ -95,6 +95,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             discountTerms);
 
         MenuDetails = menuSpecification;
+        UpdatedOn = DateTime.UtcNow;
 
         return menuSpecification;
     }
@@ -136,7 +137,8 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             condiments,
             coffee);
 
-        DishSpecification = dishSpecification;
+        DishSpecification = dishSpecification; 
+        UpdatedOn = DateTime.UtcNow;
 
         return dishSpecification;            
     }
@@ -161,6 +163,8 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             .Single();
 
         _menuSchedules.Remove(menuSchedule);
+        UpdatedOn = DateTime.UtcNow;
+
 
         _menuSchedules.Add(MenuSchedule.Create(day, start, end, Id));
     }
@@ -172,6 +176,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
             .Single();
 
         _menuSchedules.Remove(menuSchedule);
+        UpdatedOn = DateTime.UtcNow;
     }
 
     public Menu Update(List<MenuReviewId> menuReviewIds,
@@ -218,31 +223,37 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
     public void AddImage(string imageUrl)
     {
         _menuImagesUrl.Add(new MenuImageUrl(MenuImageUrlId.CreateUnique(), imageUrl, Id));
+        UpdatedOn = DateTime.UtcNow;
     }
 
     public void DeleteImage(string imageUrl, MenuImageUrlId menuImageUrlId)
     {
         _menuImagesUrl.Remove(new MenuImageUrl(menuImageUrlId, imageUrl, Id));
+        UpdatedOn = DateTime.UtcNow;
     }
 
     public void AddTag(string tag)
     {
         _tags.Add(new Tag(TagId.CreateUnique(), tag, Id));
+        UpdatedOn = DateTime.UtcNow;
     }
 
     public void DeleteTag(string tag, TagId tagId)
     {
         _tags.Remove(new Tag(tagId, tag, Id));
+        UpdatedOn = DateTime.UtcNow;
     }
 
     public void AddIngredient(string ingredient)
     {
         _ingredients.Add(new Ingredient(IngredientId.CreateUnique(), ingredient, Id));
+        UpdatedOn = DateTime.UtcNow;
     }
 
     public void DeleteIngredient(string ingredient, IngredientId ingredientId)
     {
         _ingredients.Remove(new Ingredient(ingredientId, ingredient, Id));
+        UpdatedOn = DateTime.UtcNow;
     }
 
     private Menu(List<MenuReviewId> menuReviewIds, 
