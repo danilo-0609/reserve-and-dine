@@ -1,22 +1,23 @@
 ﻿using Dinners.Application.Common;
+using Dinners.Application.Menus.GetReviewsByMenuId;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.Errors;
 using ErrorOr;
 
 namespace Dinners.Application.Menus.GetByIngredients;
 
-internal sealed class GetMenusByIngredientsQueryHandler : IQueryHandler<GetMenusByIngredientsQuery, ErrorOr<List<MenuResponse>>>
+internal sealed class GetMenusByIngredientQueryHandler : IQueryHandler<GetMenusByIngredientQuery, ErrorOr<List<MenuResponse>>>
 {
     private readonly IMenuRepository _menuRepository;
 
-    public GetMenusByIngredientsQueryHandler(IMenuRepository menuRepository)
+    public GetMenusByIngredientQueryHandler(IMenuRepository menuRepository)
     {
         _menuRepository = menuRepository;
     }
 
-    public async Task<ErrorOr<List<MenuResponse>>> Handle(GetMenusByIngredientsQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<List<MenuResponse>>> Handle(GetMenusByIngredientQuery request, CancellationToken cancellationToken)
     {
-        List<Menu> menus = await _menuRepository.GetMenusByIngredientAsync(request.Ingredients, cancellationToken);
+        List<Menu> menus = await _menuRepository.GetMenusByIngredientAsync(request.Ingredient, cancellationToken);
 
         if (!menus.Any())
         {
