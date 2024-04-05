@@ -1,18 +1,23 @@
 ﻿using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.MenuReviews;
-using Microsoft.Extensions.Caching.Memory;
+using Dinners.Infrastructure.Resolvers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 
 namespace Dinners.Infrastructure.Cache.Menus;
 
 internal sealed class CacheMenuRepository : IMenuRepository
 {
     private readonly IMenuRepository _decorated;
-    private readonly IMemoryCache _memoryCache;
+    private readonly IDistributedCache _distributedCache;
+    private readonly DinnersDbContext _dbContext;
 
-    public CacheMenuRepository(IMenuRepository decorated, IMemoryCache memoryCache)
+    public CacheMenuRepository(IMenuRepository decorated, IDistributedCache distributedCache, DinnersDbContext dinnersDbContext)
     {
         _decorated = decorated;
-        _memoryCache = memoryCache;
+        _distributedCache = distributedCache;
+        _dbContext = dinnersDbContext;
     }
 
     public async Task AddAsync(Menu menu, CancellationToken cancellationToken)
@@ -23,71 +28,232 @@ internal sealed class CacheMenuRepository : IMenuRepository
     public async Task<Menu?> GetByIdAsync(MenuId menuId, CancellationToken cancellationToken)
     {
         string key = $"menu-{menuId.Value}";
-    
-        return await _memoryCache.GetOrCreateAsync(
-            key,
-            async entry =>
-            {
-                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+        
+        string? cachedMenu = await _distributedCache.GetStringAsync(key,
+            cancellationToken);
 
-                return await _decorated.GetByIdAsync(menuId, cancellationToken);
-            });
+        Menu? menu;
+        if (string.IsNullOrEmpty(cachedMenu))
+        {
+            menu = await _decorated.GetByIdAsync(menuId, cancellationToken);
+        
+            if (menu is null)
+            {
+                return menu;
+            }
+
+            await _distributedCache.SetStringAsync(
+                key,
+                JsonConvert.SerializeObject(menu, 
+                new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+                }),
+                cancellationToken);
+
+            return menu;
+        }
+        
+        menu = JsonConvert.DeserializeObject<Menu>(cachedMenu, new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.All,
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            ContractResolver = new PrivateResolver()
+        });
+
+        if (menu is not null)
+        {
+            _dbContext.Set<Menu>().Attach(menu);
+        }
+
+        return menu;
     }
 
     public async Task<List<string>> GetMenuImagesUrlById(MenuId menuId, CancellationToken cancellationToken)
     {
-        string key = $"menuImagesUrl-{menuId}";
+        string key = $"menuImagesUrl-{menuId.Value}";
 
-        return await _memoryCache.GetOrCreateAsync(
-            key,
-            async entry =>
+        string? cachedMenuImagesUrls = await _distributedCache.GetStringAsync(key,
+            cancellationToken);
+
+        List<string> menuImagesUrls;
+        if (string.IsNullOrEmpty(cachedMenuImagesUrls))
+        {
+            menuImagesUrls = await _decorated.GetMenuImagesUrlById(menuId, cancellationToken);
+
+            if (!menuImagesUrls.Any())
             {
-                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                return menuImagesUrls;
+            }
 
-                return await _decorated.GetMenuImagesUrlById(menuId, cancellationToken);
-            });
+            await _distributedCache.SetStringAsync(
+                key,
+                JsonConvert.SerializeObject(menuImagesUrls, new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+                }),
+                cancellationToken);
+
+            return menuImagesUrls;
+        }
+
+        menuImagesUrls = JsonConvert.DeserializeObject<List<string>>(cachedMenuImagesUrls,
+        new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.All,
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            ContractResolver = new PrivateResolver()
+        })!;
+
+        if (!menuImagesUrls.Any())
+        {
+            _dbContext.Set<Menu>().Attach(await _dbContext
+                .Menus
+                .Where(r => r.Id == menuId)
+                .SingleAsync());
+        }
+
+        return menuImagesUrls;
     }
 
     public async Task<List<MenuReviewId>> GetMenuReviewsIdByIdAsync(MenuId menuId, CancellationToken cancellationToken)
     {
-        string key = $"menuReviewsId-{menuId}";
+        string key = $"menuReviewsId-{menuId.Value}";
 
-        return await _memoryCache.GetOrCreateAsync(
-            key,
-            async entry =>
+        string? cachedMenuReviewIds = await _distributedCache.GetStringAsync(key,
+        cancellationToken);
+
+        List<MenuReviewId> menuReviewsIds;
+        if (string.IsNullOrEmpty(cachedMenuReviewIds))
+        {
+            menuReviewsIds = await _decorated.GetMenuReviewsIdByIdAsync(menuId, cancellationToken);
+
+            if (!menuReviewsIds.Any())
             {
-                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                return menuReviewsIds;
+            }
 
-                return await _decorated.GetMenuReviewsIdByIdAsync(menuId, cancellationToken);
-            });
+            await _distributedCache.SetStringAsync(
+                key,
+                JsonConvert.SerializeObject(menuReviewsIds, new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+                }),
+            cancellationToken);
+
+            return menuReviewsIds;
+        }
+
+        menuReviewsIds = JsonConvert.DeserializeObject<List<MenuReviewId>>(cachedMenuReviewIds,
+        new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.All,
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            ContractResolver = new PrivateResolver()
+        })!;
+
+        if (!menuReviewsIds.Any())
+        {
+            _dbContext.Set<Menu>().Attach(await _dbContext
+                .Menus
+                .Where(r => r.Id == menuId)
+                .SingleAsync());
+        }
+
+        return menuReviewsIds;
     }
 
-    public async Task<List<Menu>> GetMenusByIngredientAsync(List<string> ingredients, CancellationToken cancellationToken)
+    public async Task<List<Menu>> GetMenusByIngredientAsync(string ingredient, CancellationToken cancellationToken)
     {
-        string key = $"menus-ingredients";
+        string key = $"menu-{ingredient}";
 
-        return await _memoryCache.GetOrCreateAsync(
-            key,
-            async entry =>
+        string? cachedMenus = await _distributedCache.GetStringAsync(key,
+            cancellationToken);
+
+        List<Menu> menus;
+        if (string.IsNullOrEmpty(cachedMenus))
+        {
+            menus = await _decorated.GetMenusByIngredientAsync(ingredient, cancellationToken);
+
+            if (!menus.Any())
             {
-                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                return menus;
+            }
 
-                return await _decorated.GetMenusByIngredientAsync(ingredients, cancellationToken);
-            });
+            await _distributedCache.SetStringAsync(
+                key,
+                JsonConvert.SerializeObject(menus, new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+                }),
+            cancellationToken);
+
+            return menus;
+        }
+
+        menus = JsonConvert.DeserializeObject<List<Menu>>(cachedMenus,
+        new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.All,
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            ContractResolver = new PrivateResolver()
+        })!;
+
+        if (!menus.Any())
+        {
+            _dbContext.Set<Menu>().AttachRange(menus);
+        }
+
+        return menus;
     }
 
     public async Task<List<Menu>> GetMenusByNameAsync(string name, CancellationToken cancellationToken)
     {
-        string key = $"menus-{name}";
+        string key = $"menu-{name}";
 
-        return await _memoryCache.GetOrCreateAsync(
-            key,
-            async entry =>
+        string? cachedMenus = await _distributedCache.GetStringAsync(key,
+        cancellationToken);
+
+        List<Menu> menus;
+        if (string.IsNullOrEmpty(cachedMenus))
+        {
+            menus = await _decorated.GetMenusByNameAsync(name, cancellationToken);
+
+            if (!menus.Any())
             {
-                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                return menus;
+            }
 
-                return await _decorated.GetMenusByNameAsync(name, cancellationToken);
-            });
+            await _distributedCache.SetStringAsync(
+                key,
+                JsonConvert.SerializeObject(menus, new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+                }),
+                cancellationToken);
+
+            return menus;
+        }
+
+        menus = JsonConvert.DeserializeObject<List<Menu>>(cachedMenus,
+        new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.All,
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            ContractResolver = new PrivateResolver()
+        })!;
+
+        if (menus.Any())
+        {
+            _dbContext.Set<Menu>().AttachRange(menus);
+        }
+
+        return menus;
     }
 
     public async Task UpdateAsync(Menu menu, CancellationToken cancellationToken)
