@@ -8,6 +8,8 @@ using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantRatings;
 using Dinners.Infrastructure.Blobs;
 using Dinners.Infrastructure.Cache.Menus;
+using Dinners.Infrastructure.Cache.Reservations;
+using Dinners.Infrastructure.Cache.Restaurants;
 using Dinners.Infrastructure.Domain.Menus;
 using Dinners.Infrastructure.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Domain.Menus.Reviews;
@@ -61,14 +63,27 @@ public static class DependencyInjection
         services.AddScoped<IMenuRepository, MenuRepository>();
         services.Decorate<IMenuRepository, CacheMenuRepository>();
 
-        services.AddScoped<IReviewRepository, ReviewRepository>();
-        services.AddScoped<IMenusReviewsRepository, MenusReviewsRepository>();
         services.AddScoped<IReservationRepository, ReservationRepository>();
-        services.AddScoped<IReservationPaymentRepository, PaymentRepository>();
-        services.AddScoped<IRefundRepository, RefundRepository>();
-        services.AddScoped<IRestaurantRatingRepository, RatingRepository>();
-        services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        services.Decorate<IReservationRepository, CacheReservationRepository>();
 
+        services.AddScoped<IReservationPaymentRepository, PaymentRepository>();
+        services.Decorate<IReservationPaymentRepository, CachePaymentRepository>();
+
+        services.AddScoped<IRefundRepository, RefundRepository>();
+        services.Decorate<IRefundRepository, CacheRefundRepository>();
+
+        services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.Decorate<IReviewRepository, CacheReviewRepository>();
+
+
+        services.AddScoped<IMenusReviewsRepository, MenusReviewsRepository>();
+        
+
+        services.AddScoped<IRestaurantRatingRepository, RatingRepository>();
+        services.Decorate<IRestaurantRatingRepository, CacheRatingRepository>();    
+
+        services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        services.Decorate<IRestaurantRepository, CacheRestaurantRepository>();
 
         return services;
     }
