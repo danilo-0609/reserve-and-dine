@@ -77,7 +77,7 @@ public sealed class MenuTests
     [Fact]
     public void Review_Should_ReturnAnError_WhenRateIsNotAValidNumber()
     {
-        var menu = Menu.Publish(MenuId.CreateUnique(), 
+        var menu = Menu.Publish(MenuId.CreateUnique(),
             RestaurantId.CreateUnique(),
             _menuDetails,
             _dishSpecification,
