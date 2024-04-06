@@ -151,6 +151,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
 
         _menuSchedules.Add(menuSchedule);
 
+        UpdatedOn = DateTime.UtcNow;
         return menuSchedule;
     }
 
