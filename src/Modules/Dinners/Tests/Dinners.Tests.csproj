@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IntegrationTests\Reservations\" />
     <Folder Include="IntegrationTests\Restaurants\" />
   </ItemGroup>
 
