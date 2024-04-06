@@ -1,6 +1,6 @@
-﻿using API.Configuration;
-using BuildingBlocks.Application;
+﻿using BuildingBlocks.Application;
 using Dinners.Application.Menus.DishSpecifications;
+using Dinners.Application.Menus.MenuSchedules;
 using Dinners.Application.Menus.MenuSpecification;
 using Dinners.Application.Menus.Publish;
 using Dinners.Application.Menus.Review;
@@ -14,6 +14,8 @@ using Dinners.Domain.Restaurants;
 using Dinners.Infrastructure.Domain.Menus;
 using Dinners.Infrastructure.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Domain.Menus.Reviews;
+using Dinners.Tests.UnitTests.Restaurants;
+using Domain.Restaurants;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 
@@ -112,7 +114,13 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
     [InlineData("Dinner")]
     public async void Publish_Should_ReturnAMenuId_WhenSuccessful(string menuType)
     {
-        var command = new PublishMenuCommand(Guid.NewGuid(),
+        Restaurant restaurant = new RestaurantTests().CreateRestaurant();
+
+        await DbContext.Restaurants.AddAsync(restaurant);
+        await DbContext.SaveChangesAsync();
+        
+
+        var command = new PublishMenuCommand(restaurant.Id.Value,
             "Menu title",
             "Menu description",
             menuType,
@@ -127,9 +135,36 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
 
         var result = await Sender.Send(command);
 
-        bool isErrorRestaurantNotFound = result.FirstError.Code == "Restaurant.NotFound";
+        Assert.IsType<Guid>(result.Value);
+    }
 
-        Assert.True(isErrorRestaurantNotFound);
+    [Fact]
+    public async void Publish_Should_StoreTheMenuInDatabase_WhenSuccessful()
+    {
+        Restaurant restaurant = new RestaurantTests().CreateRestaurant();
+
+        await DbContext.Restaurants.AddAsync(restaurant);
+        await DbContext.SaveChangesAsync();
+
+
+        var command = new PublishMenuCommand(restaurant.Id.Value,
+            "Menu title",
+            "Menu description",
+            "Lunch",
+            10.0m,
+            "USD",
+            0.0m,
+            new List<string>() { "#Lunch", "#Delicious" },
+            false,
+            "Primary chef name",
+            false,
+            new List<string>() { "Tomato", "Rice", "Potato" });
+
+        var result = await Sender.Send(command);
+
+        bool menuWasStoredInDatabase = DbContext.Menus.Any(r => r.Id.Value == result.Value);
+
+        Assert.True(menuWasStoredInDatabase);
     }
 
     [Fact]
@@ -373,5 +408,59 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
         bool isDishSpecificationUpdated = menuFromDatabase!.DishSpecification == dishSpecification;
             
         Assert.True(isDishSpecificationUpdated);
+    }
+
+    [Fact]
+    public async void SetMenuSchedule_Should_ReturnAnError_WhenMenuDoesNotExistInDatabase()
+    {
+        var command = new SetMenuScheduleCommand(Guid.NewGuid(),
+            DayOfWeek.Tuesday,
+            TimeSpan.FromHours(8),
+            TimeSpan.FromHours(19));
+
+        var result = await Sender.Send(command);
+
+        bool isErrorMenuDoesNotExist = result.FirstError.Code == "Menu.NotFound";
+
+        Assert.True(isErrorMenuDoesNotExist);
+    }
+
+    [Fact]
+    public async void SetMenuSchedule_Should_AddMenuScheduleInDatabase_WhenSuccessful()
+    {
+        var menuId = MenuId.CreateUnique();
+
+        List<MenuSchedule> menuSchedules = new()
+        {
+            MenuSchedule.Create(DayOfWeek.Tuesday, TimeSpan.FromHours(7), TimeSpan.FromHours(19), menuId),
+            MenuSchedule.Create(DayOfWeek.Wednesday, TimeSpan.FromHours(8), TimeSpan.FromHours(19), menuId),
+        };
+
+        var menu = Menu.Publish(menuId,
+            RestaurantId.CreateUnique(),
+            _menuDetails,
+            _dishSpecification,
+            new List<string>(),
+            new List<string>(),
+            new List<string>(),
+            menuSchedules,
+            DateTime.Now);
+
+        await DbContext.Menus.AddAsync(menu);
+        await DbContext.SaveChangesAsync();
+
+        var command = new SetMenuScheduleCommand(menu.Id.Value,
+            DayOfWeek.Saturday,
+            TimeSpan.FromHours(8),
+            TimeSpan.FromHours(19));
+
+        var result = await Sender.Send(command);
+
+        bool isMenuScheduleStoredInDatabase = DbContext
+            .Menus
+            .Any(r => r.MenuSchedules
+                .Any(t => t.Day == DayOfWeek.Saturday));
+
+        Assert.True(isMenuScheduleStoredInDatabase);
     }
 }
