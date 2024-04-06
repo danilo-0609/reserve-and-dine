@@ -31,6 +31,6 @@ internal sealed class RequestReservationCommandValidator : AbstractValidator<Req
             .NotNull().NotEmpty();
 
         RuleFor(r => r.MenuIds)
-            .NotNull().NotEmpty();
+            .NotNull();
     }
 }
