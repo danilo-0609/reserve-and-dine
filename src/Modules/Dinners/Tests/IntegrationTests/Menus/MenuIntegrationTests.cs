@@ -141,7 +141,7 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
     [Fact]
     public async void Publish_Should_StoreTheMenuInDatabase_WhenSuccessful()
     {
-        Restaurant restaurant = new RestaurantTests().CreateRestaurant();
+        Restaurant restaurant = new RestaurantTests().CreateRestaurant(RestaurantId.CreateUnique());
 
         await DbContext.Restaurants.AddAsync(restaurant);
         await DbContext.SaveChangesAsync();
