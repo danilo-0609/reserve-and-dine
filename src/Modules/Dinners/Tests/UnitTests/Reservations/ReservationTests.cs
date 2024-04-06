@@ -20,22 +20,6 @@ public sealed class ReservationTests
         "Client name",
         numberOfAttendees: 4);
 
-    [Fact]
-    public void Request_Should_ReturnAnError_WhenTableIsNotAvailable()
-    {
-        var reservation = Reservation.Request(_reservationInformation,
-            availableTables: new List<int>() { 2, 3 },
-            4,
-            RestaurantId.CreateUnique(),
-            _reservationAttendees,
-            new List<MenuId>());
-
-        bool isErrorCannotBeMadeWhenTableIsNotAvailable = reservation
-            .FirstError
-            .Code == "Reservation.CannotBeMadeWhenTableIsNotAvailable";
-
-        Assert.True(isErrorCannotBeMadeWhenTableIsNotAvailable);
-    }
 
     [Fact]
     public void Request_Should_ReturnAnError_WhenNumberOfAttendeesIsGreaterThanNumberOfSeats()
@@ -45,7 +29,6 @@ public sealed class ReservationTests
         numberOfAttendees: 5);
 
         var reservation = Reservation.Request(_reservationInformation,
-            availableTables: new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             reservationAttendees,
@@ -82,7 +65,6 @@ public sealed class ReservationTests
                     .SingleOrDefault();
 
         var reservation = Reservation.Request(_reservationInformation,
-            availableTables,
             numberOfSeats,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -117,7 +99,6 @@ public sealed class ReservationTests
                     .SingleOrDefault();
 
         var reservation = Reservation.Request(_reservationInformation,
-            availableTables,
             numberOfSeats,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -135,7 +116,6 @@ public sealed class ReservationTests
     public void Cancel_Should_ReturnAnError_WhenReservationHasBeenAssisted()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -159,7 +139,6 @@ public sealed class ReservationTests
     public void Cancel_Should_RefundMoneyPaid_WhenReservationHasBeenPaid()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -180,7 +159,6 @@ public sealed class ReservationTests
     public void Cancel_Should_RaiseReservationCancelledDomainEvent_WhenSuccessful()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -200,7 +178,6 @@ public sealed class ReservationTests
     public void Pay_Should_ReturnAnError_WhenReservationStatusIsNotRequested()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -221,7 +198,6 @@ public sealed class ReservationTests
     public void Pay_Should_ReturnAReservationPaymentId_WhenSuccessful()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -239,7 +215,6 @@ public sealed class ReservationTests
     public void Visit_Should_ReturnAnError_WhenReservationStatusIsNotPaid()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -258,7 +233,6 @@ public sealed class ReservationTests
     public void Visit_Should_RaiseReservationVisitedDomainEvent_WhenSuccessful()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -280,7 +254,6 @@ public sealed class ReservationTests
     public void Visit_Should_TurnReservationStatusToVisiting_WhenSuccessful()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -301,7 +274,6 @@ public sealed class ReservationTests
     public void Finish_Should_ReturnAnError_WhenReservationStatusIsNotVisiting()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -320,7 +292,6 @@ public sealed class ReservationTests
     public void Finish_Should_RaiseAReservationFinishedDomainEvent_WhenSuccessful()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -344,7 +315,6 @@ public sealed class ReservationTests
     public void Finish_Should_TurnReservationStatusToFinished_WhenSuccessful()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -367,7 +337,6 @@ public sealed class ReservationTests
     public void UpdateAttendees_Should_ReturnAnError_WhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
@@ -386,7 +355,6 @@ public sealed class ReservationTests
     public void DeleteMenu_Should_ReturnAnError_WhenMenuDoesNotExistWithinTheReservationMenus()
     {
         var reservation = Reservation.Request(_reservationInformation,
-            new List<int>() { 1, 2, 3 },
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,

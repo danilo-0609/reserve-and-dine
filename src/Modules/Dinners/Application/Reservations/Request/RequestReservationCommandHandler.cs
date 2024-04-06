@@ -64,17 +64,7 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
             return Error.NotFound("Reservation.TableNotFound", "The table was not found");
         }
 
-        List<int> availableTables = restaurant.RestaurantTables
-            .Where(r => !r.ReservedHours
-                .Any(
-                    t => t.ReservationDateTime.Date == reservationInformation.ReservationDateTime.Date &&
-                         t.ReservationTimeRange.Start <= reservationInformation.ReservationDateTime &&
-                         t.ReservationTimeRange.End > reservationInformation.ReservationDateTime))
-            .Select(r => r.Number)
-            .ToList();
-
-        var reservation = Reservation.Request(reservationInformation,
-            availableTables,   
+        var reservation = Reservation.Request(reservationInformation,   
             restaurant.RestaurantTables.Where(g => g.Number == reservationInformation.ReservedTable)
                             .Select(g => g.Seats)
                             .SingleOrDefault(),

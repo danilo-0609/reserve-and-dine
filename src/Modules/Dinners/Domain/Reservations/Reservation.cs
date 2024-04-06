@@ -38,7 +38,6 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
     public DateTime? CancelledAt { get; private set; }
 
     public static ErrorOr<Reservation> Request(ReservationInformation reservationInformation,
-        List<int> availableTables,
         int numberOfSeats,
         RestaurantId restaurantId,
         ReservationAttendees reservationAttendees,
@@ -51,13 +50,6 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             ReservationStatus.Requested,
             menuIds,
             DateTime.UtcNow);
-
-        var isTableReservedNow = reservation.CheckRule(new ReservationCannotBeMadeWhenTableIsNotAvailableRule(availableTables, reservationInformation.ReservedTable));
-
-        if (isTableReservedNow.IsError)
-        {
-            return isTableReservedNow.FirstError;
-        }
 
         var isNumberOfAttendeesGreaterThanTableSeats = reservation.CheckRule(
             new CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule(reservationAttendees.NumberOfAttendees, numberOfSeats));
