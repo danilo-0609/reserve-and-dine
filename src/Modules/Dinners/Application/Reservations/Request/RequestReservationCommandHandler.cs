@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Application;
 using Dinners.Application.Common;
 using Dinners.Domain.Menus;
+using Dinners.Domain.Menus.Errors;
 using Dinners.Domain.Reservations;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
@@ -13,12 +14,14 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
     private readonly IReservationRepository _reservationRepository;
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
+    private readonly IMenuRepository _menuRepository;
 
-    public RequestReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor)
+    public RequestReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor, IMenuRepository menuRepository)
     {
         _reservationRepository = reservationRepository;
         _restaurantRepository = restaurantRepository;
         _executionContextAccessor = executionContextAccessor;
+        _menuRepository = menuRepository;
     }
 
     public async Task<ErrorOr<Guid>> Handle(RequestReservationCommand request, CancellationToken cancellationToken)
@@ -28,6 +31,21 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
         if (restaurant is null)
         {
             return RestaurantErrorCodes.NotFound;
+        }
+
+        List<MenuId> menuIds = new();
+
+        if (request.MenuIds.Any())
+        {
+            foreach (var menuId in request.MenuIds)
+            {
+                if (!await _menuRepository.ExistsAsync(MenuId.Create(menuId), cancellationToken))
+                {
+                    return MenuErrorCodes.NotFound;
+                }
+
+                menuIds.Add(MenuId.Create(menuId));
+            }
         }
 
         var reservationInformation = ReservationInformation.Create(request.ReservedTable,
@@ -62,7 +80,7 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
                             .SingleOrDefault(),
             RestaurantId.Create(request.RestaurantId),
             reservationAttendees,
-            request.MenuIds.ConvertAll(menuId => MenuId.Create(menuId)));
+            menuIds);
     
         if (reservation.IsError)
         {
