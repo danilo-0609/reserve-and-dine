@@ -26,17 +26,7 @@ internal sealed class SetMenuScheduleCommandHandler : ICommandHandler<SetMenuSch
 
         menu.SetMenuSchedule(request.Day, request.Start, request.End);
 
-        var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
-            menu.MenuDetails,
-            menu.DishSpecification,
-            menu.MenuConsumers.ToList(),
-            menu.MenuImagesUrl.ToList(),
-            menu.Tags.ToList(),
-            menu.MenuSchedules.ToList(),
-            menu.Ingredients.ToList(),
-            DateTime.UtcNow);
-
-        await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
+        await _menuRepository.UpdateAsync(menu, cancellationToken);
 
         return Unit.Value;
     }
