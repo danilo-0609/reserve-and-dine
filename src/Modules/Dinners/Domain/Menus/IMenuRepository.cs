@@ -8,6 +8,8 @@ public interface IMenuRepository
 
     Task<Menu?> GetByIdAsync(MenuId menuId, CancellationToken cancellationToken);
     
+    Task<bool> ExistsAsync(MenuId menuId, CancellationToken cancellationToken);
+
     Task UpdateAsync(Menu menu, CancellationToken cancellationToken);
 
     Task<List<Menu>> GetMenusByIngredientAsync(string ingredient, CancellationToken cancellationToken);

@@ -18,6 +18,11 @@ internal sealed class MenuRepository : IMenuRepository
         await _dbContext.Menus.AddAsync(menu, cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(MenuId menuId, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Menus.AnyAsync(menu => menu.Id == menuId, cancellationToken);
+    }
+
     public async Task<Menu?> GetByIdAsync(MenuId menuId, CancellationToken cancellationToken)
     {
         return await _dbContext

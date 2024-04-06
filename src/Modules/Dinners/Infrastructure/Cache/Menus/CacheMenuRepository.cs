@@ -25,6 +25,11 @@ internal sealed class CacheMenuRepository : IMenuRepository
         await _decorated.AddAsync(menu, cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(MenuId menuId, CancellationToken cancellationToken)
+    {
+        return await _decorated.ExistsAsync(menuId, cancellationToken);
+    }
+
     public async Task<Menu?> GetByIdAsync(MenuId menuId, CancellationToken cancellationToken)
     {
         string key = $"menu-{menuId.Value}";
