@@ -106,7 +106,7 @@ public sealed class Menu : AggregateRoot<MenuId, Guid>
         DateTime reviewedAt,
         string comment = "")
     {
-        var menuReview = MenuReview.Post(clientId, rate, menuConsumers, reviewedAt, comment);
+        var menuReview = MenuReview.Post(Id, clientId, rate, menuConsumers, reviewedAt, comment);
 
         if (menuReview.IsError)
         {

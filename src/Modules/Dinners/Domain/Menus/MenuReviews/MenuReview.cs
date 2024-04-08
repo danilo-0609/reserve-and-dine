@@ -20,7 +20,7 @@ public sealed class MenuReview : AggregateRoot<MenuReviewId, Guid>
     public DateTime? UpdatedAt { get; private set; }
 
 
-    public static ErrorOr<MenuReview> Post(
+    public static ErrorOr<MenuReview> Post(MenuId menuId,
         Guid clientId,
         decimal rate,
         List<MenuConsumer> menuConsumers,
@@ -50,6 +50,7 @@ public sealed class MenuReview : AggregateRoot<MenuReviewId, Guid>
         }
 
         menuReview.AddDomainEvent(new MenuReviewedDomainEvent(Guid.NewGuid(),
+            menuId,
             menuReview.Id,
             DateTime.UtcNow));
 
