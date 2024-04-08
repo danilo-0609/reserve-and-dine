@@ -114,7 +114,7 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
     [InlineData("Dinner")]
     public async void Publish_Should_ReturnAMenuId_WhenSuccessful(string menuType)
     {
-        Restaurant restaurant = new RestaurantTests().CreateRestaurant();
+        Restaurant restaurant = new RestaurantTests().CreateRestaurant(RestaurantId.CreateUnique());
 
         await DbContext.Restaurants.AddAsync(restaurant);
         await DbContext.SaveChangesAsync();
@@ -162,7 +162,7 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
 
         var result = await Sender.Send(command);
 
-        bool menuWasStoredInDatabase = DbContext.Menus.Any(r => r.Id.Value == result.Value);
+        bool menuWasStoredInDatabase = DbContext.Menus.Any(r => r.Id == MenuId.Create(result.Value));
 
         Assert.True(menuWasStoredInDatabase);
     }
@@ -314,9 +314,7 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
 
         await _menuRepository.AddAsync(menu, CancellationToken.None);
         await DbContext.SaveChangesAsync();
-
-        DbContext.Entry(menu).State = EntityState.Detached;
-
+        
         _executionContextAccessorMock.UserId.Returns(clientId);
 
         var command = new ReviewMenuCommand(menuId.Value,
