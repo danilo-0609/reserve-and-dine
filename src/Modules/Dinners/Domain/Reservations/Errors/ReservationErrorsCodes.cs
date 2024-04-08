@@ -17,8 +17,8 @@ public static class ReservationErrorsCodes
     public static Error ReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved =>
         Error.Validation("Reservation.CannotReserveWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved", CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule.Message);
 
-    public static Error CancelWhenReservationStatusIsAssisted =>
-        Error.Validation("Reservation.CancelWhenReservationStatusIsAssisted", CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule.Message);
+    public static Error CancelWhenReservationStatusIsNotPaidOrRequested =>
+        Error.Validation("Reservation.CancelWhenReservationStatusIsNotPaidOrRequested", CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule.Message);
 
     public static Error AssistWhenReservationStatusIsNotPaid =>
         Error.Validation("Reservation.AssistWhenReservationStatusIsNotPaid", CannotAssistWhenReservationStatusIsNotPaidRule.Message);

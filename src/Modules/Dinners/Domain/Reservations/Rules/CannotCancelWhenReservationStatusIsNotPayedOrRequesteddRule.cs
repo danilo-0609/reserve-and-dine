@@ -13,7 +13,7 @@ internal sealed class CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRul
         _reservationStatus = reservationStatus;
     }
 
-    public Error Error => ReservationErrorsCodes.CancelWhenReservationStatusIsAssisted;
+    public Error Error => ReservationErrorsCodes.CancelWhenReservationStatusIsNotPaidOrRequested;
 
     public bool IsBroken() => !CanCancelReservation(_reservationStatus);
 
