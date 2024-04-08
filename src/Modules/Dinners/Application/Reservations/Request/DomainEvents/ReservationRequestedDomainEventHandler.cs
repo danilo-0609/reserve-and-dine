@@ -8,6 +8,6 @@ internal sealed class ReservationRequestedDomainEventHandler : IDomainEventHandl
 
     public Task Handle(ReservationRequestedDomainEvent notification, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }
