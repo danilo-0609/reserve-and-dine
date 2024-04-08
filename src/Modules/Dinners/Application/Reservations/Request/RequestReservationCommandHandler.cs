@@ -15,13 +15,15 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
     private readonly IMenuRepository _menuRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RequestReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor, IMenuRepository menuRepository)
+    public RequestReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor, IMenuRepository menuRepository, IUnitOfWork unitOfWork)
     {
         _reservationRepository = reservationRepository;
         _restaurantRepository = restaurantRepository;
         _executionContextAccessor = executionContextAccessor;
         _menuRepository = menuRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ErrorOr<Guid>> Handle(RequestReservationCommand request, CancellationToken cancellationToken)
@@ -88,6 +90,7 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
 
         await _reservationRepository.AddAsync(reservation.Value, cancellationToken);
         await _restaurantRepository.UpdateAsync(restaurant);
+        await _unitOfWork.SaveChangesAsync();
 
         return reservation.Value.Id.Value;
     }
