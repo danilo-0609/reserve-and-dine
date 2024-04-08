@@ -11,15 +11,15 @@ internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuComma
 {
     private readonly IReviewRepository _reviewRepository;
     private readonly IMenuRepository _menuRepository;
-    private readonly IMenusReviewsRepository _menuReviewsRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
+    private readonly IMenusReviewsRepository _menusReviewsRepository;
 
-    public ReviewMenuCommandHandler(IReviewRepository menuReviewRepository, IMenuRepository menuRepository, IExecutionContextAccessor executionContextAccessor, IMenusReviewsRepository menuReviewsRepository)
+    public ReviewMenuCommandHandler(IReviewRepository menuReviewRepository, IMenuRepository menuRepository, IExecutionContextAccessor executionContextAccessor, IMenusReviewsRepository menusReviewsRepository)
     {
         _reviewRepository = menuReviewRepository;
         _menuRepository = menuRepository;
         _executionContextAccessor = executionContextAccessor;
-        _menuReviewsRepository = menuReviewsRepository;
+        _menusReviewsRepository = menusReviewsRepository;
     }
 
     public async Task<ErrorOr<Guid>> Handle(ReviewMenuCommand request, CancellationToken cancellationToken)
@@ -42,19 +42,9 @@ internal sealed class ReviewMenuCommandHandler : ICommandHandler<ReviewMenuComma
             return review.FirstError;
         }
 
-        var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
-            menu.MenuDetails,
-            menu.DishSpecification,
-            menu.MenuConsumers.ToList(),
-            menu.MenuImagesUrl.ToList(),
-            menu.Tags.ToList(),
-            menu.MenuSchedules.ToList(),
-            menu.Ingredients.ToList(),
-            DateTime.UtcNow);
-
-        await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
-        await _menuReviewsRepository.AddAsync(new MenusReviews(menu.Id, review.Value.Id), cancellationToken);
+        await _menuRepository.UpdateAsync(menu, cancellationToken);
         await _reviewRepository.AddAsync(review.Value);
+        await _menusReviewsRepository.AddAsync(new MenusReviews(menu.Id, review.Value.Id), cancellationToken);
 
         return review.Value.Id.Value;
     }
