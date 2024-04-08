@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Application;
+using Dinners.Application.Common;
 using Dinners.Application.Reservations.Request;
 using Dinners.Domain.Common;
 using Dinners.Domain.Menus;
@@ -7,6 +8,7 @@ using Dinners.Domain.Menus.Dishes;
 using Dinners.Domain.Menus.Schedules;
 using Dinners.Domain.Reservations;
 using Dinners.Domain.Restaurants;
+using Dinners.Infrastructure;
 using Dinners.Infrastructure.Domain.Menus;
 using Dinners.Infrastructure.Domain.Reservations;
 using Dinners.Infrastructure.Domain.Restaurants;
@@ -16,21 +18,23 @@ using NSubstitute;
 
 namespace Dinners.Tests.IntegrationTests.Reservations;
 
-public sealed class ReservationIntegrationTests : BaseIntegrationTest
+public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
 {
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IReservationRepository _reservationRepository;
     private readonly IExecutionContextAccessor _executionContextAccessorMock;
     private readonly IMenuRepository _menuRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-
-    public ReservationIntegrationTests(IntegrationTestWebAppFactory factory) : base(factory)
+    public RequestReservationIntegrationTests(IntegrationTestWebAppFactory factory) : base(factory)
     {
         _restaurantRepository = new RestaurantRepository(DbContext);
         _reservationRepository = new ReservationRepository(DbContext);
         _menuRepository = new MenuRepository(DbContext);
 
         _executionContextAccessorMock = Substitute.For<IExecutionContextAccessor>();
+
+        _unitOfWork = new UnitOfWork(DbContext);
     }
 
     [Fact]
@@ -73,10 +77,11 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
 
         _executionContextAccessorMock.UserId.Returns(Guid.NewGuid());
 
-        var handler = new RequestReservationCommandHandler(_reservationRepository, 
+        var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -125,7 +130,8 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -174,7 +180,8 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -225,7 +232,8 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -278,7 +286,8 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -331,13 +340,14 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         bool isErrorCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTime = result
             .FirstError
-            .Code == "Restaurant.CannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTime";
+            .Code == "Table.CannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTime";
 
         Assert.True(isErrorCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTime);
     }
@@ -381,7 +391,8 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -427,13 +438,14 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
-        var result = await handler.Handle(command, CancellationToken.None);
+        await handler.Handle(command, CancellationToken.None);
 
         bool isReservationAddedToDatabase = DbContext
             .Reservations
-            .Where(t => t.Id == ReservationId.Create(result.Value)).Any();
+            .Any();
 
         Assert.True(isReservationAddedToDatabase);
     }
@@ -479,7 +491,8 @@ public sealed class ReservationIntegrationTests : BaseIntegrationTest
         var handler = new RequestReservationCommandHandler(_reservationRepository,
             _restaurantRepository,
             _executionContextAccessorMock,
-            _menuRepository);
+            _menuRepository,
+            _unitOfWork);
 
         await handler.Handle(command, CancellationToken.None);
 
