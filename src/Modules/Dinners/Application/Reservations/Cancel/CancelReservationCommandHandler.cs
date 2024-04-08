@@ -31,14 +31,7 @@ internal sealed class CancelReservationCommandHandler : ICommandHandler<CancelRe
             return cancelReservation.FirstError;
         }
 
-        var reservationUpdate = reservation.Update(reservation.ReservationInformation,
-            reservation.MenuIds.ToList(),
-            reservation.ReservationStatus,
-            reservation.ReservationAttendees,
-            reservation.ReservationPaymentId,
-            reservation.RefundId);
-
-        await _reservationRepository.UpdateAsync(reservationUpdate, cancellationToken);
+        await _reservationRepository.UpdateAsync(reservation, cancellationToken);
 
         return Unit.Value;
     }
