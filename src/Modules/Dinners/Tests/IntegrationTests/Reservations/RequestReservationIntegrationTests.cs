@@ -443,6 +443,11 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
 
         await handler.Handle(command, CancellationToken.None);
 
+        Reservation? getReservation = await DbContext
+            .Reservations
+            .Where(r => r.RestaurantId == restaurant.Id)
+            .FirstOrDefaultAsync();
+
         bool isReservationAddedToDatabase = DbContext
             .Reservations
             .Any();
