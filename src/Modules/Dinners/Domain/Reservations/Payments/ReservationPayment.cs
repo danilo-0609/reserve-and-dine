@@ -36,7 +36,7 @@ public sealed class ReservationPayment : Entity<ReservationPaymentId, Guid>
             return statusMustBeRequestedRule.FirstError;
         }
 
-        payment.AddDomainEvent(new ReservationPayedDomainEvent(Guid.NewGuid(),
+        payment.AddDomainEvent(new ReservationPaidDomainEvent(Guid.NewGuid(),
             payment.Id,
             reservationId,
             payerId,
