@@ -98,6 +98,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
                 ReservationInformation.ReservationDateTime,
                 DateTime.UtcNow));
 
+            AddDomainEvent(refund.DomainEvents.First());
+
             RefundId = refund.Id;
             CancelledAt = DateTime.UtcNow;
             ReservationStatus = ReservationStatus.Cancelled;
@@ -140,6 +142,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         {
             return payment.FirstError;
         }
+
+        AddDomainEvent(payment.Value.DomainEvents.First());
 
         ReservationStatus = ReservationStatus.Paid;
         PaidAt = DateTime.UtcNow;
