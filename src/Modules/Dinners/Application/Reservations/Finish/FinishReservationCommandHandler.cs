@@ -49,14 +49,8 @@ internal sealed class FinishReservationCommandHandler : ICommandHandler<FinishRe
             return freeTable.FirstError;
         }
 
-        var reservationUpdate = reservation.Update(reservation.ReservationInformation,
-            reservation.MenuIds.ToList(),
-            reservation.ReservationStatus,
-            reservation.ReservationAttendees,
-            reservation.ReservationPaymentId,
-            reservation.RefundId);
-
-        await _reservationRepository.UpdateAsync(reservationUpdate, cancellationToken);
+        await _reservationRepository.UpdateAsync(reservation, cancellationToken);
+        await _restaurantRepository.UpdateAsync(restaurant);
 
         return Unit.Value;
     }
