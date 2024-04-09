@@ -4,7 +4,7 @@ using Dinners.Domain.Reservations.ReservationsPayments;
 
 namespace Dinners.Domain.Reservations.Payments.Events;
 
-public sealed record ReservationPayedDomainEvent(
+public sealed record ReservationPaidDomainEvent(
     Guid DomainEventId,
     ReservationPaymentId ReservationPaymentId,
     ReservationId ReservationId,

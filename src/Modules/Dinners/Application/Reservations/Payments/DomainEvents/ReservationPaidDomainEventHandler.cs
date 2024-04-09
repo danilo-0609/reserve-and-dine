@@ -6,20 +6,20 @@ using Dinners.IntegrationEvents;
 
 namespace Dinners.Application.Reservations.Payments.DomainEvents;
 
-internal sealed class ReservationPayedDomainEventHandler : IDomainEventHandler<ReservationPayedDomainEvent>
+internal sealed class ReservationPaidDomainEventHandler : IDomainEventHandler<ReservationPaidDomainEvent>
 {
     private readonly IEventBus _eventBus;
     private readonly IReservationPaymentRepository _reservationPaymentRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ReservationPayedDomainEventHandler(IEventBus eventBus, IReservationPaymentRepository reservationPaymentRepository, IUnitOfWork unitOfWork)
+    public ReservationPaidDomainEventHandler(IEventBus eventBus, IReservationPaymentRepository reservationPaymentRepository, IUnitOfWork unitOfWork)
     {
         _eventBus = eventBus;
         _reservationPaymentRepository = reservationPaymentRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task Handle(ReservationPayedDomainEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(ReservationPaidDomainEvent notification, CancellationToken cancellationToken)
     {
         var payment = ReservationPayment.Create(notification.ReservationPaymentId,
             notification.ClientId,
