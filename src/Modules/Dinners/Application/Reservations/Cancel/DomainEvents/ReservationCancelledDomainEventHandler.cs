@@ -9,27 +9,8 @@ namespace Dinners.Application.Reservations.Cancel.DomainEvents;
 
 internal sealed class ReservationCancelledDomainEventHandler : IDomainEventHandler<ReservationCancelledDomainEvent>
 {
-    private readonly IRestaurantRepository _restaurantRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public ReservationCancelledDomainEventHandler(IRestaurantRepository restaurantRepository, IUnitOfWork unitOfWork)
+    public Task Handle(ReservationCancelledDomainEvent notification, CancellationToken cancellationToken)
     {
-        _restaurantRepository = restaurantRepository;
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task Handle(ReservationCancelledDomainEvent notification, CancellationToken cancellationToken)
-    {
-        Restaurant? restaurant = await _restaurantRepository.GetRestaurantById(notification.RestaurantId);
-
-        if (restaurant is null)
-        {
-            throw new DomainEventHandlerException(RestaurantErrorCodes.NotFound, DateTime.UtcNow);
-        }
-
-        restaurant.CancelReservation(notification.NumberOfTable, notification.ReservationDateTime);
-
-        await _restaurantRepository.UpdateAsync(restaurant);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Task.CompletedTask;       
     }
 }
