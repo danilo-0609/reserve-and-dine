@@ -20,6 +20,9 @@ public static class ReservationErrorsCodes
     public static Error CancelWhenReservationStatusIsNotPaidOrRequested =>
         Error.Validation("Reservation.CancelWhenReservationStatusIsNotPaidOrRequested", CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule.Message);
 
+    public static Error CannotAssistToReservationOutOfTheRequestedTime =>
+        Error.Validation("Reservation.MustAssistToReservationInTheRequestedTime", MustAssistToReservationInTheRequestedTimeRule.Message);
+
     public static Error AssistWhenReservationStatusIsNotPaid =>
         Error.Validation("Reservation.AssistWhenReservationStatusIsNotPaid", CannotAssistWhenReservationStatusIsNotPaidRule.Message);
 

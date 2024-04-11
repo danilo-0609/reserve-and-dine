@@ -153,6 +153,13 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
     public ErrorOr<SuccessOperation> Visit()
     {
+        var mustVisitInReservationTime = CheckRule(new MustAssistToReservationInTheRequestedTimeRule(DateTime.Now, ReservationInformation.ReservationDateTime));
+        
+        if (mustVisitInReservationTime.IsError)
+        {
+            return mustVisitInReservationTime.FirstError;
+        }
+
         var cannotVisitWhenReservationStatusIsNotPaidRule = CheckRule(new CannotAssistWhenReservationStatusIsNotPaidRule(ReservationStatus));
 
         if (cannotVisitWhenReservationStatusIsNotPaidRule.IsError)
@@ -164,7 +171,6 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             Id,
             RestaurantId,
             ReservationAttendees.ClientId,
-            _menuIds,
             DateTime.UtcNow));
 
         ReservationStatus = ReservationStatus.Visiting;
