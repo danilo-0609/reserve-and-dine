@@ -1,4 +1,5 @@
 ﻿using Dinners.Domain.Menus;
+using Dinners.Domain.Menus.Details;
 using Dinners.Domain.Menus.MenuReviews;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,14 +32,15 @@ internal sealed class MenuRepository : IMenuRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task<List<string>> GetMenuImagesUrlById(MenuId menuId, CancellationToken cancellationToken)
+    public async Task<string?> GetMenuImageUrlById(MenuId menuId, MenuImageUrlId imageUrlId, CancellationToken cancellationToken)
     {
         return await _dbContext
             .Menus
             .Where(r => r.Id == menuId)
             .SelectMany(x => x.MenuImagesUrl
+                .Where(r => r.Id == imageUrlId)
                 .Select(r => r.Value))
-            .ToListAsync(cancellationToken);
+            .SingleOrDefaultAsync();
     }
 
     public async Task<List<MenuReviewId>> GetMenuReviewsIdByIdAsync(MenuId menuId, CancellationToken cancellationToken)

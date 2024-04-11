@@ -1,4 +1,5 @@
 ﻿using Dinners.Domain.Menus;
+using Dinners.Domain.Menus.Details;
 using Dinners.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Resolvers;
 using Microsoft.EntityFrameworkCore;
@@ -75,36 +76,36 @@ internal sealed class CacheMenuRepository : IMenuRepository
         return menu;
     }
 
-    public async Task<List<string>> GetMenuImagesUrlById(MenuId menuId, CancellationToken cancellationToken)
+    public async Task<string?> GetMenuImageUrlById(MenuId menuId, MenuImageUrlId imageUrlId, CancellationToken cancellationToken)
     {
-        string key = $"menuImagesUrl-{menuId.Value}";
+        string key = $"menuImageUrl-{menuId.Value}";
 
         string? cachedMenuImagesUrls = await _distributedCache.GetStringAsync(key,
             cancellationToken);
 
-        List<string> menuImagesUrls;
+        string? menuImageUrl;
         if (string.IsNullOrEmpty(cachedMenuImagesUrls))
         {
-            menuImagesUrls = await _decorated.GetMenuImagesUrlById(menuId, cancellationToken);
+            menuImageUrl = await _decorated.GetMenuImageUrlById(menuId, imageUrlId, cancellationToken);
 
-            if (!menuImagesUrls.Any())
+            if (menuImageUrl is null)
             {
-                return menuImagesUrls;
+                return menuImageUrl;
             }
 
             await _distributedCache.SetStringAsync(
                 key,
-                JsonConvert.SerializeObject(menuImagesUrls, new JsonSerializerSettings()
+                JsonConvert.SerializeObject(menuImageUrl, new JsonSerializerSettings()
                 {
                     TypeNameHandling = TypeNameHandling.All,
                     ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
                 }),
                 cancellationToken);
 
-            return menuImagesUrls;
+            return menuImageUrl;
         }
 
-        menuImagesUrls = JsonConvert.DeserializeObject<List<string>>(cachedMenuImagesUrls,
+        menuImageUrl = JsonConvert.DeserializeObject<string?>(cachedMenuImagesUrls,
         new JsonSerializerSettings()
         {
             TypeNameHandling = TypeNameHandling.All,
@@ -112,7 +113,7 @@ internal sealed class CacheMenuRepository : IMenuRepository
             ContractResolver = new PrivateResolver()
         })!;
 
-        if (!menuImagesUrls.Any())
+        if (menuImageUrl is not null)
         {
             _dbContext.Set<Menu>().Attach(await _dbContext
                 .Menus
@@ -120,7 +121,7 @@ internal sealed class CacheMenuRepository : IMenuRepository
                 .SingleAsync());
         }
 
-        return menuImagesUrls;
+        return menuImageUrl;
     }
 
     public async Task<List<MenuReviewId>> GetMenuReviewsIdByIdAsync(MenuId menuId, CancellationToken cancellationToken)
