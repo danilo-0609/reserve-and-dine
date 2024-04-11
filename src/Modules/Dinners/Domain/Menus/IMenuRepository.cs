@@ -1,4 +1,5 @@
-﻿using Dinners.Domain.Menus.MenuReviews;
+﻿using Dinners.Domain.Menus.Details;
+using Dinners.Domain.Menus.MenuReviews;
 
 namespace Dinners.Domain.Menus;
 
@@ -16,7 +17,7 @@ public interface IMenuRepository
 
     Task<List<Menu>> GetMenusByNameAsync(string name, CancellationToken cancellationToken);
 
-    Task<List<string>> GetMenuImagesUrlById(MenuId menuId, CancellationToken cancellationToken);
+    Task<string?> GetMenuImageUrlById(MenuId menuId, MenuImageUrlId imageUrlId, CancellationToken cancellationToken);
 
     Task<List<MenuReviewId>> GetMenuReviewsIdByIdAsync(MenuId menuId, CancellationToken cancellationToken);
 }
