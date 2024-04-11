@@ -3,4 +3,4 @@ using ErrorOr;
 
 namespace Dinners.Application.Menus.GetReviewsByMenuId;
 
-internal sealed record GetMenuReviewsByMenuIdQuery(Guid MenuId) : IQuery<ErrorOr<List<MenuReviewResponse>>>;
+public sealed record GetMenuReviewsByMenuIdQuery(Guid MenuId) : IQuery<ErrorOr<List<MenuReviewResponse>>>;
