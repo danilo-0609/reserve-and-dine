@@ -28,12 +28,12 @@ public sealed class CancelReservationIntegrationTests : BaseIntegrationTest
     public async void Cancel_Should_ReturnAnError_WhenReservationStatusIsNotPaidOrRequested()
     {
         var reservationInformation = ReservationInformation.Create(
-        reservedTable: 1,
-        25.99m,
-        "USD",
-        DateTime.Now.AddHours(2).TimeOfDay,
-        DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
-        DateTime.Now.AddHours(2));
+            reservedTable: 1,
+            25.99m,
+            "USD",
+            DateTime.Now.AddHours(2).TimeOfDay,
+            DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
+            DateTime.Now.AddHours(2));
 
         var reservationAttendees = ReservationAttendees.Create(Guid.NewGuid(),
         "Client name",

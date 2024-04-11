@@ -38,13 +38,13 @@ public sealed class MenuIntegrationTests : BaseIntegrationTest
     }
 
     private readonly MenuDetails _menuDetails = MenuDetails.Create("Menu Details - Menu title",
-    "Menu Details -  description",
-    MenuType.Breakfast,
-    new Price(15.60m, "USD"),
-    0m,
-    false,
-    "Menu Details - Primary chef name",
-    false);
+        "Menu Details -  description",
+        MenuType.Breakfast,
+        new Price(15.60m, "USD"),
+        0m,
+        false,
+        "Menu Details - Primary chef name",
+        false);
 
     private readonly DishSpecification _dishSpecification = DishSpecification.Create(
         "Menu - Main course",
