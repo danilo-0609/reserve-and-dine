@@ -8,6 +8,7 @@ using Dinners.Domain.Reservations;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantInformations;
 using Dinners.Tests.UnitTests.Restaurants;
+using Domain.Restaurants;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -230,7 +231,57 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async void Visit_Should_PublishReservationVisitedDomainEvent_ToAddRestaurantClientAndConsumeMenusInDomainEventHandler_WhenSuccessful()
+    public async void Visit_Should_PublishReservationVisitedDomainEvent_ToAddRestaurantClientInDomainEventHandler_WhenSuccessful()
+    {
+        var restaurantId = RestaurantId.CreateUnique();
+
+        var restaurant = new RestaurantTests().CreateRestaurant(restaurantId);
+
+        var reservationInformation = ReservationInformation.Create(
+            reservedTable: 1,
+            25.99m,
+            "USD",
+            DateTime.Now.TimeOfDay,
+            DateTime.Now.AddMinutes(45).TimeOfDay,
+            DateTime.Now);
+
+        var reservationAttendees = ReservationAttendees.Create(Guid.NewGuid(),
+            "Client name",
+            numberOfAttendees: 4);
+
+        var reservation = Reservation.Request(reservationInformation,
+            4,
+            restaurantId,
+            reservationAttendees,
+            new List<MenuId>());
+
+        reservation.Value.Pay();
+
+        reservation.Value.ClearDomainEvents();
+        restaurant.ClearDomainEvents();
+
+        await DbContext.Restaurants.AddAsync(restaurant);
+        await DbContext.Reservations.AddAsync(reservation.Value);
+        await DbContext.SaveChangesAsync();
+
+        var command = new VisitReservationCommand(reservation.Value.Id.Value);
+
+        await Sender.Send(command);
+
+        await Task.Delay(15_000);
+
+        var restaurantModified = await DbContext
+            .Restaurants
+            .Where(r => r.Id == restaurant.Id)
+            .SingleAsync();
+
+        bool areRestaurantsClientsAdded = restaurantModified.RestaurantClients.Any(); 
+
+        Assert.True(areRestaurantsClientsAdded);
+    }
+
+    [Fact]
+    public async void Visit_Should_ConsumeMenusInReservation_WhenSuccessful()
     {
         var menuId = MenuId.CreateUnique();
 
@@ -305,16 +356,11 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
 
         var reservation = Reservation.Request(reservationInformation,
             4,
-            restaurant.Id,
+            restaurantId,
             reservationAttendees,
-            new List<MenuId>() { menu.Id, menu2.Id } );
+            new List<MenuId>() { menuId, menuId2 } );
 
         reservation.Value.Pay();
-
-        reservation.Value.ClearDomainEvents();
-        menu.ClearDomainEvents();
-        menu2.ClearDomainEvents();
-        restaurant.ClearDomainEvents();
 
         await DbContext.Restaurants.AddAsync(restaurant);
         await DbContext.Reservations.AddAsync(reservation.Value);
@@ -322,32 +368,21 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
         await DbContext.Menus.AddAsync(menu2);
         await DbContext.SaveChangesAsync();
 
+        menu.Consume(Guid.NewGuid());
+
+        DbContext.Menus.Update(menu);
+        await DbContext.SaveChangesAsync();
+
         var command = new VisitReservationCommand(reservation.Value.Id.Value);
 
         await Sender.Send(command);
 
-        await Task.Delay(15_000);
+        var menuModified = await DbContext.Menus.Where(r => r.Id == menuId).SingleOrDefaultAsync();
+        
+        var menuModified2 = await DbContext.Menus.Where(r => r.Id == menuId2).SingleOrDefaultAsync();
 
-        var restaurantModified = await DbContext
-            .Restaurants
-            .Where(r => r.Id == restaurant.Id)
-            .SingleAsync();
+        bool areMenusConsumed = menuModified!.MenuConsumers.Any() && menuModified2!.MenuConsumers.Any();
 
-        var menuConsumed = await DbContext
-            .Menus
-            .Where(r => r.Id == menuId)
-            .SingleAsync();
-
-        var menuConsumed2 = await DbContext
-            .Menus
-            .Where(r => r.Id == menuId2)
-            .SingleAsync();
-
-        bool areRestaurantsClientsAddedAndMenusConsumedInReservationVisitedDomainEventHandler = 
-            restaurantModified.RestaurantClients.Any() && 
-            menuConsumed.MenuConsumers.Any() &&
-            menuConsumed2.MenuConsumers.Any();
-
-        Assert.True(areRestaurantsClientsAddedAndMenusConsumedInReservationVisitedDomainEventHandler);
+        Assert.True(areMenusConsumed);
     }
 }
