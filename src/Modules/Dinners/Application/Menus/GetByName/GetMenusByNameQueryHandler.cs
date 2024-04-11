@@ -59,6 +59,7 @@ internal sealed class GetMenusByNameQueryHandler : IQueryHandler<GetMenusByNameQ
                 menuDetailsResponse,
                 dishSpecificationResponse,
                 menuSchedulesResponse,
+                menu.MenuImagesUrl.ConvertAll(r => r.Id.Value),
                 menu.CreatedOn,
                 menu.UpdatedOn);
         });

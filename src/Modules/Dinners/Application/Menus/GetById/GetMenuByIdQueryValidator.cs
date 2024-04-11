@@ -2,9 +2,9 @@
 
 namespace Dinners.Application.Menus.GetById;
 
-internal sealed class GeMenutByIdQueryValidator : AbstractValidator<GetMenuByIdQuery>
+internal sealed class GetMenuByIdQueryValidator : AbstractValidator<GetMenuByIdQuery>
 {
-    public GeMenutByIdQueryValidator()
+    public GetMenuByIdQueryValidator()
     {
         RuleFor(r => r.MenuId)
             .NotNull();
