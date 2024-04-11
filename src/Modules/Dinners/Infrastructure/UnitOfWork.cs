@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Domain.Events;
 using Dinners.Application.Common;
 using Dinners.Infrastructure.Outbox;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Dinners.Infrastructure;
@@ -46,6 +47,11 @@ internal sealed class UnitOfWork : IUnitOfWork
                 return 0;
             });
 
+        foreach (var entity in _dbContext.ChangeTracker.Entries<IHasDomainEvents>())
+        {
+            entity.State = EntityState.Detached;
+        }
+
         List<OutboxMessage> outboxMessages = domainEvents
             .Select(domainEvent => new OutboxMessage
             {
@@ -56,10 +62,13 @@ internal sealed class UnitOfWork : IUnitOfWork
                        domainEvent,
                        new JsonSerializerSettings
                        {
-                           TypeNameHandling = TypeNameHandling.All
+                           TypeNameHandling = TypeNameHandling.All,
+                           
                        })
             }).ToList();
 
-        await _dbContext.OutboxMessages.AddRangeAsync(outboxMessages);
+        await _dbContext
+            .OutboxMessages
+            .AddRangeAsync(outboxMessages);
     }
 }
