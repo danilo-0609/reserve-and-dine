@@ -4,4 +4,4 @@ using ErrorOr;
 
 namespace Dinners.Application.Menus.MenuImages.Get;
 
-internal sealed record GetMenuImagesByIdQuery(Guid MenuId) : IQuery<ErrorOr<List<BlobObject>>>;
+public sealed record GetMenuImageByIdQuery(Guid MenuId, Guid ImageId) : IQuery<ErrorOr<BlobObject>>;
