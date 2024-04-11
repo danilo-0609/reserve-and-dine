@@ -6,24 +6,28 @@ using Dinners.Domain.Reservations.DomainEvents;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using Domain.Restaurants;
+using Microsoft.Extensions.Logging;
 
 namespace Dinners.Application.Reservations.Visit.DomainEvents;
 
 internal sealed class ReservationVisitedDomainEventHandler : IDomainEventHandler<ReservationVisitedDomainEvent>
 {
-    private readonly IMenuRepository _menuRepository;
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<ReservationVisitedDomainEventHandler> _logger;
 
-    public ReservationVisitedDomainEventHandler(IMenuRepository menuRepository, IRestaurantRepository restaurantRepository, IUnitOfWork unitOfWork)
+    public ReservationVisitedDomainEventHandler(IRestaurantRepository restaurantRepository, IUnitOfWork unitOfWork, ILogger<ReservationVisitedDomainEventHandler> logger)
     {
-        _menuRepository = menuRepository;
         _restaurantRepository = restaurantRepository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task Handle(ReservationVisitedDomainEvent notification, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Working on {@Name}",
+            nameof(ReservationVisitedDomainEventHandler));
+
         Restaurant? restaurant = await _restaurantRepository.GetRestaurantById(notification.RestaurantId);
 
         if (restaurant is null)
@@ -31,58 +35,11 @@ internal sealed class ReservationVisitedDomainEventHandler : IDomainEventHandler
             throw new DomainEventHandlerException(RestaurantErrorCodes.NotFound, DateTime.UtcNow);
         }
 
+        _logger.LogInformation("Still working on {@Name}",
+            nameof(ReservationVisitedDomainEventHandler));
+
         restaurant.AddRestaurantClient(notification.ClientId);
 
         await _restaurantRepository.UpdateAsync(restaurant);
-
-        if (notification.MenuIds.Any())
-        {
-            ConsumeMenus(notification, cancellationToken);
-        }
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-
-    private void ConsumeMenus(ReservationVisitedDomainEvent notification, CancellationToken cancellationToken)
-    {
-        List<Menu> menus = new();
-
-        notification.MenuIds.ForEach(async id =>
-        {
-            var menu = await _menuRepository.GetByIdAsync(id!, cancellationToken);
-
-            if (menu is null)
-            {
-                throw new DomainEventHandlerException(MenuErrorCodes.NotFound, DateTime.UtcNow);
-            }
-
-            if (menu is not null)
-                menus.Add(menu);
-        });
-
-        menus.ForEach(menu =>
-        {
-            MenuConsumer menuConsumer = menu.Consume(notification.ClientId);
-        });
-
-        UpdateMenus(menus, cancellationToken);
-    }
-
-    private void UpdateMenus(List<Menu> menus, CancellationToken cancellationToken)
-    {
-        menus.ForEach(async menu =>
-        {
-            var menuUpdate = menu.Update(menu.MenuReviewIds.ToList(),
-                    menu.MenuDetails,
-                    menu.DishSpecification,
-                    menu.MenuConsumers.ToList(),
-                    menu.MenuImagesUrl.ToList(),
-                    menu.Tags.ToList(),
-                    menu.MenuSchedules.ToList(),
-                    menu.Ingredients.ToList(),
-                    DateTime.UtcNow);
-
-            await _menuRepository.UpdateAsync(menuUpdate, cancellationToken);
-        });
     }
 }

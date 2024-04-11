@@ -1,4 +1,5 @@
 ﻿using Dinners.Application.Common;
+using Dinners.Domain.Menus;
 using Dinners.Domain.Reservations;
 using Dinners.Domain.Reservations.Errors;
 using Dinners.Domain.Restaurants;
@@ -12,11 +13,15 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
 {
     private readonly IReservationRepository _reservationRepository;
     private readonly IRestaurantRepository _restaurantRepository;
+    private readonly IMenuRepository _menuRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public VisitReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository)
+    public VisitReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IUnitOfWork unitOfWork, IMenuRepository menuRepository)
     {
         _reservationRepository = reservationRepository;
         _restaurantRepository = restaurantRepository;
+        _unitOfWork = unitOfWork;
+        _menuRepository = menuRepository;
     }
 
     public async Task<ErrorOr<Unit>> Handle(VisitReservationCommand request, CancellationToken cancellationToken)
@@ -49,15 +54,25 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
             return occupyTable.FirstError;
         }
 
-        var reservationUpdate = reservation.Update(reservation.ReservationInformation,
-            reservation.MenuIds.ToList(),
-            reservation.ReservationStatus,
-            reservation.ReservationAttendees,
-            reservation.ReservationPaymentId!,
-            reservation.RefundId);
+        if (reservation.MenuIds.Any())
+        {
+            foreach (var menuId in reservation.MenuIds)
+            {
+                var menu = await _menuRepository.GetByIdAsync(menuId, cancellationToken);
 
-        await _reservationRepository.UpdateAsync(reservationUpdate, cancellationToken);
+                menu!.Consume(reservation.ReservationAttendees.ClientId);
+
+                await _menuRepository.UpdateAsync(menu!, cancellationToken);
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
+
+        await _reservationRepository.UpdateAsync(reservation, cancellationToken);
         await _restaurantRepository.UpdateAsync(restaurant);
+
+
+        await _unitOfWork.SaveChangesAsync();
 
         return Unit.Value;
     }
