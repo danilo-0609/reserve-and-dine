@@ -6,5 +6,6 @@ public sealed record MenuResponse(
     MenuDetailsResponse MenuDetails,
     DishSpecificationResponse DishSpecification,
     List<MenuScheduleResponse> MenuSchedules,
+    List<Guid> MenuImagesUrlId,
     DateTime CreatedOn,
     DateTime? UpdatedOn);
