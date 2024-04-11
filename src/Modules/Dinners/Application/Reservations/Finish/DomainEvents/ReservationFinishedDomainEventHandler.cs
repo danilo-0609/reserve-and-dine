@@ -7,6 +7,6 @@ internal sealed class ReservationFinishedDomainEventHandler : IDomainEventHandle
 {
     public Task Handle(ReservationFinishedDomainEvent notification, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }
