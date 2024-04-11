@@ -48,6 +48,8 @@ public sealed class DinnersDbContext : DbContext, IApplicationDbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.EnableSensitiveDataLogging();
+
         base.OnConfiguring(optionsBuilder);
     }
 
