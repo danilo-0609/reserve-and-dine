@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.Entities;
+using Newtonsoft.Json;
 
 namespace Dinners.Domain.Menus.Details;
 
@@ -10,6 +11,7 @@ public sealed record TagId : EntityId<Guid>
 
     public static TagId CreateUnique() => new TagId(Guid.NewGuid());
 
+    [JsonConstructor]
     private TagId(Guid value)
     {
         Value = value;

@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.Entities;
+using Newtonsoft.Json;
 
 namespace Dinners.Domain.Menus.Schedules;
 
@@ -10,6 +11,7 @@ public sealed record MenuScheduleId : EntityId<Guid>
 
     public static MenuScheduleId CreateUnique() => new MenuScheduleId(Guid.NewGuid());
 
+    [JsonConstructor]
     private MenuScheduleId(Guid value)
     {
         Value = value;

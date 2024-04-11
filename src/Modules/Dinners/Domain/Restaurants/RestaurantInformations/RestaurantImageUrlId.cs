@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.Entities;
+using Newtonsoft.Json;
 
 namespace Dinners.Domain.Restaurants.RestaurantInformations;
 
@@ -10,6 +11,7 @@ public sealed record RestaurantImageUrlId : EntityId<Guid>
 
     public static RestaurantImageUrlId CreateUnique() => new RestaurantImageUrlId(Guid.NewGuid());
 
+    [JsonConstructor]
     private RestaurantImageUrlId(Guid value)
     {
         Value = value;

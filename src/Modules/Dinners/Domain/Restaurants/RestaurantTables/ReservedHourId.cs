@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Domain.Entities;
+using Newtonsoft.Json;
 
 namespace Dinners.Domain.Restaurants.RestaurantTables;
 
@@ -10,6 +11,7 @@ public sealed record ReservedHourId : EntityId<Guid>
 
     public static ReservedHourId CreateUnique() => new ReservedHourId(Guid.NewGuid());
 
+    [JsonConstructor]
     private ReservedHourId(Guid value)
     {
         Value = value;
