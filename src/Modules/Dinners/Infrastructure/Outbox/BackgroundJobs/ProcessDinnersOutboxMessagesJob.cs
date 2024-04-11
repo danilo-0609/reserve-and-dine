@@ -25,7 +25,7 @@ internal sealed class ProcessDinnersOutboxMessagesJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.LogInformation("Executin {@Name}. At {@DateTime}",
+        _logger.LogInformation("Executing {@Name}. At {@DateTime}",
             nameof(ProcessDinnersOutboxMessagesJob),
             DateTime.Now);
 

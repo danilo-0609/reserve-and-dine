@@ -26,7 +26,7 @@ internal sealed class CancelNotAsistedReservationsJob : IJob
     }
 
     public async Task Execute(IJobExecutionContext context)
-    {
+    { 
         _logger.LogInformation("Working on: {@Name}. At {@DateTime}",
             nameof(CancelNotPaidReservationsJob),
             DateTime.UtcNow);
