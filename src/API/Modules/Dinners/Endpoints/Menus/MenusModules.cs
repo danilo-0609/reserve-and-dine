@@ -24,13 +24,9 @@ public sealed class MenusModules : CarterModule
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public MenusModules(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    public MenusModules()
         : base("/menus")
     {
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public override void AddRoutes(IEndpointRouteBuilder app)
