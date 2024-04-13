@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IntegrationTests\Restaurants\Administration\Update\" />
     <Folder Include="IntegrationTests\Restaurants\Close\" />
     <Folder Include="IntegrationTests\Restaurants\GetById\" />
     <Folder Include="IntegrationTests\Restaurants\AvailableTables\" />
