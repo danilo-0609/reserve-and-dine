@@ -532,16 +532,12 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return canDeleteAdmin.FirstError;
         }
 
-        if (_restaurantAdministrations.Any(t => t.AdministratorId == administratorId))
+        if (!_restaurantAdministrations.Any(t => t.AdministratorId == administratorId))
         {
             return Error.NotFound("RestaurantAdministration.NotFound", "Restaurant administrator was not found");
         }
 
-        RestaurantAdministration? restaurantAdministrator = _restaurantAdministrations
-            .Where(r => r.AdministratorId == administratorId)
-            .SingleOrDefault();
-
-        _restaurantAdministrations.Remove(restaurantAdministrator!);
+        _restaurantAdministrations.RemoveAll(r => r.AdministratorId == administratorId);
 
         return SuccessOperation.Code;
     }
@@ -551,14 +547,14 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         string administratorTitle,
         Guid adminId)
     {
-        var canUpdateAdmin = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, adminId));
+        var canUpdateAdmin = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, administratorId));
 
         if (canUpdateAdmin.IsError)
         {
             return canUpdateAdmin.FirstError;
         }
 
-        if (_restaurantAdministrations.Any(t => t.AdministratorId == administratorId))
+        if (!_restaurantAdministrations.Any(t => t.AdministratorId == adminId))
         {
             return Error.NotFound("RestaurantAdministration.NotFound", "Restaurant administrator was not found");
         }
