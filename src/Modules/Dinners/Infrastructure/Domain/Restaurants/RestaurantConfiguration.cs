@@ -150,6 +150,12 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
             x.Property(r => r.IsPremium).HasColumnName("IsPremium");
             x.Property(r => r.IsOccupied).HasColumnName("IsOccupied");
 
+            x.OwnsOne(r => r.Price, y =>
+            {
+                y.Property(r => r.Amount).HasColumnName("TablePrice").HasColumnType("decimal").HasPrecision(10, 2);
+                y.Property(r => r.Currency).HasColumnName("TablePriceCurrency");
+            });
+
             x.OwnsMany(r => r.ReservedHours, t =>
             {
                 t.WithOwner().HasForeignKey("RestaurantTableId");
