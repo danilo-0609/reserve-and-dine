@@ -1,4 +1,5 @@
 ﻿using Dinners.Application.Common;
+using Dinners.Domain.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantInformations;
 using Dinners.Domain.Restaurants.RestaurantSchedules;
@@ -52,7 +53,8 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
             return RestaurantTable.Create(restaurantId,
                 table.Number, 
                 table.Seats, 
-                table.IsPremium, 
+                table.IsPremium,
+                new Price(table.Price, table.Currency),
                 new List<ReservedHour>());
         });
 
