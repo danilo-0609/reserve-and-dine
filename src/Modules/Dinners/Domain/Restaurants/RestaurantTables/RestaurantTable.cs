@@ -15,6 +15,8 @@ public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
 
     public int Seats { get; private set; }
 
+    public Price Price { get; private set; }
+
     public bool IsPremium { get; private set; }
 
     public bool IsOccupied { get; private set; }
@@ -25,16 +27,24 @@ public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
         int number,
         int seats,
         bool isPremium,
+        Price price,
         List<ReservedHour> reservedHours)
     {
-        return new RestaurantTable(RestaurantTableId.CreateUnique() ,restaurantId, number, seats, isPremium, reservedHours);
+        return new RestaurantTable(RestaurantTableId.CreateUnique(), 
+            restaurantId, 
+            number, 
+            seats, 
+            isPremium, 
+            price,
+            reservedHours);
     }
 
     public RestaurantTable Upgrade(int number,
         int seats,
-        bool isPremium)
+        bool isPremium,
+        Price price)
     {
-        return new RestaurantTable(base.Id, RestaurantId, number, seats, isPremium, _reservedHours);
+        return new RestaurantTable(base.Id, RestaurantId, number, seats, isPremium, price, _reservedHours);
     }
 
     public void CancelReservation(DateTime reservedTime)
@@ -64,6 +74,7 @@ public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
         int number, 
         int seats, 
         bool isPremium, 
+        Price price,
         List<ReservedHour> reservedHours)
     {
         Id = restaurantTableId;
@@ -72,6 +83,8 @@ public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
         Seats = seats;
         IsPremium = isPremium;
         IsOccupied = false;
+
+        Price = price;
 
         _reservedHours = reservedHours;
     }

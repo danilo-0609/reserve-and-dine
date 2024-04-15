@@ -201,7 +201,8 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     public ErrorOr<SuccessOperation> AddTable(Guid userId,
         int number,
         int seats,
-        bool isPremium)
+        bool isPremium, 
+        Price price)
     {
         var canAddTable = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
     
@@ -218,7 +219,8 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantTable restaurantTable = RestaurantTable.Create(Id,
             number, 
             seats, 
-            isPremium, 
+            isPremium,
+            price,
             new List<ReservedHour>());
 
         _restaurantTables.Add(restaurantTable);
@@ -248,7 +250,8 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     public ErrorOr<SuccessOperation> UpgradeTable(Guid userId,
         int number,
         int seats,
-        bool isPremium)
+        bool isPremium, 
+        Price price)
     {
         var canUpgradeTable = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
 
@@ -264,7 +267,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         RestaurantTable? table = _restaurantTables.Where(r => r.Number == number)
             .SingleOrDefault()!
-            .Upgrade(number, seats, isPremium);
+            .Upgrade(number, seats, isPremium, price!);
 
         return SuccessOperation.Code;
     }
