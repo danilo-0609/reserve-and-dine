@@ -35,8 +35,6 @@ public sealed class ReservationsModule : CarterModule
         app.MapPost("/request", async (RequestReservationRequest request, ISender sender) =>
         {
             var result = await sender.Send(new RequestReservationCommand(request.ReservedTable,
-                request.Price,
-                request.Currency,
                 request.StartReservationDateTime,
                 request.EndReservationDateTime,
                 request.RestaurantId,
