@@ -41,8 +41,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
     public async void Request_Should_ReturnAnError_WhenRestaurantDoesNotExistInDatabase()
     {
         var command = new RequestReservationCommand(1,
-            20.23m,
-            "USD",
             DateTime.Now.AddHours(10),
             DateTime.Now.AddHours(10).AddMinutes(45),
             RestaurantId: Guid.NewGuid(),
@@ -66,8 +64,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(1,
-            20.23m,
-            "USD",
             DateTime.Now.AddHours(10),
             DateTime.Now.AddHours(10).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -118,8 +114,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(ReservedTable: 50,
-            20.23m,
-            "USD",
             DateTime.Now.AddHours(10),
             DateTime.Now.AddHours(10).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -168,8 +162,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(ReservedTable: restaurant.RestaurantTables.First().Number,
-            20.23m,
-            "USD",
             DateTime.Now.AddHours(10),
             DateTime.Now.AddHours(10).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -220,8 +212,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(ReservedTable: restaurant.RestaurantTables.First().Number,
-            20.23m,
-            "USD",
             StartReservationDateTime: DateTime.Now.AddHours(10), //Restaurant will be closed
             EndReservationDateTime: DateTime.Now.AddHours(10).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -274,8 +264,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(ReservedTable: restaurant.RestaurantTables.First().Number,
-            20.23m,
-            "USD",
             StartReservationDateTime: DateTime.Now.AddHours(2), //restaurant will be closed
             EndReservationDateTime: DateTime.Now.AddHours(2).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -328,8 +316,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(ReservedTable: restaurant.RestaurantTables.First().Number,
-            20.23m,
-            "USD",
             StartReservationDateTime: DateTime.Now.AddHours(2), //restaurant will be occuppied at this hour
             EndReservationDateTime: DateTime.Now.AddHours(2).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -379,8 +365,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(ReservedTable: restaurant.RestaurantTables.First().Number,
-            20.23m,
-            "USD",
             StartReservationDateTime: DateTime.Now.AddHours(2),
             EndReservationDateTime: DateTime.Now.AddHours(2).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -426,8 +410,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(ReservedTable: restaurant.RestaurantTables.First().Number,
-            20.23m,
-            "USD",
             StartReservationDateTime: DateTime.Now.AddHours(2),
             EndReservationDateTime: DateTime.Now.AddHours(2).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
@@ -484,8 +466,6 @@ public sealed class RequestReservationIntegrationTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         var command = new RequestReservationCommand(1,
-            20.23m,
-            "USD",
             StartReservationDateTime: DateTime.Now.AddHours(2),
             EndReservationDateTime: DateTime.Now.AddHours(2).AddMinutes(45),
             RestaurantId: restaurant.Id.Value,
