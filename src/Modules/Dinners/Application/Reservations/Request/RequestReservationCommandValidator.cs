@@ -9,12 +9,6 @@ internal sealed class RequestReservationCommandValidator : AbstractValidator<Req
         RuleFor(r => r.ReservedTable)
             .NotNull().NotEmpty();
 
-        RuleFor(r => r.Price)
-            .NotNull().NotEmpty();
-
-        RuleFor(r => r.Currency)
-            .NotNull().NotEmpty();
-
         RuleFor(r => r.StartReservationDateTime)
             .NotNull().NotEmpty();
 

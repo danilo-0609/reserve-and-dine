@@ -4,8 +4,6 @@ using ErrorOr;
 namespace Dinners.Application.Reservations.Request;
 
 public sealed record RequestReservationCommand(int ReservedTable,
-        decimal Price,
-        string Currency,
         DateTime StartReservationDateTime,
         DateTime EndReservationDateTime,
         Guid RestaurantId,

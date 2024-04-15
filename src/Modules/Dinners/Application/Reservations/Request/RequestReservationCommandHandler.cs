@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Application;
 using Dinners.Application.Common;
+using Dinners.Domain.Common;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.Errors;
 using Dinners.Domain.Reservations;
@@ -50,9 +51,20 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
             }
         }
 
+        if (!restaurant.RestaurantTables.Any(r => r.Number == request.ReservedTable))
+        {
+            return Error.NotFound("Reservation.TableNotFound", "The table was not found");
+        }
+
+        Price price = restaurant
+            .RestaurantTables
+            .Where(r => r.Number == request.ReservedTable)
+            .Select(r => r.Price)
+            .Single();
+
         var reservationInformation = ReservationInformation.Create(request.ReservedTable,
-            request.Price,
-            request.Currency,
+            price.Amount,
+            price.Currency,
             request.StartReservationDateTime.TimeOfDay,
             request.EndReservationDateTime.TimeOfDay,
             request.StartReservationDateTime);
@@ -60,11 +72,6 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
         var reservationAttendees = ReservationAttendees.Create(_executionContextAccessor.UserId,
             request.Name,
             request.NumberOfAttendees);
-
-        if (!restaurant.RestaurantTables.Any(r => r.Number == reservationInformation.ReservedTable))
-        {
-            return Error.NotFound("Reservation.TableNotFound", "The table was not found");
-        }
 
         var reservation = Reservation.Request(reservationInformation,   
             restaurant.RestaurantTables.Where(g => g.Number == reservationInformation.ReservedTable)
