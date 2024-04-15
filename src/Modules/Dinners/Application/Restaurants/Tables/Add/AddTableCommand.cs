@@ -7,4 +7,6 @@ namespace Dinners.Application.Restaurants.Tables.Add;
 public sealed record AddTableCommand(Guid RestaurantId,
     int Number,
     int Seats,
-    bool IsPremium) : ICommand<ErrorOr<Unit>>;
+    bool IsPremium,
+    decimal Price,
+    string Currency) : ICommand<ErrorOr<Unit>>;

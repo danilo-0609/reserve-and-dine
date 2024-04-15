@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Application;
 using Dinners.Application.Common;
+using Dinners.Domain.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using Domain.Restaurants;
@@ -31,7 +32,8 @@ internal sealed class AddTableCommandHandler : ICommandHandler<AddTableCommand, 
         var addTable = restaurant.AddTable(_executionContextAccessor.UserId, 
             request.Number, 
             request.Seats, 
-            request.IsPremium);
+            request.IsPremium,
+            new Price(request.Price, request.Currency));
     
         if (addTable.IsError)
         {

@@ -18,5 +18,26 @@ internal sealed class UpgradeTableCommandValidator : AbstractValidator<UpgradeTa
 
         RuleFor(r => r.IsPremium)
             .NotEmpty().NotNull();
+
+        RuleFor(r => r.Price)
+                .LessThanOrEqualTo(2_000_000);
+
+        RuleFor(r => r.Currency)
+            .NotEmpty()
+            .Must(value => Enum.TryParse(value, out Currency currency))
+            .WithMessage("Currency must be COP or USD");
+    }
+
+    private enum MenuType
+    {
+        Breakfast,
+        Lunch,
+        Dinner
+    }
+
+    private enum Currency
+    {
+        USD,
+        COP
     }
 }

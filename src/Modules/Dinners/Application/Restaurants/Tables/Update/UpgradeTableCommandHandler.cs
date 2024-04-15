@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Application;
 using Dinners.Application.Common;
+using Dinners.Domain.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using Domain.Restaurants;
@@ -28,14 +29,15 @@ internal sealed class UpgradeTableCommandHandler : ICommandHandler<UpgradeTableC
             return RestaurantErrorCodes.NotFound;
         }
 
-        var upgradeTable = restaurant.UpgradeTable(_executionContextAccessor.UserId,
-            request.Number,
-            request.Seats,
-            request.IsPremium);
+        var updateTable = restaurant.UpgradeTable(_executionContextAccessor.UserId,
+                request.Number,
+                request.Seats,
+                request.IsPremium,
+                new Price(request.Price, request.Currency));
 
-        if (upgradeTable.IsError)
+        if (updateTable.IsError)
         {
-            return upgradeTable.FirstError;
+            return updateTable.FirstError;
         }
 
         await _restaurantRepository.UpdateAsync(restaurant);
