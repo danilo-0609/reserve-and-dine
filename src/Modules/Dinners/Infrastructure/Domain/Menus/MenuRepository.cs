@@ -43,13 +43,19 @@ internal sealed class MenuRepository : IMenuRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task<List<MenuReviewId>> GetMenuReviewsIdByIdAsync(MenuId menuId, CancellationToken cancellationToken)
+    public async Task<List<MenuReviewId>> GetMenuReviewsIdByMenuIdAsync(MenuId menuId, CancellationToken cancellationToken)
     {
-        return await _dbContext
+        var menu = await _dbContext
             .Menus
             .Where(r => r.Id == menuId)
-            .SelectMany(x => x.MenuReviewIds)
-            .ToListAsync(cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
+    
+        if (menu is null)
+        {
+            return new List<MenuReviewId>();
+        }
+
+        return menu.MenuReviewIds.ToList();
     }
 
     public async Task<List<Menu>> GetMenusByIngredientAsync(string ingredient, CancellationToken cancellationToken)

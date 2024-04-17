@@ -19,7 +19,7 @@ internal sealed class GetMenuReviewsByMenuIdQueryHandler : IQueryHandler<GetMenu
 
     public async Task<ErrorOr<List<MenuReviewResponse>>> Handle(GetMenuReviewsByMenuIdQuery request, CancellationToken cancellationToken)
     {
-        List<MenuReviewId> menuReviewsIds = await _menuRepository.GetMenuReviewsIdByIdAsync(MenuId.Create(request.MenuId), cancellationToken); 
+        List<MenuReviewId> menuReviewsIds = await _menuRepository.GetMenuReviewsIdByMenuIdAsync(MenuId.Create(request.MenuId), cancellationToken); 
     
         if (!menuReviewsIds.Any())
         {
