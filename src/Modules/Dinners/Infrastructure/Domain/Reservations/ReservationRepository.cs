@@ -1,4 +1,5 @@
 ﻿using Dinners.Domain.Reservations;
+using Dinners.Domain.Restaurants;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dinners.Infrastructure.Domain.Reservations;
@@ -32,6 +33,15 @@ internal sealed class ReservationRepository : IReservationRepository
         return await _dbContext
             .Reservations
             .Where(r => r.Id == reservationId)
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task<Reservation?> GetByRestaurantIdAndReservationTimeAsync(RestaurantId restaurantId, DateTime reservationDateTime, CancellationToken cancellation)
+    {
+        return await _dbContext
+            .Reservations
+            .Where(r => r.RestaurantId == restaurantId && 
+                r.ReservationInformation.ReservationDateTime == reservationDateTime)
             .SingleOrDefaultAsync();
     }
 
