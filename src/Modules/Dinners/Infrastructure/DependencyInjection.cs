@@ -23,6 +23,8 @@ using Dinners.Infrastructure.Jobs.Setups;
 using Dinners.Infrastructure.Outbox.BackgroundJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Retry;
 using Quartz;
 
 namespace Dinners.Infrastructure;
@@ -48,6 +50,28 @@ public static class DependencyInjection
         services.AddDbContext<DinnersDbContext>((_, optionsBuilder) =>
         {
             optionsBuilder.UseSqlServer(databaseConnectionString);
+
+
+            var retryOptions = new RetryStrategyOptions<DinnersDbContext>
+            {
+                ShouldHandle = new PredicateBuilder<DinnersDbContext>().Handle<Exception>(),
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true,
+                MaxRetryAttempts = 4,
+                DelayGenerator = static args =>
+                {
+                    var delay = args.AttemptNumber switch
+                    {
+                        0 => TimeSpan.Zero,
+                        1 => TimeSpan.FromSeconds(1),
+                        _ => TimeSpan.FromSeconds(5)
+                    };
+
+                    return new ValueTask<TimeSpan?>(delay);
+                }
+            };
+
+            new ResiliencePipelineBuilder<DinnersDbContext>().AddRetry(retryOptions);
         });
 
         services.AddScoped<IApplicationDbContext>(sp =>
