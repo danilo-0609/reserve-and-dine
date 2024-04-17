@@ -124,7 +124,7 @@ internal sealed class CacheMenuRepository : IMenuRepository
         return menuImageUrl;
     }
 
-    public async Task<List<MenuReviewId>> GetMenuReviewsIdByIdAsync(MenuId menuId, CancellationToken cancellationToken)
+    public async Task<List<MenuReviewId>> GetMenuReviewsIdByMenuIdAsync(MenuId menuId, CancellationToken cancellationToken)
     {
         string key = $"menuReviewsId-{menuId.Value}";
 
@@ -134,7 +134,7 @@ internal sealed class CacheMenuRepository : IMenuRepository
         List<MenuReviewId> menuReviewsIds;
         if (string.IsNullOrEmpty(cachedMenuReviewIds))
         {
-            menuReviewsIds = await _decorated.GetMenuReviewsIdByIdAsync(menuId, cancellationToken);
+            menuReviewsIds = await _decorated.GetMenuReviewsIdByMenuIdAsync(menuId, cancellationToken);
 
             if (!menuReviewsIds.Any())
             {
