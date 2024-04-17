@@ -18,8 +18,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo
-			Include="Dinners.Tests"/>
+		<InternalsVisibleTo Include="Dinners.Tests" />
 	</ItemGroup>
 	
 </Project>
