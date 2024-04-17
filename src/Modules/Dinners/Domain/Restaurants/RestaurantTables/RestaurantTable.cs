@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Domain.Entities;
 using Dinners.Domain.Common;
+using Dinners.Domain.Restaurants.RestaurantTables.Events;
 
 namespace Dinners.Domain.Restaurants.RestaurantTables;
 
@@ -49,7 +50,12 @@ public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
 
     public void CancelReservation(DateTime reservedTime)
     {
-        _reservedHours.RemoveAll(r => r.ReservationDateTime == reservedTime); 
+        _reservedHours.RemoveAll(r => r.ReservationDateTime == reservedTime);
+
+        AddDomainEvent(new ReservationTableCancelledDomainEvent(Guid.NewGuid(),
+            RestaurantId,
+            reservedTime,
+            DateTime.Now));
     }
 
     public void Reserve(DateTime reservedTime, TimeRange reservationTimeRange)
