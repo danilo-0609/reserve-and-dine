@@ -44,7 +44,6 @@
     <Folder Include="IntegrationTests\Restaurants\GetRestaurantAdministrationById\" />
     <Folder Include="IntegrationTests\Restaurants\ModifySchedule\" />
     <Folder Include="IntegrationTests\Restaurants\Tables\Get\" />
-    <Folder Include="IntegrationTests\Restaurants\Tables\Delete\" />
     <Folder Include="IntegrationTests\Restaurants\Tables\Update\" />
     <Folder Include="IntegrationTests\Restaurants\UpdateInformation\" />
     <Folder Include="IntegrationTests\Restaurants\UpdateContact\" />
