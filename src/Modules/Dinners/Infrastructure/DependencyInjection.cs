@@ -45,6 +45,7 @@ public static class DependencyInjection
         services.ConfigureOptions<ProcessDinnersOutboxMessagesJobSetup>();
         services.ConfigureOptions<CancelNotAsistedReservationsJobSetup>();
         services.ConfigureOptions<CancelNotPaidReservationsJobSetup>();
+        services.ConfigureOptions<CancelReservationsAfterRestaurantWasClosedOutOfScheduleJobSetup>();
 
 
         services.AddDbContext<DinnersDbContext>((_, optionsBuilder) =>
