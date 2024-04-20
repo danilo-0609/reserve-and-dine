@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: reservations-api
+  template:
+    metadata:
+      labels:
+        app: reservations-api
+    spec:
+      containers:
+      - name: reservations-api-container
+        image: danilo0609/reservations-api:v1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+

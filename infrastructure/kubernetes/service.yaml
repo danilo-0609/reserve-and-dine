@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: reservations-api-service
+  labels: 
+    app: reservations-api-service
+spec: 
+  ports: 
+  - port: 80
+    targetPort: 80
+  selector:
+    app: reservations-api-service
+  type: LoadBalancer
