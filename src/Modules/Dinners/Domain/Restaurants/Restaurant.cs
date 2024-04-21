@@ -398,6 +398,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
     {
         var canModifyTableStatus = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
         
+
         if (canModifyTableStatus.IsError)
         {
             return canModifyTableStatus.FirstError;
