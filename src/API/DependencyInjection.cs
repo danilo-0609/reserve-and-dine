@@ -2,10 +2,10 @@
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application;
 using Carter;
-using Dinners.Infrastructure;
 using MassTransit;
 using Polly.Retry;
 using Polly;
+using API.Exceptions;
 
 namespace API;
 
@@ -45,6 +45,10 @@ public static class DependencyInjection
 
         services.AddSingleton<HttpContextAccessor>();
         services.AddHttpContextAccessor();
+
+        //Exception handlers
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
 
         services.AddScoped<IExecutionContextAccessor, ExecutionContextAccessor>();
 
