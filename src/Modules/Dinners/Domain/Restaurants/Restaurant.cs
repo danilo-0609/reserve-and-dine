@@ -393,8 +393,16 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return restaurantClient;
     }
 
-    public ErrorOr<SuccessOperation> ModifyAvailableTablesStatus(AvailableTablesStatus availableTablesStatus)
+    public ErrorOr<SuccessOperation> ModifyAvailableTablesStatus(Guid userId,
+        AvailableTablesStatus availableTablesStatus)
     {
+        var canModifyTableStatus = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
+        
+        if (canModifyTableStatus.IsError)
+        {
+            return canModifyTableStatus.FirstError;
+        }
+
         if (AvailableTablesStatus == availableTablesStatus)
         {
             return RestaurantErrorCodes.EqualAvailableTableStatus;
