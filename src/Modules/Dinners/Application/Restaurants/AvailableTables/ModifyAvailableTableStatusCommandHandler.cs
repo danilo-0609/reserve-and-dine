@@ -1,4 +1,5 @@
-﻿using Dinners.Application.Common;
+﻿using BuildingBlocks.Application;
+using Dinners.Application.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using Dinners.Domain.Restaurants.RestaurantTables;
@@ -11,10 +12,12 @@ namespace Dinners.Application.Restaurants.AvailableTables;
 internal sealed class ModifyAvailableTableStatusCommandHandler : ICommandHandler<ModifyAvailableTableStatusCommand, ErrorOr<Unit>>
 {
     private readonly IRestaurantRepository _restaurantRepository;
+    private readonly IExecutionContextAccessor _executionContextAccessor;
 
-    public ModifyAvailableTableStatusCommandHandler(IRestaurantRepository restaurantRepository)
+    public ModifyAvailableTableStatusCommandHandler(IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor)
     {
         _restaurantRepository = restaurantRepository;
+        _executionContextAccessor = executionContextAccessor;
     }
 
     public async Task<ErrorOr<Unit>> Handle(ModifyAvailableTableStatusCommand request, CancellationToken cancellationToken)
@@ -27,6 +30,7 @@ internal sealed class ModifyAvailableTableStatusCommandHandler : ICommandHandler
         }
 
         var availableTablesStatus = restaurant.ModifyAvailableTablesStatus(
+            _executionContextAccessor.UserId,
             GetAvailableTableStatus(request.AvailableTableStatus));
 
         if (availableTablesStatus.IsError)
