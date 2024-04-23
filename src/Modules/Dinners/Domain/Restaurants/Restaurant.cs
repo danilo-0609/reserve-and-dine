@@ -468,8 +468,17 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         }
 
         RestaurantSchedule schedule = RestaurantSchedule.Create(Id, day, start, end);
+        
+        if (_restaurantSchedules.Any(r => r.Day.DayOfWeek == day))
+        {
+            _restaurantSchedules.Add(schedule);
 
-        var restaurantSchedule = _restaurantSchedules.Where(r => r.Day.DayOfWeek == day).Single();
+            return SuccessOperation.Code;
+        }
+
+        var restaurantSchedule = _restaurantSchedules
+            .Where(r => r.Day.DayOfWeek == day)
+            .Single();
 
         restaurantSchedule = schedule;
 
