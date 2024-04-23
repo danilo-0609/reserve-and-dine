@@ -11,8 +11,14 @@ internal sealed class ModifyAvailableTableStatusCommandValidator : AbstractValid
 
         RuleFor(r => r.AvailableTableStatus)
             .NotNull().NotEmpty()
-            .Equal("Availables")
-            .Equal("Few")
-            .Equal("NoAvailables");
+            .Must(value => Enum.TryParse(value, out AvailableTableStatus result))
+            .WithMessage("Available table status must be NoAvailables, Few or Availables");
+    }
+
+    private enum AvailableTableStatus
+    {
+        NoAvailables,
+        Few,
+        Availables
     }
 }
