@@ -908,7 +908,10 @@ public sealed class RestaurantTests
     {
         var restaurant = CreateRestaurant();
 
-        var modifyAvailableTableStatus = restaurant.ModifyAvailableTablesStatus(restaurant.AvailableTablesStatus);
+        var modifyAvailableTableStatus = restaurant.ModifyAvailableTablesStatus(restaurant
+            .RestaurantAdministrations
+            .First()
+            .AdministratorId, restaurant.AvailableTablesStatus);
 
         bool isErrorEqualAvailableTableStatus = modifyAvailableTableStatus
             .FirstError
@@ -923,7 +926,10 @@ public sealed class RestaurantTests
         var restaurant = CreateRestaurant();
 
         //The default available tables status is "available" when creating a new restaurant instance 
-        restaurant.ModifyAvailableTablesStatus(AvailableTablesStatus.NoAvailables);
+        restaurant.ModifyAvailableTablesStatus(restaurant
+            .RestaurantAdministrations
+            .First()
+            .AdministratorId, AvailableTablesStatus.NoAvailables);
 
         bool hasAvailableTablesStatusChangedToTheRequestedStatus = restaurant
             .AvailableTablesStatus == AvailableTablesStatus.NoAvailables;
