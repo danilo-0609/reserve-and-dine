@@ -4,7 +4,7 @@ using Dinners.Application.Common;
 
 namespace Dinners.Infrastructure.Blobs;
 
-internal sealed class RestaurantBlobService : IRestaurantBlobService
+public sealed class RestaurantBlobService : IRestaurantBlobService
 {
     private readonly BlobServiceClient _blobServiceClient;
     private const string ContainerName = "restaurants";
