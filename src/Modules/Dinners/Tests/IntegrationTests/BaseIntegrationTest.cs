@@ -1,4 +1,6 @@
-﻿using Dinners.Infrastructure;
+﻿using Dinners.Application.Common;
+using Dinners.Infrastructure;
+using Dinners.Infrastructure.Blobs;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,6 +11,7 @@ public abstract class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppF
     private readonly IServiceScope _scope;
     protected readonly ISender Sender;
     protected readonly DinnersDbContext DbContext;
+    protected readonly IRestaurantBlobService RestaurantBlobService;
 
     protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
     {
@@ -16,5 +19,6 @@ public abstract class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppF
     
         Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
         DbContext = _scope.ServiceProvider.GetRequiredService<DinnersDbContext>();
+        RestaurantBlobService = _scope.ServiceProvider.GetRequiredService<IRestaurantBlobService>();
     }
 }
