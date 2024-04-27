@@ -28,9 +28,11 @@ internal sealed class InsertRestaurantImagesCommandHandler : ICommandHandler<Ins
             return RestaurantErrorCodes.NotFound;
         }
 
-        string imageUrl = await _blobService.UploadFileBlobAsync(request.FilePath, request.FormFile.FileName);
+        var restaurantImageUrlId = RestaurantImageUrlId.CreateUnique();
+
+        string imageUrl = await _blobService.UploadFileBlobAsync(request.FilePath, $"{restaurantImageUrlId.Value}-{request.FormFile.FileName}");
         
-        restaurant.AddImage(imageUrl, RestaurantImageUrlId.CreateUnique());
+        restaurant.AddImage(imageUrl, restaurantImageUrlId);
 
         await _restaurantRepository.UpdateAsync(restaurant);
 
