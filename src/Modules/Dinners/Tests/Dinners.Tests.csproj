@@ -45,7 +45,6 @@
     <Folder Include="IntegrationTests\Restaurants\UpdateInformation\" />
     <Folder Include="IntegrationTests\Restaurants\UpdateContact\" />
     <Folder Include="IntegrationTests\Restaurants\Rate\" />
-    <Folder Include="IntegrationTests\Restaurants\Post\" />
   </ItemGroup>
 
 </Project>
