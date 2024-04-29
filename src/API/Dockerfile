@@ -13,6 +13,9 @@ COPY . .
 WORKDIR "/src/API"
 RUN dotnet build "./API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+COPY variables.env ../variables.env
+ENV ENVIRONMENT_FILE=app/src
+
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
