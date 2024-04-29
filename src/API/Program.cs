@@ -1,16 +1,25 @@
 using API;
-using API.Configuration;
 using API.Modules.Dinners.Startup;
 using Carter;
+using Dinners.Infrastructure.Connections;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<IConnectionsManager, ConnectionsManager>();
 //Presentation services
-builder.Services.AddPresentation(await ConnectionsManager.GetAzureBlobStorageConnectionString());
+var blobStorageConnectionString = await new ConnectionsManager().GetAzureBlobStorageConnectionString();
+
+builder.Services.AddPresentation(blobStorageConnectionString);
+
 
 //Modules services
-builder.Services.AddDinners(await ConnectionsManager.GetDatabaseConnectionString(), 
-    await ConnectionsManager.GetAzureRedisConnectionString());
+var connectionsManager = new ConnectionsManager();
+
+var redisConnectionString = await connectionsManager.GetAzureRedisConnectionString();
+var dockerDatabaseConnectionString = await connectionsManager.GetDockerDatabaseConnectionString();
+var databaseConnectionString = await connectionsManager.GetDatabaseConnectionString();
+
+builder.Services.AddDinners(redisConnectionString, databaseConnectionString, dockerDatabaseConnectionString);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
