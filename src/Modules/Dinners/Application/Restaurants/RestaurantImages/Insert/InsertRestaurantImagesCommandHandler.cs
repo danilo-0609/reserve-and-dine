@@ -30,9 +30,11 @@ internal sealed class InsertRestaurantImagesCommandHandler : ICommandHandler<Ins
 
         var restaurantImageUrlId = RestaurantImageUrlId.CreateUnique();
 
-        string imageUrl = await _blobService.UploadFileBlobAsync(request.FilePath, $"{restaurantImageUrlId.Value}-{request.FormFile.FileName}");
+        string fileName = $"{restaurantImageUrlId.Value}-{request.FormFile.FileName}";
+
+        await _blobService.UploadFileBlobAsync(request.FilePath, fileName);
         
-        restaurant.AddImage(imageUrl, restaurantImageUrlId);
+        restaurant.AddImage(fileName, restaurantImageUrlId);
 
         await _restaurantRepository.UpdateAsync(restaurant);
 
