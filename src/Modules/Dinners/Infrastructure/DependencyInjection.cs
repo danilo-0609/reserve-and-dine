@@ -21,23 +21,30 @@ using Dinners.Infrastructure.Domain.Restaurants.Ratings;
 using Dinners.Infrastructure.EventsBus;
 using Dinners.Infrastructure.Jobs.Setups;
 using Dinners.Infrastructure.Outbox.BackgroundJobs;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
-using Polly.Retry;
 using Quartz;
 
 namespace Dinners.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string databaseConnectionString, string redisConnectionString)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string redisConnectionString, string databaseConnectionString, string dockerDatabaseConnectionString)
     {
-
         services.AddMemoryCache();
         services.AddStackExchangeRedisCache(redisOptions =>
         {
             redisOptions.Configuration = redisConnectionString;
+        });
+
+        services.AddDbContext<DinnersDbContext>(async (sp, optionsBuilder) =>
+        {
+            var connectionString = await IsAzureDatabaseAvailable(databaseConnectionString) 
+                ? databaseConnectionString : dockerDatabaseConnectionString;
+
+            optionsBuilder.UseSqlServer(connectionString);
         });
 
         services.AddQuartzHostedService();
@@ -46,34 +53,6 @@ public static class DependencyInjection
         services.ConfigureOptions<CancelNotAsistedReservationsJobSetup>();
         services.ConfigureOptions<CancelNotPaidReservationsJobSetup>();
         services.ConfigureOptions<CancelReservationsAfterRestaurantWasClosedOutOfScheduleJobSetup>();
-
-
-        services.AddDbContext<DinnersDbContext>((_, optionsBuilder) =>
-        {
-            optionsBuilder.UseSqlServer(databaseConnectionString);
-
-
-            var retryOptions = new RetryStrategyOptions<DinnersDbContext>
-            {
-                ShouldHandle = new PredicateBuilder<DinnersDbContext>().Handle<Exception>(),
-                BackoffType = DelayBackoffType.Exponential,
-                UseJitter = true,
-                MaxRetryAttempts = 4,
-                DelayGenerator = static args =>
-                {
-                    var delay = args.AttemptNumber switch
-                    {
-                        0 => TimeSpan.Zero,
-                        1 => TimeSpan.FromSeconds(1),
-                        _ => TimeSpan.FromSeconds(5)
-                    };
-
-                    return new ValueTask<TimeSpan?>(delay);
-                }
-            };
-
-            new ResiliencePipelineBuilder<DinnersDbContext>().AddRetry(retryOptions);
-        });
 
         services.AddScoped<IApplicationDbContext>(sp =>
             sp.GetRequiredService<DinnersDbContext>());
@@ -100,7 +79,6 @@ public static class DependencyInjection
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.Decorate<IReviewRepository, CacheReviewRepository>();
 
-
         services.AddScoped<IMenusReviewsRepository, MenusReviewsRepository>();
         
 
@@ -111,5 +89,41 @@ public static class DependencyInjection
         services.Decorate<IRestaurantRepository, CacheRestaurantRepository>();
 
         return services;
+    }
+
+    private async static Task<bool> IsAzureDatabaseAvailable(string connectionString)
+    {
+        var retryPolicy = Policy
+             .Handle<SqlException>()
+             .WaitAndRetryAsync(
+                 3,
+                 retryAttempt => TimeSpan.FromSeconds(5),
+                 onRetry: (exception, timeSpan, retryCount, context) =>
+                 {
+                     Console.WriteLine($"Connection lost, retry attempt {retryCount} at {DateTime.Now}. " +
+                         $"Exception Message: {exception.Message}");
+                 });
+
+        bool isAvailable = false;
+
+        await retryPolicy.ExecuteAsync(async () =>
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    isAvailable = true;
+                }
+                catch (Exception)
+                {
+                    isAvailable = false;
+                }                   
+            }
+
+            return isAvailable;
+        });
+
+        return isAvailable;
     }
 }
