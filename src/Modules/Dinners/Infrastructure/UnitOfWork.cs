@@ -47,11 +47,6 @@ internal sealed class UnitOfWork : IUnitOfWork
                 return 0;
             });
 
-        foreach (var entity in _dbContext.ChangeTracker.Entries<IHasDomainEvents>())
-        {
-            entity.State = EntityState.Detached;
-        }
-
         List<OutboxMessage> outboxMessages = domainEvents
             .Select(domainEvent => new OutboxMessage
             {
