@@ -36,15 +36,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IntegrationTests\Restaurants\GetById\" />
-    <Folder Include="IntegrationTests\Restaurants\ChangeLocalization\" />
-    <Folder Include="IntegrationTests\Restaurants\GetByName\" />
-    <Folder Include="IntegrationTests\Restaurants\GetRestaurantAdministrationById\" />
     <Folder Include="IntegrationTests\Restaurants\Tables\Get\" />
     <Folder Include="IntegrationTests\Restaurants\Tables\Update\" />
-    <Folder Include="IntegrationTests\Restaurants\UpdateInformation\" />
-    <Folder Include="IntegrationTests\Restaurants\UpdateContact\" />
-    <Folder Include="IntegrationTests\Restaurants\Rate\" />
   </ItemGroup>
 
 </Project>
