@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using System;
+
 namespace Dinners.Application.Restaurants.Rate.Upgrade;
 
 internal sealed class UpgradeRateCommandValidator : AbstractValidator<UpgradeRateCommand>
@@ -10,7 +10,10 @@ internal sealed class UpgradeRateCommandValidator : AbstractValidator<UpgradeRat
             .NotNull();
 
         RuleFor(r => r.Stars)
-            .NotEmpty().NotNull();
+            .NotEmpty()
+            .NotNull()
+            .LessThan(6)
+            .GreaterThan(0);
 
         RuleFor(r => r.Comment)
             .NotNull();

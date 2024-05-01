@@ -10,7 +10,10 @@ internal sealed class RateRestaurantCommandValidator : AbstractValidator<RateRes
             .NotEmpty().NotNull();
 
         RuleFor(r => r.Stars)
-            .NotEmpty().NotNull();
+            .NotEmpty()
+            .NotNull()
+            .LessThan(6)
+            .GreaterThan(0);
 
         RuleFor(r => r.Comment)
             .NotNull();
