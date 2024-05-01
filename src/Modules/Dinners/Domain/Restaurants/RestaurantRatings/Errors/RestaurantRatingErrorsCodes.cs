@@ -12,11 +12,11 @@ public static class RestaurantRatingErrorsCodes
         Error.NotFound("RestaurantRating.NotFound", "Restaurant rating was not found");
 
     public static Error CannotRateWhenHasNotVisitedTheRestaurant =>
-        Error.Validation("RestaurantRatings.CannotRate", RatingCannotBeMadeWhenClientHasNotVisitedTheRestaurantRule.Message);
+        Error.Validation("RestaurantRatings.CannotRateWhenClientHasNotVisitedTheRestaurant", RatingCannotBeMadeWhenClientHasNotVisitedTheRestaurantRule.Message);
 
-    public static Error IsNotRaterUser =>
-        Error.Validation("RestaurantRatings.IsNotRaterUser", CannotUpdateRatingWhenIsNotRaterUserRule.Message);
+    public static Error CannotUpdateRateWhenIsNotUserRater =>
+        Error.Validation("RestaurantRatings.CannotUpdateRateWhenIsNotUserRater", CannotUpdateRatingWhenIsNotRaterUserRule.Message);
 
-    public static Error CannotDeleteRating =>
-        Error.Unauthorized("RestaurantRatings.CannotDeleteRating", "Cannot delete rating if you're not the same rater user");
+    public static Error CannotDeleteRatingIfUserHasNotPostedThatRating =>
+        Error.Unauthorized("RestaurantRatings.CannotDeleteRatingIfUserHasNotPostedThatRating", "Cannot delete rating if you're not the same rater user");
 }

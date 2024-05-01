@@ -15,7 +15,7 @@ internal sealed class CannotUpdateRatingWhenIsNotRaterUserRule : IBusinessRule
         _ratingUserId = ratingUserId;
     }
 
-    public Error Error => RestaurantRatingErrorsCodes.IsNotRaterUser;
+    public Error Error => RestaurantRatingErrorsCodes.CannotUpdateRateWhenIsNotUserRater;
 
     public bool IsBroken() => _clientId != _ratingUserId;
 

@@ -29,7 +29,7 @@ internal sealed class DeleteRateCommandHandler : ICommandHandler<DeleteRateComma
 
         if (_executionContextAccessor.UserId != rating.ClientId)
         {
-            return RestaurantRatingErrorsCodes.CannotDeleteRating;
+            return RestaurantRatingErrorsCodes.CannotDeleteRatingIfUserHasNotPostedThatRating;
         }
 
         await _restaurantRatingRepository.DeleteAsync(rating.Id, cancellationToken);
