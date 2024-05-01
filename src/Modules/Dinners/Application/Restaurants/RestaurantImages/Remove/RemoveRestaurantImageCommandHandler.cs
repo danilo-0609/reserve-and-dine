@@ -4,6 +4,7 @@ using ErrorOr;
 using MediatR;
 using Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
+using Dinners.Domain.Restaurants.RestaurantInformations;
 
 namespace Dinners.Application.Restaurants.RestaurantImages.Remove;
 
@@ -27,18 +28,20 @@ internal sealed class RemoveRestaurantImageCommandHandler : ICommandHandler<Remo
             return RestaurantErrorCodes.NotFound;
         }
 
-        if (!restaurant.RestaurantImagesUrl.Any(r => r.Value == request.RestaurantImageUrl))
+        var restaurantImageUrlId = RestaurantImageUrlId.Create(request.imageId);
+
+        if (!restaurant.RestaurantImagesUrl.Any(r => r.Id == restaurantImageUrlId))
         {
             return Error.NotFound("Restaurant.ImageNotFound", "Restaurant was not found");
         }
 
         var restaurantImageUrl = restaurant.RestaurantImagesUrl
-            .Where(r => r.Value == request.RestaurantImageUrl)
+            .Where(r => r.Id == restaurantImageUrlId)
             .Single();
 
-        await _blobService.DeleteBlobAsync(request.RestaurantImageUrl);
+        await _blobService.DeleteBlobAsync(restaurantImageUrl.Value);
 
-        restaurant.RemoveImage(request.RestaurantImageUrl, restaurantImageUrl.Id);
+        restaurant.RemoveImage(restaurantImageUrl.Value, restaurantImageUrl.Id);
 
         await _restaurantRepository.UpdateAsync(restaurant);
 
