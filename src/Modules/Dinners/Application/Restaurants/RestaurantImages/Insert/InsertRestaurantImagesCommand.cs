@@ -5,5 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Dinners.Application.Restaurants.RestaurantImages.Insert;
 
-internal sealed record InsertRestaurantImagesCommand(Guid Id, IFormFile FormFile, string FilePath) : ICommand<ErrorOr<Unit>>;
+public sealed record InsertRestaurantImagesCommand(Guid Id, 
+    IFormFile FormFile, 
+    string FilePath) : ICommand<ErrorOr<Unit>>;
 

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Dinners.Application.Restaurants.ChangeLocalization;
 
-internal sealed record ChangeRestaurantLocalizationCommand(Guid RestaurantId,
+public sealed record ChangeRestaurantLocalizationCommand(Guid RestaurantId,
     string Country,
     string City,
     string Region,
