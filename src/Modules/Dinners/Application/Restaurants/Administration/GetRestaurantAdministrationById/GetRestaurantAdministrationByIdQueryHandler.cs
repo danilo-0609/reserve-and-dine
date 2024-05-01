@@ -5,7 +5,7 @@ using Dinners.Domain.Restaurants.Errors;
 using Domain.Restaurants;
 using ErrorOr;
 
-namespace Dinners.Application.Restaurants.GetRestaurantAdministrationById;
+namespace Dinners.Application.Restaurants.Administration.GetRestaurantAdministrationById;
 
 internal sealed class GetRestaurantAdministrationByIdQueryHandler : IQueryHandler<GetRestaurantAdministrationByIdQuery, ErrorOr<IReadOnlyList<RestaurantAdministrationResponse>>>
 {
@@ -21,7 +21,7 @@ internal sealed class GetRestaurantAdministrationByIdQueryHandler : IQueryHandle
     public async Task<ErrorOr<IReadOnlyList<RestaurantAdministrationResponse>>> Handle(GetRestaurantAdministrationByIdQuery request, CancellationToken cancellationToken)
     {
         Restaurant? restaurant = await _restaurantRepository.GetRestaurantById(RestaurantId.Create(request.RestaurantId));
-    
+
         if (restaurant is null)
         {
             return RestaurantErrorCodes.NotFound;
@@ -35,9 +35,9 @@ internal sealed class GetRestaurantAdministrationByIdQueryHandler : IQueryHandle
         return restaurant
             .RestaurantAdministrations
             .ToList()
-            .ConvertAll(admin => 
-                new RestaurantAdministrationResponse(admin.Name, 
-                    admin.AdministratorId, 
+            .ConvertAll(admin =>
+                new RestaurantAdministrationResponse(admin.Name,
+                    admin.AdministratorId,
                     admin.AdministratorTitle)).AsReadOnly();
     }
 }

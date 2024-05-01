@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Dinners.Application.Restaurants.GetRestaurantAdministrationById;
+namespace Dinners.Application.Restaurants.Administration.GetRestaurantAdministrationById;
 
 internal sealed class GetRestaurantAdministrationByIdQueryValidator : AbstractValidator<GetRestaurantAdministrationByIdQuery>
 {
