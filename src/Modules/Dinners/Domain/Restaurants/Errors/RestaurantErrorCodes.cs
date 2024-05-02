@@ -8,8 +8,8 @@ public static class RestaurantErrorCodes
     public static Error NotFound =>
         Error.Validation("Restaurant.NotFound", "Restaurant was not found");
 
-    public static Error ImagesNotFound =>
-        Error.NotFound("Restaurant.ImagesNotFound", "Restaurant images were not found");
+    public static Error ImageNotFound =>
+        Error.NotFound("Restaurant.ImageNotFound", "The restaurant image was not found");
 
     public static Error CannotDeleteRestaurant =>
         Error.Unauthorized("Restaurant.CannotDeleteRestaurant", "Cannot delete restaurant if you are not a restaurant administrator");
