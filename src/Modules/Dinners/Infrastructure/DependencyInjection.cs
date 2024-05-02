@@ -41,10 +41,7 @@ public static class DependencyInjection
 
         services.AddDbContext<DinnersDbContext>(async (sp, optionsBuilder) =>
         {
-            var connectionString = await IsAzureDatabaseAvailable(databaseConnectionString) 
-                ? databaseConnectionString : dockerDatabaseConnectionString;
-
-            optionsBuilder.UseSqlServer(connectionString);
+            optionsBuilder.UseSqlServer(databaseConnectionString, r => r.EnableRetryOnFailure(4));
         });
 
         services.AddQuartzHostedService();
@@ -89,41 +86,5 @@ public static class DependencyInjection
         services.Decorate<IRestaurantRepository, CacheRestaurantRepository>();
 
         return services;
-    }
-
-    private async static Task<bool> IsAzureDatabaseAvailable(string connectionString)
-    {
-        var retryPolicy = Policy
-             .Handle<SqlException>()
-             .WaitAndRetryAsync(
-                 3,
-                 retryAttempt => TimeSpan.FromSeconds(5),
-                 onRetry: (exception, timeSpan, retryCount, context) =>
-                 {
-                     Console.WriteLine($"Connection lost, retry attempt {retryCount} at {DateTime.Now}. " +
-                         $"Exception Message: {exception.Message}");
-                 });
-
-        bool isAvailable = false;
-
-        await retryPolicy.ExecuteAsync(async () =>
-        {
-            using (var connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    isAvailable = true;
-                }
-                catch (Exception)
-                {
-                    isAvailable = false;
-                }                   
-            }
-
-            return isAvailable;
-        });
-
-        return isAvailable;
     }
 }
