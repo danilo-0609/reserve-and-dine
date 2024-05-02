@@ -1,6 +1,9 @@
-﻿using Dinners.Domain.Restaurants;
+﻿using Dinners.Domain.Menus;
+using Dinners.Domain.Restaurants;
+using Dinners.Domain.Restaurants.RestaurantInformations;
 using Dinners.Domain.Restaurants.RestaurantTables;
 using Domain.Restaurants;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dinners.Infrastructure.Domain.Restaurants;
@@ -62,14 +65,15 @@ internal sealed class RestaurantRepository : IRestaurantRepository
           .SingleOrDefaultAsync();
     }
 
-    public async Task<List<string>> GetRestaurantImagesUrlById(RestaurantId restaurantId, CancellationToken cancellationToken)
+    public async Task<string?> GetRestaurantImageUrlById(RestaurantId restaurantId, RestaurantImageUrlId restaurantImageUrlId, CancellationToken cancellationToken)
     {
         return await _dbContext
         .Restaurants
-        .Where(r => r.Id == restaurantId)
-        .SelectMany(x => x.RestaurantImagesUrl
-            .Select(r => r.Value))
-        .ToListAsync(cancellationToken);
+            .Where(r => r.Id == restaurantId)
+            .SelectMany(x => x.RestaurantImagesUrl
+                .Where(r => r.Id == restaurantImageUrlId)
+                .Select(r => r.Value))
+            .SingleOrDefaultAsync();
     }
 
     public async Task<List<Restaurant>> GetRestaurantsByNameAsync(string name, CancellationToken cancellationToken)

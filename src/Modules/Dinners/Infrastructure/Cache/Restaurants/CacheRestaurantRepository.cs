@@ -1,4 +1,5 @@
 ﻿using Dinners.Domain.Restaurants;
+using Dinners.Domain.Restaurants.RestaurantInformations;
 using Dinners.Domain.Restaurants.RestaurantTables;
 using Dinners.Infrastructure.Resolvers;
 using Domain.Restaurants;
@@ -125,36 +126,36 @@ internal sealed class CacheRestaurantRepository : IRestaurantRepository
         return restaurant;
     }
 
-    public async Task<List<string>> GetRestaurantImagesUrlById(RestaurantId restaurantId, CancellationToken cancellationToken)
+    public async Task<string?> GetRestaurantImageUrlById(RestaurantId restaurantId, RestaurantImageUrlId restaurantImageUrlId,  CancellationToken cancellationToken)
     {
-        string key = $"restaurantImagesUrls-{restaurantId.Value}";
+        string key = $"restaurantImagesUrl-{restaurantImageUrlId.Value}";
 
         string? cachedRestaurantImagesUrls = await _distributedCache.GetStringAsync(key,
             cancellationToken);
 
-        List<string> restaurantImagesUrls;
+        string? restaurantImagesUrl;
         if (string.IsNullOrEmpty(cachedRestaurantImagesUrls))
         {
-            restaurantImagesUrls = await _decorated.GetRestaurantImagesUrlById(restaurantId, cancellationToken);
+            restaurantImagesUrl = await _decorated.GetRestaurantImageUrlById(restaurantId, restaurantImageUrlId, cancellationToken);
 
-            if (!restaurantImagesUrls.Any())
+            if (restaurantImagesUrl is null)
             {
-                return restaurantImagesUrls;
+                return restaurantImagesUrl;
             }
 
             await _distributedCache.SetStringAsync(
                 key,
-                JsonConvert.SerializeObject(restaurantImagesUrls, new JsonSerializerSettings()
+                JsonConvert.SerializeObject(restaurantImagesUrl, new JsonSerializerSettings()
                 {
                     TypeNameHandling = TypeNameHandling.All,
                     ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
                 }),
                 cancellationToken);
 
-            return restaurantImagesUrls;
+            return restaurantImagesUrl;
         }
 
-        restaurantImagesUrls = JsonConvert.DeserializeObject<List<string>>(cachedRestaurantImagesUrls,
+        restaurantImagesUrl = JsonConvert.DeserializeObject<string>(cachedRestaurantImagesUrls,
         new JsonSerializerSettings()
         {
             TypeNameHandling = TypeNameHandling.All,
@@ -162,7 +163,7 @@ internal sealed class CacheRestaurantRepository : IRestaurantRepository
             ContractResolver = new PrivateResolver()
         })!;
 
-        if (!restaurantImagesUrls.Any())
+        if (restaurantImagesUrl is not null)
         {
             _dbContext.Set<Restaurant>().Attach(
                  await _dbContext
@@ -171,7 +172,7 @@ internal sealed class CacheRestaurantRepository : IRestaurantRepository
                 .SingleAsync());
         }
 
-        return restaurantImagesUrls;
+        return restaurantImagesUrl;
     }
 
     public async Task<List<Restaurant>> GetRestaurantsByNameAsync(string name, CancellationToken cancellationToken)

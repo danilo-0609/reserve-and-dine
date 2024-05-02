@@ -1,4 +1,5 @@
-﻿using Dinners.Domain.Restaurants.RestaurantTables;
+﻿using Dinners.Domain.Restaurants.RestaurantInformations;
+using Dinners.Domain.Restaurants.RestaurantTables;
 using Domain.Restaurants;
 
 namespace Dinners.Domain.Restaurants;
@@ -9,7 +10,7 @@ public interface IRestaurantRepository
 
     Task<Restaurant?> GetRestaurantById(RestaurantId restaurantId);
 
-    Task<List<string>> GetRestaurantImagesUrlById(RestaurantId restaurantId, CancellationToken cancellationToken);
+    Task<string?> GetRestaurantImageUrlById(RestaurantId restaurantId, RestaurantImageUrlId restaurantImageUrlId, CancellationToken cancellationToken);
 
     Task UpdateAsync(Restaurant restaurant);
 
