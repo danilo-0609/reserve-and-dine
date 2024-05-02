@@ -37,7 +37,8 @@ internal sealed class GetReservationByIdQueryHandler : IQueryHandler<GetReservat
             reservation.RestaurantId.Value,
             reservationAttendees,
             reservation.ReservationStatus.Value,
-            reservation.ReservationPaymentId?.Value);
+            reservation.ReservationPaymentId?.Value,
+            reservation.MenuIds.ConvertAll(r => r.Value));
 
         return reservationResponse;
     }
