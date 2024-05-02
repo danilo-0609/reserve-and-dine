@@ -82,4 +82,9 @@ internal sealed class MenuRepository : IMenuRepository
 
         return Task.CompletedTask;
     }
+
+    public async Task DeleteAsync(MenuId menuId)
+    {
+        await _dbContext.Menus.Where(r => r.Id == menuId).ExecuteDeleteAsync();
+    }
 }

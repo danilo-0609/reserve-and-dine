@@ -266,4 +266,9 @@ internal sealed class CacheMenuRepository : IMenuRepository
     {
         await _decorated.UpdateAsync(menu, cancellationToken);
     }
+
+    public async Task DeleteAsync(MenuId menuId)
+    {
+        await _decorated.DeleteAsync(menuId);
+    }
 }

@@ -13,6 +13,8 @@ public interface IMenuRepository
 
     Task UpdateAsync(Menu menu, CancellationToken cancellationToken);
 
+    Task DeleteAsync(MenuId menuId);
+
     Task<List<Menu>> GetMenusByIngredientAsync(string ingredient, CancellationToken cancellationToken);
 
     Task<List<Menu>> GetMenusByNameAsync(string name, CancellationToken cancellationToken);
