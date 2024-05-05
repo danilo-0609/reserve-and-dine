@@ -11,6 +11,8 @@ services:
       - "5001:5001"
     depends_on: 
         - "reservations.testing.database"
+    env_file: 
+        - variables.env
 
   reservations.testing.database: 
      image: mcr.microsoft.com/mssql/server:2022-latest
@@ -21,4 +23,6 @@ services:
        - "1433:1433"
      environment:
        ACCEPT_EULA: "Y"
-       MSSQL_SA_PASSWORD: "SqlP@ssword"
+       MSSQL_SA_PASSWORD: ${SQL_DOCKER_PASSWORD}
+
+   
