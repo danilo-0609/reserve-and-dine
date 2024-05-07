@@ -23,6 +23,7 @@ using Dinners.Infrastructure.Jobs.Setups;
 using Dinners.Infrastructure.Outbox.BackgroundJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Quartz;
@@ -31,17 +32,17 @@ namespace Dinners.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string redisConnectionString, string databaseConnectionString, string dockerDatabaseConnectionString)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMemoryCache();
         services.AddStackExchangeRedisCache(redisOptions =>
         {
-            redisOptions.Configuration = redisConnectionString;
+            redisOptions.Configuration = configuration.GetConnectionString("RedisConnectionString");
         });
 
         services.AddDbContext<DinnersDbContext>(async (sp, optionsBuilder) =>
         {
-            optionsBuilder.UseSqlServer(databaseConnectionString, r => r.EnableRetryOnFailure(4));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerSqlDatabase"), r => r.EnableRetryOnFailure(4));
         });
 
         services.AddQuartzHostedService();
