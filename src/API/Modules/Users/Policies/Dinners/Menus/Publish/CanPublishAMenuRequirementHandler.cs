@@ -49,6 +49,5 @@ public sealed class CanPublishAMenuRequirementHandler : AuthorizationHandler<Can
             await Task.FromResult(0);
             return;
         }
-    
     }
 }
