@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Modules.Users.Migrations
 {
     /// <inheritdoc />
+    /// 
     public partial class Adding_User_Context : Migration
     {
         /// <inheritdoc />

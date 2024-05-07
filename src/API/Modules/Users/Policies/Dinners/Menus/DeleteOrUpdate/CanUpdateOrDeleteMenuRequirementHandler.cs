@@ -7,6 +7,7 @@ namespace API.Modules.Users.Policies.Dinners.Menus.Delete;
 
 public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandler<CanUpdateOrDeleteMenuRequirement>
 {
+
     private readonly IMenuRepository _menuRepository;
     private readonly IRestaurantRepository _restaurantRepository;
 

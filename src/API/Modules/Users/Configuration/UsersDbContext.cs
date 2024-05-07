@@ -18,4 +18,5 @@ public sealed class UsersDbContext : IdentityDbContext<User, IdentityRole<Guid>,
 
         builder.HasDefaultSchema("users");
     }
+
 }

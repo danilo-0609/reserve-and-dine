@@ -17,4 +17,5 @@ public sealed class Role : IdentityRole<Guid>
     public static Role RestaurantAdministrator => new Role(nameof(RestaurantAdministrator), Guid.NewGuid());
 
     public static Role Client => new Role(nameof(Client), Guid.NewGuid());
+
 }

@@ -14,7 +14,7 @@ public sealed class CanPublishAMenuRequirementHandler : AuthorizationHandler<Can
     }
 
     protected override async Task HandleRequirementAsync(
-        AuthorizationHandlerContext context, 
+        AuthorizationHandlerContext context,
         CanPublishAMenuRequirement requirement,
         Guid restaurantId)
     {
@@ -49,5 +49,6 @@ public sealed class CanPublishAMenuRequirementHandler : AuthorizationHandler<Can
             await Task.FromResult(0);
             return;
         }
+    
     }
 }

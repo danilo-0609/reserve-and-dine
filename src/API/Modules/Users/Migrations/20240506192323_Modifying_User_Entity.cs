@@ -4,6 +4,7 @@
 
 namespace API.Modules.Users.Migrations
 {
+
     /// <inheritdoc />
     public partial class Modifying_User_Entity : Migration
     {

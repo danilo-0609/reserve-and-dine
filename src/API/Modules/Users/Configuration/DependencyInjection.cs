@@ -18,6 +18,7 @@ public static class DependencyInjection
                 policy.RequireRole(Role.RestaurantAdministrator.Value);
                 policy.Requirements.Add(new CanPublishAMenuRequirement());
             });
+
         });
 
         services.AddTransient<IAuthorizationHandler, CanPublishAMenuRequirementHandler>();
