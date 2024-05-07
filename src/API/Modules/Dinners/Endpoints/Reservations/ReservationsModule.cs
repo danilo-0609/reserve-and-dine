@@ -8,6 +8,7 @@ using Dinners.Application.Reservations.Payments.Pays;
 using Dinners.Application.Reservations.Request;
 using Dinners.Application.Reservations.Visit;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Modules.Dinners.Endpoints.Reservations;
 
@@ -23,7 +24,7 @@ public sealed class ReservationsModule : CarterModule
 
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var result = await sender.Send(new GetReservationByIdQuery(id));
 
@@ -32,7 +33,7 @@ public sealed class ReservationsModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPost("/request", async (RequestReservationRequest request, ISender sender) =>
+        app.MapPost("/request", async ([FromBody] RequestReservationRequest request, [FromServices] ISender sender) =>
         {
             var result = await sender.Send(new RequestReservationCommand(request.ReservedTable,
                 request.StartReservationDateTime,
@@ -56,7 +57,7 @@ public sealed class ReservationsModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPost("/assist", async (Guid id, ISender sender) =>
+        app.MapPost("/assist", async (Guid id, [FromServices] ISender sender) =>
         {
             var result = await sender.Send(new VisitReservationCommand(id));
 
@@ -65,7 +66,7 @@ public sealed class ReservationsModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/pay", async (Guid id, ISender sender) =>
+        app.MapPut("/pay", async (Guid id, [FromServices] ISender sender) =>
         {
             var result = await sender.Send(new PayReservationCommand(id));
 
@@ -74,7 +75,7 @@ public sealed class ReservationsModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/finish", async (Guid id, ISender sender) =>
+        app.MapPut("/finish", async (Guid id, [FromServices] ISender sender) =>
         {
             var result = await sender.Send(new FinishReservationCommand(id));
 

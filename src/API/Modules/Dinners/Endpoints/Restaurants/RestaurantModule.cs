@@ -46,7 +46,7 @@ public sealed class RestaurantModule : CarterModule
 
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/administrations/{id}", async (Guid id, AddRestaurantAdminRequest request, ISender sender) =>
+        app.MapPost("/administrations/{id}", async (Guid id, [FromBody] AddRestaurantAdminRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new AddAdministrationCommand(id,
                 request.Name,
@@ -58,7 +58,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapDelete("/administrations/{id}", async (Guid id, Guid administratorId, ISender sender) =>
+        app.MapDelete("/administrations/{id}", async (Guid id, Guid administratorId, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new DeleteAdministrationCommand(id, administratorId));
 
@@ -67,7 +67,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/administrations/{id}", async (Guid id, UpdateRestaurantAdminRequest request, ISender sender) =>
+        app.MapPut("/administrations/{id}", async (Guid id, [FromBody] UpdateRestaurantAdminRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpdateAdministrationCommand(id, 
                 request.Name,
@@ -79,7 +79,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("/administrations/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("/administrations/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetRestaurantAdministrationByIdQuery(id));
 
@@ -88,7 +88,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/tables/availables/{id}", async (Guid id, string availableTablesStatus, ISender sender) =>
+        app.MapPut("/tables/availables/{id}", async (Guid id, string availableTablesStatus, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new ModifyAvailableTableStatusCommand(id, availableTablesStatus));
 
@@ -97,7 +97,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/localization/{id}", async (Guid id, ChangeRestaurantLocalizationRequest request, ISender sender) =>
+        app.MapPut("/localization/{id}", async (Guid id, [FromBody] ChangeRestaurantLocalizationRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new ChangeRestaurantLocalizationCommand(id,
                 request.Country,
@@ -112,7 +112,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/close/{id}", async (Guid id, ISender sender) =>
+        app.MapPut("/close/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new CloseRestaurantCommand(id));
 
@@ -121,7 +121,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapDelete("/{id}", async (Guid id, ISender sender) =>
+        app.MapDelete("/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new DeleteRestaurantCommand(id));
 
@@ -130,7 +130,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetRestaurantByIdQuery(id));
 
@@ -139,7 +139,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("/localization", async (GetRestaurantByLocalizationRequest request, ISender sender) =>
+        app.MapGet("/localization", async ([FromBody] GetRestaurantByLocalizationRequest request, [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetRestaurantsByLocalizationQuery(request.Country,
                 request.City,
@@ -151,7 +151,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("/", async (string name, ISender sender) =>
+        app.MapGet("/", async (string name, [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetRestaurantsByNameQuery(name));
 
@@ -160,7 +160,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/schedule/{id}", async (Guid id, ModifyRestaurantScheduleRequest request, ISender sender) =>
+        app.MapPut("/schedule/{id}", async (Guid id, [FromBody] ModifyRestaurantScheduleRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new ModifyRestaurantScheduleCommand(id, request.Day, request.Start, request.End));
 
@@ -169,7 +169,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/open/{id}", async (Guid id, ISender sender) =>
+        app.MapPut("/open/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new OpenRestaurantCommand(id));
 
@@ -178,7 +178,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/contact/{id}", async (Guid id, UpdateRestaurantContactRequest request, ISender sender) =>
+        app.MapPut("/contact/{id}", async (Guid id, [FromBody] UpdateRestaurantContactRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpdateRestaurantContactCommand(id,
                 request.Email,
@@ -195,7 +195,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/information/{id}", async (Guid id, UpdateRestaurantInformationRequest request, ISender sender) =>
+        app.MapPut("/information/{id}", async (Guid id, [FromBody] UpdateRestaurantInformationRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpdateInformationCommand(id,
                 request.Title,
@@ -207,7 +207,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPost("/", async (PostRestaurantRequest request, ISender sender) =>
+        app.MapPost("/", async ([FromBody] PostRestaurantRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new PostRestaurantCommand(request.RestaurantInformation,
                 request.RestaurantLocalization,
@@ -223,7 +223,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapDelete("/rate/{id}", async (Guid id, ISender sender) =>
+        app.MapDelete("/rate/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new DeleteRateCommand(id));
 
@@ -232,7 +232,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("rate/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("rate/{id}", async (Guid id, [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetRateByRestaurantIdQuery(id));
 
@@ -241,7 +241,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPost("/rate/{id}", async (Guid id, RateRestaurantRequest request, ISender sender) =>
+        app.MapPost("/rate/{id}", async (Guid id, [FromBody] RateRestaurantRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new RateRestaurantCommand(id,
                 request.Stars,
@@ -252,7 +252,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/rate/{id}", async (Guid id, UpdateRestaurantRateRequest request, ISender sender) =>
+        app.MapPut("/rate/{id}", async (Guid id, [FromBody] UpdateRestaurantRateRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpgradeRateCommand(id,
                 request.Stars,
@@ -263,7 +263,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("/images/{id}/{imageId}", async (Guid id, Guid imageId, ISender sender) =>
+        app.MapGet("/images/{id}/{imageId}", async (Guid id, Guid imageId, [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetRestaurantImageQuery(id, imageId));
 
@@ -272,7 +272,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/images/{id}", async ([FromForm] IFormFile file, Guid id, ISender sender) =>
+        app.MapPut("/images/{id}", async ([FromForm] IFormFile file, Guid id, [FromServices] ISender sender) =>
         {
             var filePath = await GetFilePath(file);
 
@@ -285,7 +285,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapDelete("/images/{id}/{imageId}", async (Guid id, Guid imageId, ISender sender) =>
+        app.MapDelete("/images/{id}/{imageId}", async (Guid id, Guid imageId, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new RemoveRestaurantImageCommand(id, imageId));
 
@@ -294,7 +294,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPost("/tables/{id}", async (Guid id, AddTableRequest request, ISender sender) =>
+        app.MapPost("/tables/{id}", async (Guid id, [FromBody] AddTableRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new AddTableCommand(id,
                 request.Number,
@@ -308,7 +308,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapDelete("/tables/{id}/{number}", async (Guid id, int number, ISender sender) =>
+        app.MapDelete("/tables/{id}/{number}", async (Guid id, int number, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new DeleteTableCommand(id, number));
 
@@ -326,7 +326,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/tables/{id}", async (Guid id, UpdateTableRequest request, ISender sender) =>
+        app.MapPut("/tables/{id}", async (Guid id, [FromBody] UpdateTableRequest request, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpgradeTableCommand(id,
                 request.Number,
