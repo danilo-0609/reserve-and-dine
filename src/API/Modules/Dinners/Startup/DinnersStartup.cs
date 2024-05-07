@@ -5,10 +5,10 @@ namespace API.Modules.Dinners.Startup;
 
 public static class DinnersStartup
 {
-    public static IServiceCollection AddDinners(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDinners(this IServiceCollection services, string redisConnectionString, string databaseConnectionString, string dockerDatabaseConnectionString)
     {
         services.AddApplication();
-        services.AddInfrastructure(configuration);
+        services.AddInfrastructure(redisConnectionString, databaseConnectionString, dockerDatabaseConnectionString);
 
         return services;
     }
