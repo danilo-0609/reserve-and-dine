@@ -1,30 +1,42 @@
 using API;
 using API.Modules.Dinners.Startup;
+using API.Modules.Users.Configuration;
+using API.Modules.Users.Entities;
+using API.Modules.Users.Policies.Dinners;
 using Carter;
 using Dinners.Infrastructure.Connections;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<IConnectionsManager, ConnectionsManager>();
-//Presentation services
-var blobStorageConnectionString = await new ConnectionsManager().GetAzureBlobStorageConnectionString();
 
-builder.Services.AddPresentation(blobStorageConnectionString);
-
-
-//Modules services
 var connectionsManager = new ConnectionsManager();
-
+var databaseConnectionString = await connectionsManager.GetDatabaseConnectionString();
 var redisConnectionString = await connectionsManager.GetAzureRedisConnectionString();
 var dockerDatabaseConnectionString = await connectionsManager.GetDockerDatabaseConnectionString();
-var databaseConnectionString = await connectionsManager.GetDatabaseConnectionString();
+var azureBlobStorageConnectionString = await connectionsManager.GetAzureBlobStorageConnectionString();
 
-builder.Services.AddDinners(redisConnectionString, databaseConnectionString, dockerDatabaseConnectionString);
+builder.Configuration["ConnectionStrings:AzureSqlDatabase"] = databaseConnectionString;
+builder.Configuration["ConnectionStrings:RedisConnectionString"] = redisConnectionString;
+builder.Configuration["ConnectionStrings:DockerSqlDatabase"] = dockerDatabaseConnectionString;
+builder.Configuration["ConnectionStrings:AzureBlobStorage"] = azureBlobStorageConnectionString;
+
+builder.Services.AddSingleton<IConnectionsManager, ConnectionsManager>();
+builder.Services.AddUsers(builder.Configuration);
+
+//Presentation services
+
+builder.Services.AddPresentation(builder.Configuration);
+
+//Modules services
+builder.Services.AddDinners(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -33,6 +45,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapIdentityApi<User>();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapCarter();
 
