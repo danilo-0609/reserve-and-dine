@@ -4,16 +4,18 @@ using BuildingBlocks.Application;
 using Carter;
 using MassTransit;
 using API.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using API.Modules.Users.Policies.Dinners.Menus.Publish;
 
 namespace API;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services, string blobStorageConnectionString)
+    public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCarter();
 
-        services.AddScoped(serviceProvider => new BlobServiceClient(blobStorageConnectionString));
+        services.AddScoped(serviceProvider => new BlobServiceClient(configuration.GetConnectionString("AzureBlobStorage")));
 
         services.AddSingleton<HttpContextAccessor>();
         services.AddHttpContextAccessor();
