@@ -5,9 +5,8 @@ using System.Security.Claims;
 
 namespace API.Modules.Users.Policies.Dinners.Menus.Delete;
 
-public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandler<CanUpdateOrDeleteMenuRequirement>
+public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandler<CanUpdateOrDeleteMenuRequirement, Guid>
 {
-
     private readonly IMenuRepository _menuRepository;
     private readonly IRestaurantRepository _restaurantRepository;
 
@@ -17,7 +16,7 @@ public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandl
         _menuRepository = menuRepository;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CanUpdateOrDeleteMenuRequirement requirement)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CanUpdateOrDeleteMenuRequirement requirement, Guid menuId)
     {
         string? userIdValue = context.User.Claims
                     .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -30,7 +29,7 @@ public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandl
 
         Guid userId = Guid.Parse(userIdValue);
 
-        var menu = await _menuRepository.GetByIdAsync(MenuId.Create(requirement.MenuId), CancellationToken.None);
+        var menu = await _menuRepository.GetByIdAsync(MenuId.Create(menuId), CancellationToken.None);
     
         if (menu is null)
         {

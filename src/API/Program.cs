@@ -1,20 +1,29 @@
 using API;
 using API.Modules.Dinners.Startup;
-using API.Modules.Users.Configuration;
-using API.Modules.Users.Entities;
-using API.Modules.Users.Policies.Dinners;
+using API.Modules.Users.Startup;
+using API.OptionsSetup;
 using Carter;
 using Dinners.Infrastructure.Connections;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var keyVaultUri = Environment.GetEnvironmentVariable("KEY_VAULT_URI");
 
-var connectionsManager = new ConnectionsManager();
+builder.Configuration["ConnectionStrings:AzureKeyVaultUri"] = keyVaultUri;
+
+var connectionsManager = new ConnectionsManager(builder.Configuration);
 var databaseConnectionString = await connectionsManager.GetDatabaseConnectionString();
 var redisConnectionString = await connectionsManager.GetAzureRedisConnectionString();
 var dockerDatabaseConnectionString = await connectionsManager.GetDockerDatabaseConnectionString();
 var azureBlobStorageConnectionString = await connectionsManager.GetAzureBlobStorageConnectionString();
+
+var jwtIssuer = await connectionsManager.GetJWTIssuer();
+var jwtAudience = await connectionsManager.GetJWTAudience();
+var jwtSecretKey = await connectionsManager.GetJWTSecretKey();
+
+builder.Configuration["JWT:Issuer"] = jwtIssuer;
+builder.Configuration["JWT:Audience"] = jwtAudience;
+builder.Configuration["JWT:SecretKey"] = jwtSecretKey;
 
 builder.Configuration["ConnectionStrings:AzureSqlDatabase"] = databaseConnectionString;
 builder.Configuration["ConnectionStrings:RedisConnectionString"] = redisConnectionString;
@@ -22,6 +31,8 @@ builder.Configuration["ConnectionStrings:DockerSqlDatabase"] = dockerDatabaseCon
 builder.Configuration["ConnectionStrings:AzureBlobStorage"] = azureBlobStorageConnectionString;
 
 builder.Services.AddSingleton<IConnectionsManager, ConnectionsManager>();
+builder.Services.ConfigureOptions<JwtOptionsSetup>();
+
 builder.Services.AddUsers(builder.Configuration);
 
 //Presentation services
@@ -45,8 +56,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.MapIdentityApi<User>();
 
 app.UseAuthentication();
 
