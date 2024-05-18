@@ -19,7 +19,7 @@ namespace Dinners.Infrastructure;
 public sealed class DinnersDbContext : DbContext, IApplicationDbContext
 {
 
-    public DinnersDbContext(DbContextOptions<DinnersDbContext> options) 
+    public DinnersDbContext(DbContextOptions<DinnersDbContext> options)
         : base(options)
     {
     }

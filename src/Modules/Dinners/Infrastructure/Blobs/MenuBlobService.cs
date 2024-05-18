@@ -57,7 +57,7 @@ internal sealed class MenuBlobService : IMenuBlobService
 
         var blobClient = containerClient.GetBlobClient(fileName);
 
-        var response = await blobClient.UploadAsync(filePath, true);
+        await blobClient.UploadAsync(filePath, true);
 
         return blobClient.Uri.ToString();
     }
