@@ -28,7 +28,7 @@ public static class DependencyInjection
 
         services.AddDbContext<UsersDbContext>((sp, optionsBuilder) =>
         {
-            optionsBuilder.UseSqlServer("Server=localhost,1433;Initial Catalog=RestaurantReservations;User ID =sa;Password=SqlP@ssword;TrustServerCertificate=True;", 
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerSqlDatabase"), 
                 r => r.EnableRetryOnFailure(4));
 
             optionsBuilder.EnableSensitiveDataLogging();
@@ -45,6 +45,7 @@ public static class DependencyInjection
             sp.GetRequiredService<UsersDbContext>());
 
         services.AddScoped<IJwtProvider, JwtProvider>();
+        services.AddScoped<ITokenSetService, TokenSetService>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
