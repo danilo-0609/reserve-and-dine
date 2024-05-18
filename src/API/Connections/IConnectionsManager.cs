@@ -1,4 +1,4 @@
-﻿namespace Dinners.Infrastructure.Connections;
+﻿namespace API.Connections;
 
 public interface IConnectionsManager
 {
@@ -9,4 +9,10 @@ public interface IConnectionsManager
     Task<string> GetAzureRedisConnectionString();
 
     Task<string> GetDockerDatabaseConnectionString();
+
+    Task<string> GetJWTIssuer();
+
+    Task<string> GetJWTAudience();
+
+    Task<string> GetJWTSecretKey();
 }

@@ -3,7 +3,7 @@ using API.Modules.Dinners.Startup;
 using API.Modules.Users.Startup;
 using API.OptionsSetup;
 using Carter;
-using Dinners.Infrastructure.Connections;
+using API.Connections;
 
 var builder = WebApplication.CreateBuilder(args);
 
