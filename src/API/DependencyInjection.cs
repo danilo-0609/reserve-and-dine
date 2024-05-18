@@ -13,7 +13,6 @@ using API.Modules.Users.Policies.Dinners.Menus;
 using API.Modules.Users.Policies.Dinners;
 using Microsoft.AspNetCore.Authorization;
 using API.Modules.Users.Policies.Dinners.Menus.Publish;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 
 namespace API;
 

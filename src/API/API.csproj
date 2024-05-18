@@ -10,10 +10,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.11.2" />
+    <PackageReference Include="Azure.Identity" Version="1.11.3" />
     <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.6.0" />
     <PackageReference Include="Carter" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -25,10 +34,14 @@
     <ProjectReference Include="..\Modules\Dinners\Application\Dinners.Application.csproj" />
     <ProjectReference Include="..\Modules\Dinners\Infrastructure\Dinners.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Dinners\IntegrationEvents\Dinners.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\Modules\Users\Application\Users.Application.csproj" />
+    <ProjectReference Include="..\Modules\Users\Infrastructure\Users.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\Users\" />
+    <Folder Include="Modules\Users\Policies\Administrations\" />
+    <Folder Include="Modules\Users\Policies\Dinners\Restaurants\" />
+    <Folder Include="Modules\Users\Policies\Dinners\Reservations\" />
   </ItemGroup>
 
 </Project>
