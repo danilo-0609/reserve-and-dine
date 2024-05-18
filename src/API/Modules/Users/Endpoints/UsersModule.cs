@@ -1,14 +1,39 @@
-﻿using Carter;
+﻿using API.Configuration;
+using API.Modules.Users.Requests;
+using Carter;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Users.Application.Abstractions;
+using Users.Application.Users.Login;
 
 namespace API.Modules.Users.Endpoints;
 
-public class UsersModule : CarterModule
+public sealed class UsersModule : CarterModule
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UsersModule(IHttpContextAccessor httpContextAccessor)
+        : base("users")
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("login", () =>
+        app.MapPost("login", async ([FromServices] ISender sender, 
+            [FromServices] ITokenSetService tokenSetService, 
+            [FromBody] LoginRequest request) =>
         {
-            return Results.Ok();
+            var result = await sender.Send(new LoginUserCommand(request.Email, request.Password));
+
+            if (!result.IsError)
+            {
+                tokenSetService.SetTokenInsideCookie(result.Value, _httpContextAccessor.HttpContext!);
+            }
+
+            return result.Match(
+                onValue => Results.Ok(),
+                onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
     }
 }
