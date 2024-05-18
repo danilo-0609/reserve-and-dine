@@ -9,6 +9,7 @@ using Dinners.Domain.Restaurants.RestaurantRatings;
 using Dinners.Domain.Restaurants.RestaurantSchedules;
 using Dinners.Domain.Restaurants.RestaurantTables;
 using Dinners.Domain.Restaurants.RestaurantUsers;
+using Dinners.Domain.Restaurants.RestaurantUsers.Events;
 using Dinners.Domain.Restaurants.Rules;
 using ErrorOr;
 using System.Data;
@@ -539,6 +540,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             administratorTitle);
 
         _restaurantAdministrations.Add(restaurantAdministration);
+
+        AddDomainEvent(new NewRestaurantAdministratorAddedDomainEvent(Guid.NewGuid(),
+            newAdministratorId,
+            DateTime.UtcNow));
 
         return restaurantAdministration;
     }
