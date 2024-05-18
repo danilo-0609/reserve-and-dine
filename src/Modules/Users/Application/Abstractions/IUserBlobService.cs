@@ -1,6 +1,6 @@
 ﻿using BuildingBlocks.Application;
 
-namespace Users.Application.Common;
+namespace Users.Application.Abstractions;
 
 public interface IUserBlobService
 {

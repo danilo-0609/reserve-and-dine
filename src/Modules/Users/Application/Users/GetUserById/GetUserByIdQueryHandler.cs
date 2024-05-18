@@ -19,7 +19,7 @@ internal sealed class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, 
 
         if (user is null)
         {
-            return Error.NotFound("User.NotFound", "User was not found");
+            return UserErrorCodes.NotFound;
         }
 
         UserResponse userResponse = new(user.Id.Value,
