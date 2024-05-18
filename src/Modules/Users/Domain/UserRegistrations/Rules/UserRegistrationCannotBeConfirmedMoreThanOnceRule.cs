@@ -1,5 +1,5 @@
 ﻿using BuildingBlocks.Domain.Rules;
-using Users.Domain.UserRegistrations.Errors;
+using ErrorOr;
 
 namespace Users.Domain.UserRegistrations.Rules;
 
@@ -12,7 +12,7 @@ internal sealed class UserRegistrationCannotBeConfirmedMoreThanOnceRule : IBusin
         _actualRegistrationStatus = userRegistrationStatus;
     }
 
-    public Error Error => UserRegistrationErrors.AlreadyConfirmed;
+    public Error Error => UserRegistrationErrorCodes.AlreadyConfirmed;
 
     public bool IsBroken() => _actualRegistrationStatus == UserRegistrationStatus.Confirmed;
 

@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Domain.Rules;
 using ErrorOr;
-using Users.Domain.UserRegistrations.Errors;
 
 namespace Users.Domain.UserRegistrations.Rules;
 
@@ -14,7 +13,7 @@ internal sealed class UserRegistrationCannotBeConfirmedAfterExpirationRule : IBu
         _actualRegistrationStatus = userRegistrationStatus;
     }
 
-    public Error Error => UserRegistrationErrors.ConfirmedAfterExpiration;
+    public Error Error => UserRegistrationErrorCodes.ConfirmedAfterExpiration;
 
     public bool IsBroken() => _actualRegistrationStatus == UserRegistrationStatus.Expired;
 

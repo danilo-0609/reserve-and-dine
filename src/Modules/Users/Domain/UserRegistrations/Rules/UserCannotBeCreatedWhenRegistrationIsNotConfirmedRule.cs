@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Domain.Rules;
 using ErrorOr;
-using Users.Domain.UserRegistrations.Errors;
 
 namespace Users.Domain.UserRegistrations.Rules;
 
@@ -14,7 +13,7 @@ internal class UserCannotBeCreatedWhenRegistrationIsNotConfirmedRule : IBusiness
         _actualRegistrationStatus = userRegistrationStatus;
     }
 
-    public Error Error => UserRegistrationErrors.RegistrationIsNotConfirmed;
+    public Error Error => UserRegistrationErrorCodes.RegistrationIsNotConfirmed;
 
     public bool IsBroken() => _actualRegistrationStatus != UserRegistrationStatus.Confirmed;
 

@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Domain.Rules;
 using ErrorOr;
-using Users.Domain.UserRegistrations.Errors;
 
 namespace Users.Domain.UserRegistrations.Rules;
 
@@ -14,7 +13,7 @@ internal sealed class UserRegistrationCannotBeExpiredMoreThanOnceRule : IBusines
         _actualRegistrationStatus = actualRegistrationStatus;
     }
 
-    public Error Error => UserRegistrationErrors.AlreadyExpired;
+    public Error Error => UserRegistrationErrorCodes.AlreadyExpired;
 
     public bool IsBroken() => _actualRegistrationStatus == UserRegistrationStatus.Expired;
 

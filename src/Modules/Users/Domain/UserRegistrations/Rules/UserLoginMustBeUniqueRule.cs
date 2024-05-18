@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Domain.Rules;
 using ErrorOr;
-using Users.Domain.UserRegistrations.Errors;
 
 namespace Users.Domain.UserRegistrations.Rules;
 
@@ -16,7 +15,7 @@ internal sealed class UserLoginMustBeUniqueRule : IBusinessRule
         _usersCounter = usersCounter;
     }
 
-    public Error Error => UserRegistrationErrors.LoginIsNotUnique;
+    public Error Error => UserRegistrationErrorCodes.LoginIsNotUnique;
 
     public bool IsBroken() => _usersCounter.CountUsersWithLogin(_login) > 0;
 

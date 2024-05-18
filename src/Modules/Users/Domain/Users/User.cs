@@ -55,9 +55,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
         string login,
         string password,
         string email,
-        string firstName,
-        string lastName,
-        string address,
         List<Role> roles,
         DateTime createdDateTime,
         DateTime updatedDateTime,
@@ -68,15 +65,15 @@ public sealed class User : AggregateRoot<UserId, Guid>
             login,
             Password.Create(password),
             email,
-            true,
-            firstName,
-            lastName,
-            $"{firstName} {lastName}",
-            address,
             roles,
             profileImageName,
             createdDateTime,
             updatedDateTime);
+    }
+
+    public void ChangePassword(Password password)
+    {
+        Password = password;
     }
 
     public void AddRole(Role role)
@@ -87,6 +84,11 @@ public sealed class User : AggregateRoot<UserId, Guid>
     public void SetProfileImageUrl(string url)
     {
         ProfileImageUrl = url;
+    }
+
+    public void DeleteProfileImageUrl()
+    {
+        ProfileImageUrl = "";
     }
 
     private User(
@@ -116,11 +118,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
     string login,
     Password password,
     string email,
-    bool isActive,
-    string firstName,
-    string lastName,
-    string name,
-    string address,
     List<Role> roles,
     string profileImageName,
     DateTime createdDateTime,

@@ -28,9 +28,6 @@ public sealed class UserRegistration : AggregateRoot<UserRegistrationId, Guid>
         string login,
         string password,
         string email,
-        string firstName,
-        string lastName,
-        string address,
         IUsersCounter usersCounter,
         DateTime registeredDate)
     {
