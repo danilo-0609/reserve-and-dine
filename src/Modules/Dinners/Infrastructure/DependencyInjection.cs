@@ -35,14 +35,11 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMemoryCache();
-        services.AddStackExchangeRedisCache(redisOptions =>
-        {
-            redisOptions.Configuration = configuration.GetConnectionString("RedisConnectionString");
-        });
+        services.AddDistributedMemoryCache();
 
         services.AddDbContext<DinnersDbContext>(async (sp, optionsBuilder) =>
         {
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerSqlDatabase"), r => r.EnableRetryOnFailure(4));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerSqlDatabase"));
         });
 
         services.AddQuartzHostedService();
