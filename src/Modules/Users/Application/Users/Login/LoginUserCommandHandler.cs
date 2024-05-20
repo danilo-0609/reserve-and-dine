@@ -26,7 +26,9 @@ internal sealed class LoginUserCommandHandler : ICommandHandler<LoginUserCommand
             return UserErrorCodes.NotFound;
         }
 
-        if (user.Password != Password.Create(request.Password))
+        var passwordRequested = Password.CreateUnique(request.Password);
+
+        if (passwordRequested != user.Password)
         {
             return UserErrorCodes.IncorrectPassword;
         }
