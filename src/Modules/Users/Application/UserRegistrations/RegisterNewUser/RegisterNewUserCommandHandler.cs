@@ -1,31 +1,28 @@
 ﻿using ErrorOr;
 using Users.Application.Common;
 using Users.Domain.UserRegistrations;
+using Users.Domain.Users;
 
 namespace Users.Application.UserRegistrations.RegisterNewUser;
 
 internal sealed class RegisterNewUserCommandHandler : ICommandHandler<RegisterNewUserCommand, ErrorOr<Guid>>
 {
     private readonly IUserRegistrationRepository _userRegistrationRepository;
-    private readonly IUsersCounter _usersCounter;
+    private readonly IUserRepository _userRepository;
 
-    public RegisterNewUserCommandHandler(IUserRegistrationRepository userRegistrationRepository, IUsersCounter usersCounter)
+    public RegisterNewUserCommandHandler(IUserRegistrationRepository userRegistrationRepository, IUsersCounter usersCounter, IUserRepository userRepository)
     {
         _userRegistrationRepository = userRegistrationRepository;
-        _usersCounter = usersCounter;
+        _userRepository = userRepository;
     }
 
     public async Task<ErrorOr<Guid>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken)
     {
-        var userRegistration = UserRegistration.RegisterNewUser(request.Login,
-            request.Password,
-            request.Email,
-            _usersCounter,
-            DateTime.UtcNow);
-    
-        if (userRegistration.IsError)
+        var isLoginUnique = await _userRepository.IsLoginUnique(request.Login, cancellationToken);
+
+        if (isLoginUnique is false)
         {
-            return userRegistration.FirstError;
+            return UserRegistrationErrorCodes.LoginIsNotUnique;
         }
 
         var isEmailUnique = await _userRegistrationRepository.IsEmailUnique(request.Email, cancellationToken);
@@ -35,8 +32,13 @@ internal sealed class RegisterNewUserCommandHandler : ICommandHandler<RegisterNe
             return UserRegistrationErrorCodes.EmailIsNotUnique;
         }
 
-        await _userRegistrationRepository.AddAsync(userRegistration.Value);
+        var userRegistration = UserRegistration.RegisterNewUser(request.Login,
+            request.Password,
+            request.Email,
+            DateTime.UtcNow);
 
-        return userRegistration.Value.Id.Value;
+        await _userRegistrationRepository.AddAsync(userRegistration);
+
+        return userRegistration.Id.Value;
     }
 }
