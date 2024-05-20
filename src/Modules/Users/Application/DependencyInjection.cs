@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Users.Application.Services;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 
 namespace Users.Application;
 
@@ -32,6 +33,14 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(ApplicationAssemblyReference.Assembly, includeInternalTypes: true);
 
+        services.AddSingleton(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+
+            var connectionString = configuration.GetConnectionString("DockerSqlDatabase");
+
+            return new SqlConnectionFactory(connectionString!);
+        });
 
         return services;
     }
