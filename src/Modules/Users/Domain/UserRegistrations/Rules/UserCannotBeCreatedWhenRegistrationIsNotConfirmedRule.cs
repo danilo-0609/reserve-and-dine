@@ -15,7 +15,7 @@ internal class UserCannotBeCreatedWhenRegistrationIsNotConfirmedRule : IBusiness
 
     public Error Error => UserRegistrationErrorCodes.RegistrationIsNotConfirmed;
 
-    public bool IsBroken() => _actualRegistrationStatus != UserRegistrationStatus.Confirmed;
+    public bool IsBroken() => _actualRegistrationStatus.Value != UserRegistrationStatus.Confirmed.Value;
 
     public static string Message => "User cannot be created when registration is not confirmed";
 }

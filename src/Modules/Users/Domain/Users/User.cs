@@ -15,8 +15,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
 
     public string Email { get; private set; }
 
-    public List<Role> Roles { get; private set; }
-
     public string ProfileImageUrl { get; private set; } = string.Empty;
 
     public DateTime CreatedDateTime { get; private set; }
@@ -35,10 +33,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
             login,
             password,
             email,
-            new List<Role>()
-            {
-                Role.Client
-            },
             createdDateTime,
             null);
 
@@ -55,7 +49,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
         string login,
         string password,
         string email,
-        List<Role> roles,
         DateTime createdDateTime,
         DateTime updatedDateTime,
         string profileImageName = "")
@@ -65,7 +58,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
             login,
             Password.Create(password),
             email,
-            roles,
             profileImageName,
             createdDateTime,
             updatedDateTime);
@@ -74,11 +66,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
     public void ChangePassword(Password password)
     {
         Password = password;
-    }
-
-    public void AddRole(Role role)
-    {
-        Roles.Add(role);
     }
 
     public void SetProfileImageUrl(string url)
@@ -96,7 +83,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
         string login,
         Password password,
         string email,
-        List<Role> roles,
         DateTime createdDateTime,
         DateTime? updatedDateTime)
         : base(id)
@@ -105,8 +91,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
         Login = login;
         Password = password;
         Email = email;
-
-        Roles = roles;
 
         ProfileImageUrl = "";
         CreatedDateTime = createdDateTime;
@@ -118,7 +102,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
     string login,
     Password password,
     string email,
-    List<Role> roles,
     string profileImageName,
     DateTime createdDateTime,
     DateTime? updatedDateTime)
@@ -129,7 +112,6 @@ public sealed class User : AggregateRoot<UserId, Guid>
         Password = password;
         Email = email;
 
-        Roles = roles;
 
         ProfileImageUrl = profileImageName;
         CreatedDateTime = createdDateTime;

@@ -8,8 +8,8 @@ public static class UserErrorCodes
         Error.NotFound("User.NotFound", "User was not found");
 
     public static Error IncorrectPassword =>
-        Error.Unauthorized("User.IncorrectPassword", "Password is incorrect");
+        Error.Validation("User.IncorrectPassword", "Password is incorrect");
 
     public static Error PasswordConfirmationIncorrect =>
-        Error.Unauthorized("User.PasswordConfirmationIncorrect", "Password confirmation is incorrect. Doesn not match the new password");
+        Error.Validation("User.PasswordConfirmationIncorrect", "Password confirmation is incorrect. Doesn not match the new password");
 }

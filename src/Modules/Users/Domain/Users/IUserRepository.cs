@@ -11,4 +11,6 @@ public interface IUserRepository
     Task UpdateAsync(User user, CancellationToken cancellationToken);
 
     Task AddAsync(User user, CancellationToken cancellationToken);
+
+    Task<bool> IsLoginUnique(string login, CancellationToken cancellationToken);
 }

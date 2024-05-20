@@ -24,11 +24,10 @@ public sealed class UserRegistration : AggregateRoot<UserRegistrationId, Guid>
 
     public DateTime? ConfirmedDate { get; private set; }
 
-    public static ErrorOr<UserRegistration> RegisterNewUser(
+    public static UserRegistration RegisterNewUser(
         string login,
         string password,
         string email,
-        IUsersCounter usersCounter,
         DateTime registeredDate)
     {
         Password hash = Password.CreateUnique(password);
@@ -42,12 +41,6 @@ public sealed class UserRegistration : AggregateRoot<UserRegistrationId, Guid>
             UserRegistrationStatus.WaitingForConfirmation,
             null);
 
-        var isLoginUnique = userRegistration.CheckRule(new UserLoginMustBeUniqueRule(login, usersCounter));
-
-        if (isLoginUnique.IsError)
-        {
-            return isLoginUnique.FirstError;
-        }
 
         userRegistration.AddDomainEvent(new NewUserRegisteredDomainEvent(
             Guid.NewGuid(),
