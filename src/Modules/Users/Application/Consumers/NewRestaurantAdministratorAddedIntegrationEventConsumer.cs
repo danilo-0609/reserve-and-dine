@@ -16,19 +16,8 @@ internal sealed class NewRestaurantAdministratorAddedIntegrationEventConsumer : 
         _unitOfWork = unitOfWork;
     }
 
-    public async Task Consume(ConsumeContext<NewRestaurantAdministratorAddedIntegrationEvent> context)
+    public Task Consume(ConsumeContext<NewRestaurantAdministratorAddedIntegrationEvent> context)
     {
-        var user = await _userRepository.GetByIdAsync(UserId.Create(context.Message.UserId), CancellationToken.None);
-    
-        if (user is null)
-        {
-            throw new ArgumentNullException(nameof(user));
-        }
-
-        user.AddRole(Role.RestaurantAdministrator);
-
-        await _userRepository.UpdateAsync(user, CancellationToken.None);
-
-        await _unitOfWork.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 }
