@@ -29,7 +29,7 @@ internal sealed class UserRegistrationRepository : IUserRegistrationRepository
 
     public async Task<bool> IsEmailUnique(string email, CancellationToken cancellationToken)
     {
-        return await _dbContext
+        return !await _dbContext
             .UserRegistrations
             .AnyAsync(r => r.Email == email);
     }

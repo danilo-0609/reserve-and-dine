@@ -19,8 +19,6 @@ public sealed class UsersDbContext : DbContext, IUsersDbContext
 
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
-    public DbSet<Role> Roles { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(UsersDbContext).Assembly);

@@ -35,6 +35,13 @@ internal sealed class UserRepository : IUserRepository
             .SingleOrDefaultAsync();
     }
 
+    public async Task<bool> IsLoginUnique(string login, CancellationToken cancellationToken)
+    {
+        return !await _dbContext
+            .Users
+            .AnyAsync(t => t.Login == login, cancellationToken);
+    }
+
     public Task UpdateAsync(User user, CancellationToken cancellationToken)
     {
         _dbContext.Users.Update(user);

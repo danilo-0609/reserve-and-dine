@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Users.Domain.Common;
 using Users.Domain.Users;
 
 namespace Users.Infrastructure.Domain.Users;
@@ -22,17 +23,15 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(r => r.Login)
             .HasColumnName("Login");
 
-        builder.ComplexProperty(r => r.Password, x =>
+        builder.OwnsOne<Password>("Password", p =>
         {
-            x.Property(r => r.Value)
-                .HasColumnName("Password");
+            p.Property(p => p.Value)
+             .HasColumnName("Password")
+             .HasMaxLength(150);
         });
 
         builder.Property(r => r.Email)
             .HasColumnName("Email");
-
-        builder.HasMany(r => r.Roles)
-            .WithMany().UsingEntity<UserRole>();
 
         builder.Property(r => r.ProfileImageUrl)
             .HasColumnName("ProfileImageUrl");

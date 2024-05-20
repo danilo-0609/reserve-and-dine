@@ -13,11 +13,15 @@ public class DatabaseDesignTimeDbContextFactory : IDesignTimeDbContextFactory<Us
         _configuration = configuration;
     }
 
+    public DatabaseDesignTimeDbContextFactory()
+    {
+    }
+
     public UsersDbContext CreateDbContext(string[] args)
     {
         var builder = new DbContextOptionsBuilder<UsersDbContext>();
         
-        builder.UseSqlServer(_configuration.GetConnectionString("DockerSqlDatabase"),
+        builder.UseSqlServer(_configuration.GetConnectionString("DockerSQlDatabase"),
                 r => r.EnableRetryOnFailure(4));
 
         return new UsersDbContext(builder.Options);
