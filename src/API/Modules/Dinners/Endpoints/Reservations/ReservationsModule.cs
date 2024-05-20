@@ -31,7 +31,8 @@ public sealed class ReservationsModule : CarterModule
             return result.Match(
                 onValue => Results.Ok(onValue),
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
 
         app.MapPost("/request", async ([FromBody] RequestReservationRequest request, [FromServices] ISender sender) =>
         {
