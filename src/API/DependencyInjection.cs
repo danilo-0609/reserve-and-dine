@@ -9,10 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Users.Infrastructure.Authentication;
-using API.Modules.Users.Policies.Dinners.Menus;
-using API.Modules.Users.Policies.Dinners;
 using Microsoft.AspNetCore.Authorization;
-using API.Modules.Users.Policies.Dinners.Menus.Publish;
+using API.AuthorizationPolicies.Dinners.Menus.DeleteOrUpdate;
+using API.AuthorizationPolicies.Dinners.Menus.Publish;
+using API.AuthorizationPolicies;
 
 namespace API;
 
@@ -65,16 +65,7 @@ public static class DependencyInjection
             };
         });
 
-        services.AddTransient<IAuthorizationRequirement, CanUpdateOrDeleteMenuRequirement>();
-        services.AddTransient<IAuthorizationRequirement, CanPublishAMenuRequirement>();
-
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(Policy.CanDeleteOrUpdateMenu, x =>
-            {
-                x.AddRequirements(new CanUpdateOrDeleteMenuRequirement());
-            });
-        });
+        services.AddAuthorizationPolicies();
 
         //Exception handlers
         services.AddExceptionHandler<GlobalExceptionHandler>();
