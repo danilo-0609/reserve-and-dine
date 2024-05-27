@@ -28,7 +28,9 @@ internal sealed class LoginUserCommandHandler : ICommandHandler<LoginUserCommand
 
         var passwordRequested = Password.CreateUnique(request.Password);
 
-        if (passwordRequested != user.Password)
+        Console.WriteLine($"Passwords: Created: {passwordRequested.Value}, In database: {user.Password.Value}");
+
+        if (passwordRequested.Value != user.Password.Value)
         {
             return UserErrorCodes.IncorrectPassword;
         }
