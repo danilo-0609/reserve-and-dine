@@ -1,7 +1,6 @@
-﻿using API.Configuration;
+﻿using API.AuthorizationPolicies.Dinners.Menus.Publish;
+using API.Configuration;
 using API.Modules.Dinners.Requets;
-using API.Modules.Users.Policies.Dinners;
-using API.Modules.Users.Policies.Dinners.Menus.Publish;
 using Carter;
 using Dinners.Application.Menus.GetById;
 using Dinners.Application.Menus.GetByIngredients;

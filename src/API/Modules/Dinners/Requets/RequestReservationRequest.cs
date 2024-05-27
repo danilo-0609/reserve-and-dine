@@ -1,8 +1,9 @@
 ﻿namespace API.Modules.Dinners.Requets;
 
 public sealed record RequestReservationRequest(int ReservedTable,
-        DateTime StartReservationDateTime,
-        DateTime EndReservationDateTime,
+        string Start,
+        string End,
+        DateTime ReservationDateTime,
         Guid RestaurantId,
         string Name,
         int NumberOfAttendees,
