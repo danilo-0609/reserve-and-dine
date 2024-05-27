@@ -6,11 +6,11 @@ namespace API.AuthorizationPolicies.Dinners.Menus.Publish;
 
 public sealed class CanPublishAMenuRequirementHandler : AuthorizationHandler<CanPublishAMenuRequirement, Guid>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IRestaurantRepository _restaurantRepository;
 
-    public CanPublishAMenuRequirementHandler(IServiceProvider serviceProvider)
+    public CanPublishAMenuRequirementHandler(IRestaurantRepository restaurantRepository)
     {
-        _serviceProvider = serviceProvider;
+        _restaurantRepository = restaurantRepository;
     }
 
     protected override async Task HandleRequirementAsync(
@@ -23,31 +23,25 @@ public sealed class CanPublishAMenuRequirementHandler : AuthorizationHandler<Can
 
         if (userIdValue is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
         Guid userId = Guid.Parse(userIdValue);
 
-        using (var scope = _serviceProvider.CreateAsyncScope())
+       
+        var restaurant = await _restaurantRepository.GetRestaurantById(RestaurantId.Create(restaurantId));
+
+        if (restaurant is null)
         {
-            var restaurantRepository = scope.ServiceProvider.GetRequiredService<IRestaurantRepository>();
-
-            var restaurant = await restaurantRepository.GetRestaurantById(RestaurantId.Create(restaurantId));
-
-            if (restaurant is null)
-            {
-                await Task.FromResult(0);
-                return;
-            }
-
-            if (restaurant.RestaurantAdministrations.Any(r => r.AdministratorId == userId))
-            {
-                context.Succeed(requirement);
-            }
-
-            await Task.FromResult(0);
             return;
         }
+
+        if (restaurant.RestaurantAdministrations.Any(r => r.AdministratorId == userId))
+        {
+            context.Succeed(requirement);
+        }
+
+        return;
+
     }
 }

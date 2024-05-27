@@ -2,6 +2,6 @@
 
 namespace API.AuthorizationPolicies.Dinners.Reservations.Get;
 
-public class CanGetReservationRequirement : IAuthorizationRequirement
+public sealed class CanGetReservationRequirement : IAuthorizationRequirement
 {
 }

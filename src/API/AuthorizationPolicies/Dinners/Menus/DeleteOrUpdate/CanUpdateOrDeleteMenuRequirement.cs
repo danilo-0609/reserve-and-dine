@@ -2,6 +2,6 @@
 
 namespace API.AuthorizationPolicies.Dinners.Menus.DeleteOrUpdate;
 
-public sealed class CanUpdateOrDeleteMenuRequirement : IAuthorizationRequirement
+public sealed class CanUpdateOrDeleteMenuRequirement :  IAuthorizationRequirement
 {
 }

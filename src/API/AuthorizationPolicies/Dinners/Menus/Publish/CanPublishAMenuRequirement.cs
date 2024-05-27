@@ -2,6 +2,6 @@
 
 namespace API.AuthorizationPolicies.Dinners.Menus.Publish;
 
-public sealed class CanPublishAMenuRequirement : IAuthorizationRequirement
+public sealed class CanPublishAMenuRequirement :  IAuthorizationRequirement
 {
 }

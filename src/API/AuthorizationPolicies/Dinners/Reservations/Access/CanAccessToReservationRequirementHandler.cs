@@ -21,7 +21,6 @@ public class CanAccessToReservationRequirementHandler : AuthorizationHandler<Can
 
         if (userIdValue is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
@@ -34,7 +33,6 @@ public class CanAccessToReservationRequirementHandler : AuthorizationHandler<Can
             context.Succeed(requirement);
         }
 
-        await Task.FromResult(0);
         return;
     }
 }

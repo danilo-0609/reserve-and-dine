@@ -23,7 +23,6 @@ public class CanGetReservationRequirementHandler : AuthorizationHandler<CanGetRe
 
         if (userIdValue is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
@@ -34,7 +33,6 @@ public class CanGetReservationRequirementHandler : AuthorizationHandler<CanGetRe
 
         if (reservation is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
@@ -43,7 +41,6 @@ public class CanGetReservationRequirementHandler : AuthorizationHandler<CanGetRe
 
         if (restaurant is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
@@ -53,7 +50,6 @@ public class CanGetReservationRequirementHandler : AuthorizationHandler<CanGetRe
             context.Succeed(requirement);
         }
 
-        await Task.FromResult(0);
         return;
     }
 }

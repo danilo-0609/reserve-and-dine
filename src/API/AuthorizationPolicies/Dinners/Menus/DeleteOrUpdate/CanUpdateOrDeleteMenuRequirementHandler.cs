@@ -23,7 +23,6 @@ public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandl
 
         if (userIdValue is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
@@ -33,7 +32,6 @@ public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandl
 
         if (menu is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
@@ -41,7 +39,6 @@ public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandl
 
         if (restaurant is null)
         {
-            await Task.FromResult(0);
             return;
         }
 
@@ -50,7 +47,6 @@ public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandl
             context.Succeed(requirement);
         }
 
-        await Task.FromResult(0);
         return;
     }
 }
