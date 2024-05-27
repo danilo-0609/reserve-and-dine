@@ -39,9 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\Users\Policies\Administrations\" />
-    <Folder Include="Modules\Users\Policies\Dinners\Restaurants\" />
-    <Folder Include="Modules\Users\Policies\Dinners\Reservations\" />
+    <Folder Include="AuthorizationPolicies\Dinners\Restaurants\" />
   </ItemGroup>
 
 </Project>

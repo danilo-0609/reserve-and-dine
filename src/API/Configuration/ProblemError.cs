@@ -1,6 +1,6 @@
 ﻿using API.Common.Http;
 using ErrorOr;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 namespace API.Configuration;
 
 public sealed class ProblemError 
