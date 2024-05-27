@@ -10,34 +10,33 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
     {
-        services.AddTransient<IAuthorizationRequirement, CanUpdateOrDeleteMenuRequirement>();
-        services.AddTransient<IAuthorizationRequirement, CanPublishAMenuRequirement>();
-        services.AddTransient<IAuthorizationRequirement, CanAccessToReservationRequirement>();
-        services.AddTransient<IAuthorizationRequirement, CanGetReservationRequirement>();
-
         services.AddAuthorization(options =>
         {
             options.AddPolicy(Policy.CanDeleteOrUpdateMenu, x =>
             {
-                x.AddRequirements(new CanUpdateOrDeleteMenuRequirement());
+                x.Requirements.Add(new CanUpdateOrDeleteMenuRequirement());
             });
 
             options.AddPolicy(Policy.CanPublishMenu, x =>
             {
-                x.AddRequirements(new CanPublishAMenuRequirement());
+                x.Requirements.Add(new CanPublishAMenuRequirement());
             });
 
             options.AddPolicy(Policy.CanAccessToReservation, x =>
             {
-                x.AddRequirements(new CanAccessToReservationRequirement());
+                x.Requirements.Add(new CanAccessToReservationRequirement());
             });
 
             options.AddPolicy(Policy.CanGetReservation, x =>
             {
-                x.AddRequirements(new CanGetReservationRequirement());
+                x.Requirements.Add(new CanGetReservationRequirement());
             });
         });
 
+        services.AddScoped<IAuthorizationHandler, CanUpdateOrDeleteMenuRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, CanPublishAMenuRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, CanAccessToReservationRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, CanGetReservationRequirementHandler>();
 
         return services;
     }
