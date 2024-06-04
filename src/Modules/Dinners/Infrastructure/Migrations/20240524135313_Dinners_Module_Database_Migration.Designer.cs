@@ -5,6 +5,7 @@ using Dinners.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,9 +13,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dinners.Infrastructure.Migrations
 {
     [DbContext(typeof(DinnersDbContext))]
-    partial class DinnersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240524135313_Dinners_Module_Database_Migration")]
+    partial class Dinners_Module_Database_Migration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -936,12 +939,12 @@ namespace Dinners.Infrastructure.Migrations
                                     b2.Property<Guid>("RestaurantScheduleId")
                                         .HasColumnType("uniqueidentifier");
 
-                                    b2.Property<TimeSpan>("End")
-                                        .HasColumnType("time")
+                                    b2.Property<DateTime>("End")
+                                        .HasColumnType("datetime2")
                                         .HasColumnName("CloseTime");
 
-                                    b2.Property<TimeSpan>("Start")
-                                        .HasColumnType("time")
+                                    b2.Property<DateTime>("Start")
+                                        .HasColumnType("datetime2")
                                         .HasColumnName("OpenTime");
 
                                     b2.HasKey("RestaurantScheduleId");
@@ -1026,12 +1029,12 @@ namespace Dinners.Infrastructure.Migrations
                                             b3.Property<Guid>("ReservedHourId")
                                                 .HasColumnType("uniqueidentifier");
 
-                                            b3.Property<TimeSpan>("End")
-                                                .HasColumnType("time")
+                                            b3.Property<DateTime>("End")
+                                                .HasColumnType("datetime2")
                                                 .HasColumnName("EndReservationTimeRange");
 
-                                            b3.Property<TimeSpan>("Start")
-                                                .HasColumnType("time")
+                                            b3.Property<DateTime>("Start")
+                                                .HasColumnType("datetime2")
                                                 .HasColumnName("StartReservationTimeRange");
 
                                             b3.HasKey("ReservedHourId");
