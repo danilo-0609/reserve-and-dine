@@ -7,9 +7,9 @@ internal sealed class CancelNotAsistedReservationsJobSetup : IConfigureOptions<Q
 {
     public void Configure(QuartzOptions options)
     {
-        var jobKey = new JobKey(nameof(CancelNotAsistedReservationsJob));
+        var jobKey = new JobKey(nameof(CancelNotAssistedReservationsJob));
 
-        options.AddJob<CancelNotAsistedReservationsJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
+        options.AddJob<CancelNotAssistedReservationsJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
             .AddTrigger(
                 trigger =>
                     trigger.ForJob(jobKey)

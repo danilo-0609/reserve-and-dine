@@ -36,7 +36,7 @@ internal sealed class CancelNotPaidReservationsJob : IJob
         List<Reservation> reservations = await _dbContext
             .Reservations
             .Where(t => t.ReservationStatus == ReservationStatus.Requested &&
-                    t.RequestedAt > expirationLimit)
+                    t.RequestedAt < expirationLimit)
             .Take(20)
             .ToListAsync();
 

@@ -44,7 +44,7 @@ internal sealed class CancelReservationsAfterRestaurantWasClosedOutOfScheduleJob
             {
                 foreach (var reservedHour in table.ReservedHours)
                 {
-                    if (reservedHour.ReservationDateTime < restaurant
+                    if (reservedHour.ReservationDateTime.TimeOfDay < restaurant
                         .RestaurantSchedules
                         .Where(r => r.Day.DayOfWeek > reservedHour.ReservationDateTime.DayOfWeek)
                         .Single()
