@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using System.Configuration;
 
 namespace Users.Infrastructure.Configuration;
 
@@ -21,7 +22,7 @@ public class DatabaseDesignTimeDbContextFactory : IDesignTimeDbContextFactory<Us
     {
         var builder = new DbContextOptionsBuilder<UsersDbContext>();
         
-        builder.UseSqlServer(_configuration.GetConnectionString("DockerSQlDatabase"),
+        builder.UseSqlServer(_configuration.GetConnectionString("DockerSqlDatabase"),
                 r => r.EnableRetryOnFailure(4));
 
         return new UsersDbContext(builder.Options);
