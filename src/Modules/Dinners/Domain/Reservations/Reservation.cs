@@ -72,7 +72,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return reservation;
     }
 
-    public ErrorOr<SuccessOperation> Cancel(string causeOfCancellation = "")
+    public ErrorOr<Success> Cancel(string causeOfCancellation = "")
     {
         var canCancelReservation = CheckRule(new CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule(ReservationStatus));
 
@@ -104,7 +104,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             CancelledAt = DateTime.UtcNow;
             ReservationStatus = ReservationStatus.Cancelled;
 
-            return SuccessOperation.Code;
+            
         }
 
         AddDomainEvent(new ReservationCancelledDomainEvent(
@@ -119,7 +119,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         CancelledAt = DateTime.UtcNow;
         ReservationStatus = ReservationStatus.Cancelled;
 
-        return SuccessOperation.Code;
+        return new Success();
     }
 
     public ErrorOr<ReservationPaymentId> Pay()
@@ -151,7 +151,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return payment.Value.Id;
     }
 
-    public ErrorOr<SuccessOperation> Visit()
+    public ErrorOr<Success> Visit()
     {
         var mustVisitInReservationTime = CheckRule(new MustAssistToReservationInTheRequestedTimeRule(DateTime.Now, ReservationInformation.ReservationDateTime));
         
@@ -175,10 +175,10 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
         ReservationStatus = ReservationStatus.Visiting;
 
-        return SuccessOperation.Code;
+        return new Success();
     }
 
-    public ErrorOr<SuccessOperation> Finish()
+    public ErrorOr<Success> Finish()
     {
         var statusMustBeVisited = CheckRule(new CannotFinishAReservationWhenReservationStatusIsNotVisitedRule(ReservationStatus));
     
@@ -196,7 +196,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
         ReservationStatus = ReservationStatus.Finished;
 
-        return SuccessOperation.Code;
+        return new Success();
     }
 
     public Reservation Update(ReservationInformation reservationInformation,
