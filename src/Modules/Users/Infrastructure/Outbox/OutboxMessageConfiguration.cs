@@ -7,7 +7,7 @@ internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outb
 {
     public void Configure(EntityTypeBuilder<OutboxMessage> builder)
     {
-        builder.ToTable("UsersOutboxMessages", "dinners");
+        builder.ToTable("UsersOutboxMessages", "users");
     
         builder.HasKey(x => x.Id);
 
