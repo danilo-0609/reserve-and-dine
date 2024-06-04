@@ -36,7 +36,7 @@ internal sealed class PostRestaurantCommandHandler : ICommandHandler<PostRestaur
 
         var restaurantSchedules = request.RestaurantSchedules.ConvertAll(schedule =>
         {
-            return RestaurantSchedule.Create(restaurantId, schedule.Day, schedule.Start, schedule.End);
+            return RestaurantSchedule.Create(restaurantId, schedule.Day, TimeSpan.FromHours(int.Parse(schedule.Start)), TimeSpan.FromHours(int.Parse(schedule.End)));
         });
 
         var restaurantContact = RestaurantContact.Create(request.RestaurantContact.Email,

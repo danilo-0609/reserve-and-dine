@@ -18,10 +18,6 @@ internal sealed class PostRestaurantCommandValidator : AbstractValidator<PostRes
             .NotNull()
             .SetValidator(new RestaurantScheduleRequestValidator());
 
-        RuleFor(r => r.RestaurantSchedules)
-            .Must(r => r.Count == 7).WithMessage("Restaurant schedules list must contain exactly 7 entries")
-            .Must(HaveAllDaysOfWeek).WithMessage("Restaurant schedules list must include every day of the week");
-
         RuleForEach(r => r.RestaurantTables)
             .NotEmpty()
             .NotNull()
