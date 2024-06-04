@@ -9,10 +9,10 @@ internal sealed class RequestReservationCommandValidator : AbstractValidator<Req
         RuleFor(r => r.ReservedTable)
             .NotNull().NotEmpty();
 
-        RuleFor(r => r.StartReservationDateTime)
+        RuleFor(r => r.Start)
             .NotNull().NotEmpty();
 
-        RuleFor(r => r.EndReservationDateTime)
+        RuleFor(r => r.End)
             .NotNull().NotEmpty();
 
         RuleFor(r => r.RestaurantId)

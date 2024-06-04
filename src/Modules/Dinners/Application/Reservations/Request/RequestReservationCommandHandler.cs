@@ -7,6 +7,7 @@ using Dinners.Domain.Reservations;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using ErrorOr;
+using TimeRange = Dinners.Domain.Common.TimeRange;
 
 namespace Dinners.Application.Reservations.Request;
 
@@ -62,34 +63,38 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
             .Select(r => r.Price)
             .Single();
 
+        var startTime = TimeSpan.FromHours(int.Parse(request.Start));
+        var endTime = TimeSpan.FromHours(int.Parse(request.End));
+
         var reservationInformation = ReservationInformation.Create(request.ReservedTable,
             price.Amount,
             price.Currency,
-            request.StartReservationDateTime.TimeOfDay,
-            request.EndReservationDateTime.TimeOfDay,
-            request.StartReservationDateTime);
+            startTime,
+            endTime,
+            request.ReservationDateTime);
 
         var reservationAttendees = ReservationAttendees.Create(_executionContextAccessor.UserId,
             request.Name,
             request.NumberOfAttendees);
 
-        var reservation = Reservation.Request(reservationInformation,   
+        var reservation = Reservation.Request(reservationInformation,
             restaurant.RestaurantTables.Where(g => g.Number == reservationInformation.ReservedTable)
                             .Select(g => g.Seats)
                             .SingleOrDefault(),
             RestaurantId.Create(request.RestaurantId),
             reservationAttendees,
             menuIds);
-    
+
         if (reservation.IsError)
         {
             return reservation.FirstError;
         }
 
         var restaurantTableReservation = restaurant
-            .ReserveTable(request.ReservedTable, 
-                   new Domain.Common.TimeRange(request.StartReservationDateTime, request.EndReservationDateTime));
-        
+            .ReserveTable(request.ReservedTable,
+                   new TimeRange(startTime, endTime),
+            request.ReservationDateTime);
+
         if (restaurantTableReservation.IsError)
         {
             return restaurantTableReservation.FirstError;
@@ -97,8 +102,7 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
 
         await _reservationRepository.AddAsync(reservation.Value, cancellationToken);
         await _restaurantRepository.UpdateAsync(restaurant);
-        await _unitOfWork.SaveChangesAsync();
-
+        
         return reservation.Value.Id.Value;
     }
 }
