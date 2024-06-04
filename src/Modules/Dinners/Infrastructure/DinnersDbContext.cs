@@ -45,14 +45,7 @@ public sealed class DinnersDbContext : DbContext, IApplicationDbContext
     public DbSet<RestaurantRating> Ratings { get; set; }
 
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.EnableSensitiveDataLogging();
-
-        base.OnConfiguring(optionsBuilder);
-    }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Restaurant>().Ignore(e => e.RestaurantTables);

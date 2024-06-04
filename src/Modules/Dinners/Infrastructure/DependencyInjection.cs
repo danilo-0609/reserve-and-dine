@@ -21,11 +21,9 @@ using Dinners.Infrastructure.Domain.Restaurants.Ratings;
 using Dinners.Infrastructure.EventsBus;
 using Dinners.Infrastructure.Jobs.Setups;
 using Dinners.Infrastructure.Outbox.BackgroundJobs;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
 using Quartz;
 
 namespace Dinners.Infrastructure;
@@ -40,6 +38,8 @@ public static class DependencyInjection
         services.AddDbContext<DinnersDbContext>(async (sp, optionsBuilder) =>
         {
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerSqlDatabase"));
+
+            optionsBuilder.EnableSensitiveDataLogging();
         });
 
         services.AddQuartzHostedService();
