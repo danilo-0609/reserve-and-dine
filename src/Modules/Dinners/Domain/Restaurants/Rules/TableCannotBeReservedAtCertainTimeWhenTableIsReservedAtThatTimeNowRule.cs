@@ -25,7 +25,7 @@ internal sealed class TableCannotBeReservedAtCertainTimeWhenTableIsReservedAtTha
     private bool IsReservationTimeNotValid()
     {
         return _restaurantTables
-                .Any(r => r.ReservedHours.Any(r => r.ReservationDateTime == _reservationRequestTimeRange.Start) ||
+                .Any(r => r.ReservedHours.Any(r => TimeSpan.FromHours(r.ReservationDateTime.Hour) == _reservationRequestTimeRange.Start) ||
                 r.ReservedHours.Any(r => r.ReservationTimeRange.Start < _reservationRequestTimeRange.End) &&
                 r.ReservedHours.Any(r => r.ReservationTimeRange.End > _reservationRequestTimeRange.Start));
     }

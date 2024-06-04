@@ -68,7 +68,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         RestaurantContact restaurantContact,
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
-        List<string> specialities,
+        List<string> specialties,
         List<string> chefs,
         DateTime postedAt)
     {
@@ -81,7 +81,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             restaurantTables,
             restaurantAdministrations,
             new List<RestaurantClient>(),
-            specialities.ConvertAll(speciality => new Speciality(SpecialityId.CreateUnique(), restaurantId, speciality)),
+            specialties.ConvertAll(speciality => new Speciality(SpecialityId.CreateUnique(), restaurantId, speciality)),
             chefs.ConvertAll(chef => new Chef(ChefId.CreateUnique(), restaurantId, chef)),
             new List<RestaurantImageUrl>(), 
             postedAt);
@@ -273,7 +273,10 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return SuccessOperation.Code;
     }
 
-    public ErrorOr<SuccessOperation> ReserveTable(int tableNumber, TimeRange reservationTimeRange)
+    public ErrorOr<SuccessOperation> ReserveTable(
+        int tableNumber, 
+        TimeRange reservationTimeRange, 
+        DateTime reservedDateTime)
     {
         RestaurantTable? table = _restaurantTables
             .Where(r => r.Number == tableNumber)
@@ -284,11 +287,11 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        var currentDaySchedule = RestaurantSchedules
+        RestaurantSchedule currentDaySchedule = RestaurantSchedules
             .Where(r => r.Day.DayOfWeek == DateTime.Now.DayOfWeek)
             .Single();
 
-        var isRequestedTimeInRestaurantSchedule = CheckRule(new CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(currentDaySchedule, reservationTimeRange));
+        var isRequestedTimeInRestaurantSchedule = CheckRule(new CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(currentDaySchedule, reservationTimeRange, reservedDateTime));
 
         if (isRequestedTimeInRestaurantSchedule.IsError)
         {
@@ -309,7 +312,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return cannotBeReservedWhenItWillBeOcuppiedRule.FirstError;
         }
 
-        table.Reserve(reservationTimeRange.Start, reservationTimeRange);
+        table.Reserve(reservedDateTime, reservationTimeRange);
 
         return SuccessOperation.Code;
     }
@@ -458,8 +461,8 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
     public ErrorOr<SuccessOperation> ModifySchedule(Guid userId,
         DayOfWeek day,
-        DateTime start,
-        DateTime end)
+        TimeSpan start,
+        TimeSpan end)
     {
         var canChangeProperty = CheckRule(new CannotChangeRestaurantPropertiesWhenUserIsNotAdministratorRule(_restaurantAdministrations, userId));
 
@@ -648,7 +651,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         List<RestaurantTable> restaurantTables,
         List<RestaurantAdministration> restaurantAdministrations,
         List<RestaurantClient> restaurantClients,
-        List<Speciality> specialities,
+        List<Speciality> specialties,
         List<Chef> chefs,
         List<RestaurantImageUrl> restaurantImagesUrl,
         DateTime postedAt) : base(id)
@@ -663,11 +666,11 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         _restaurantClients = restaurantClients;
         _restaurantTables = restaurantTables;
         _restaurantAdministrations = restaurantAdministrations;
-        _specialties = specialities;
+        _specialties = specialties;
         _chefs = chefs;
         _restaurantImagesUrl = restaurantImagesUrl;
 
-        RestaurantScheduleStatus = SetRestaurantScheduleStatus();
+        RestaurantScheduleStatus = RestaurantScheduleStatus.Opened;
         AvailableTablesStatus = UpdateAvailableTablesStatus();
 
         PostedAt = postedAt;
@@ -692,23 +695,6 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         }
 
         return AvailableTablesStatus.Availables;
-    }
-
-    private RestaurantScheduleStatus SetRestaurantScheduleStatus()
-    {
-        var currentDaySchedule = RestaurantSchedules.Where(r => r.Day.DayOfWeek == DateTime.Now.DayOfWeek)
-            .Single();
-
-        var startHour = currentDaySchedule.HoursOfOperation.Start;
-
-        var endHour = currentDaySchedule.HoursOfOperation.End;
-
-        if (DateTime.Now > startHour && DateTime.Now < endHour)
-        {
-            return RestaurantScheduleStatus.Opened;
-        }
-
-        return RestaurantScheduleStatus.Closed;
     }
 
     private Restaurant() { }

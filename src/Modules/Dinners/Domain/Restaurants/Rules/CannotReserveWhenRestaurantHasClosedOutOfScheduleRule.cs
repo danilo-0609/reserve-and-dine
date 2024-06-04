@@ -32,8 +32,8 @@ internal sealed class CannotReserveWhenRestaurantHasClosedOutOfScheduleRule : IB
     {
         if (_scheduleStatus ==  RestaurantScheduleStatus.Closed)
         {
-            if (_requestedTimeRange.Start.Hour > _restaurantSchedule.HoursOfOperation.Start.Hour && 
-                _requestedTimeRange.Start.Day == _restaurantSchedule.HoursOfOperation.Start.Day)
+            if (_requestedTimeRange.Start.Hours > _restaurantSchedule.HoursOfOperation.Start.Hours && 
+                _requestedTimeRange.Start.Days == _restaurantSchedule.HoursOfOperation.Start.Days)
             {
                 return true;
             }

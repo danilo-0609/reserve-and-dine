@@ -10,12 +10,15 @@ internal sealed class CannotReserveWhenTimeOfReservationIsOutOfScheduleRule : IB
 {
     private readonly RestaurantSchedule _restaurantSchedule;
     private readonly TimeRange _reservationTimeRangeRequested;
+    private readonly DateTime _reservationDateTimeRequested;
 
-    public CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(RestaurantSchedule restaurantSchedule, 
-        TimeRange reservationTimeRangeRequested)
+    public CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(RestaurantSchedule restaurantSchedule,
+        TimeRange reservationTimeRangeRequested,
+        DateTime reservationDateTimeRequested)
     {
         _restaurantSchedule = restaurantSchedule;
         _reservationTimeRangeRequested = reservationTimeRangeRequested;
+        _reservationDateTimeRequested = reservationDateTimeRequested;
     }
 
     public Error Error => RestaurantErrorCodes.CannotReserveWhenTimeOfReservationIsOutOfSchedule;
@@ -32,7 +35,7 @@ internal sealed class CannotReserveWhenTimeOfReservationIsOutOfScheduleRule : IB
 
     public bool IsRestaurantOpenForReservation()
     {
-        if (_restaurantSchedule.Day.DayOfWeek == _reservationTimeRangeRequested.Start.DayOfWeek
+        if (_restaurantSchedule.Day.DayOfWeek == _reservationDateTimeRequested.DayOfWeek
             && _restaurantSchedule.HoursOfOperation.Start <= _reservationTimeRangeRequested.Start
             && _restaurantSchedule.HoursOfOperation.End > _reservationTimeRangeRequested.End)
         {

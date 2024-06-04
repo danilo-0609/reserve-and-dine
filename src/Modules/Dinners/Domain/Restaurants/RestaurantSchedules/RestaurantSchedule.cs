@@ -30,8 +30,8 @@ public sealed class RestaurantSchedule : Entity<RestaurantScheduleId, Guid>
 
     public static RestaurantSchedule Create(RestaurantId restaurantId,
         DayOfWeek day,
-        DateTime start,
-        DateTime end)
+        TimeSpan start,
+        TimeSpan end)
     {
         return new RestaurantSchedule(RestaurantScheduleId.CreateUnique(), restaurantId, new DayOfOperation(day), new TimeRange(start, end), null);
     }
