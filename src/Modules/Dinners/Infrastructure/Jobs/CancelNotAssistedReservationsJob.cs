@@ -7,14 +7,14 @@ using Quartz;
 namespace Dinners.Infrastructure.Jobs;
 
 [DisallowConcurrentExecution]
-internal sealed class CancelNotAsistedReservationsJob : IJob
+internal sealed class CancelNotAssistedReservationsJob : IJob
 {
     private readonly DinnersDbContext _dbContext;
     private readonly ILogger<CancelNotPaidReservationsJob> _logger;
     private readonly IReservationRepository _reservationRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CancelNotAsistedReservationsJob(DinnersDbContext dbContext, 
+    public CancelNotAssistedReservationsJob(DinnersDbContext dbContext, 
         ILogger<CancelNotPaidReservationsJob> logger, 
         IReservationRepository reservationRepository, 
         IUnitOfWork unitOfWork)
