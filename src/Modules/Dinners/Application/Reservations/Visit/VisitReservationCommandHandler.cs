@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Dinners.Application.Reservations.Visit;
 
-internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitReservationCommand, ErrorOr<Unit>>
+internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitReservationCommand, ErrorOr<Success>>
 {
     private readonly IReservationRepository _reservationRepository;
     private readonly IRestaurantRepository _restaurantRepository;
@@ -24,7 +24,7 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
         _menuRepository = menuRepository;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(VisitReservationCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(VisitReservationCommand request, CancellationToken cancellationToken)
     {
         Reservation? reservation = await _reservationRepository.GetByIdAsync(ReservationId.Create(request.ReservationId), cancellationToken);
     
@@ -33,11 +33,11 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
             return ReservationErrorsCodes.NotFound;
         }
 
-        var asisting = reservation.Visit();
+        var assisting = reservation.Visit();
     
-        if (asisting.IsError)
+        if (assisting.IsError)
         {
-            return asisting.FirstError;
+            return assisting.FirstError;
         }
 
         var restaurant = await _restaurantRepository.GetRestaurantById(reservation.RestaurantId);
@@ -74,6 +74,6 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
 
         await _unitOfWork.SaveChangesAsync();
 
-        return Unit.Value;
+        return new Success();
     }
 }
