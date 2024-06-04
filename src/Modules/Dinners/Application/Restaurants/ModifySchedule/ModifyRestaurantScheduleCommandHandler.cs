@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Dinners.Application.Restaurants.ModifySchedule;
 
-internal sealed class ModifyRestaurantScheduleCommandHandler : ICommandHandler<ModifyRestaurantScheduleCommand, ErrorOr<Unit>>
+internal sealed class ModifyRestaurantScheduleCommandHandler : ICommandHandler<ModifyRestaurantScheduleCommand, ErrorOr<Success>>
 {
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
@@ -19,7 +19,7 @@ internal sealed class ModifyRestaurantScheduleCommandHandler : ICommandHandler<M
         _executionContextAccessor = executionContextAccessor;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(ModifyRestaurantScheduleCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(ModifyRestaurantScheduleCommand request, CancellationToken cancellationToken)
     {
         Restaurant? restaurant = await _restaurantRepository.GetRestaurantById(RestaurantId.Create(request.RestaurantId));
 
@@ -40,6 +40,6 @@ internal sealed class ModifyRestaurantScheduleCommandHandler : ICommandHandler<M
 
         await _restaurantRepository.UpdateAsync(restaurant);
 
-        return Unit.Value;
+        return new Success();
     }
 }
