@@ -13,7 +13,7 @@ internal sealed class CannotFinishAReservationWhenReservationStatusIsNotVisitedR
         _reservationStatus = reservationStatus;
     }
 
-    public Error Error => ReservationErrorsCodes.CannotFinishIfStatusIsNotAsisting;
+    public Error Error => ReservationErrorsCodes.CannotFinishIfStatusIsNotAssisting;
 
     public bool IsBroken() => _reservationStatus != ReservationStatus.Visiting;
 
