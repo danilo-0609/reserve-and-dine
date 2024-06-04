@@ -6,7 +6,7 @@ namespace Dinners.Domain.Restaurants.Errors;
 public static class RestaurantErrorCodes
 {
     public static Error NotFound =>
-        Error.Validation("Restaurant.NotFound", "Restaurant was not found");
+        Error.NotFound("Restaurant.NotFound", "Restaurant was not found");
 
     public static Error ImageNotFound =>
         Error.NotFound("Restaurant.ImageNotFound", "The restaurant image was not found");
