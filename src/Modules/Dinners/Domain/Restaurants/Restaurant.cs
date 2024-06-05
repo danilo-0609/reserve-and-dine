@@ -287,29 +287,41 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        RestaurantSchedule currentDaySchedule = RestaurantSchedules
-            .Where(r => r.Day.DayOfWeek == DateTime.Now.DayOfWeek)
-            .Single();
+        RestaurantSchedule? daySchedule = RestaurantSchedules
+        .Where(r =>
+        {
+            var openingTime = r.HoursOfOperation.Start;
+            var closingTime = r.HoursOfOperation.End;
+            var isOvernight = openingTime > closingTime;
+            
+            if (reservedDateTime.Hour >= 0)
+            {
+                return r.Day.DayOfWeek == reservedDateTime.DayOfWeek - 1;
+            }
 
-        var isRequestedTimeInRestaurantSchedule = CheckRule(new CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(currentDaySchedule, reservationTimeRange, reservedDateTime));
+            return r.Day.DayOfWeek == reservedDateTime.DayOfWeek;
+        })
+        .Single();
+
+        var isRequestedTimeInRestaurantSchedule = CheckRule(new CannotReserveWhenTimeOfReservationIsOutOfScheduleRule(daySchedule, reservationTimeRange, reservedDateTime));
 
         if (isRequestedTimeInRestaurantSchedule.IsError)
         {
             return isRequestedTimeInRestaurantSchedule.FirstError;
         }
 
-        var isRestaurantCloseOutOfNormalSchedule = CheckRule(new CannotReserveWhenRestaurantHasClosedOutOfScheduleRule(currentDaySchedule, RestaurantScheduleStatus, reservationTimeRange));
+        var isRestaurantCloseOutOfNormalSchedule = CheckRule(new CannotReserveWhenRestaurantHasClosedOutOfScheduleRule(daySchedule, RestaurantScheduleStatus, reservationTimeRange));
 
         if (isRestaurantCloseOutOfNormalSchedule.IsError)
         {
             return isRestaurantCloseOutOfNormalSchedule.FirstError;
         }
 
-        var cannotBeReservedWhenItWillBeOcuppiedRule = CheckRule(new TableCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTimeNowRule(_restaurantTables, reservationTimeRange));
+        var cannotBeReservedWhenItWillBeOccuppiedRule = CheckRule(new TableCannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTimeNowRule(_restaurantTables, reservationTimeRange));
 
-        if (cannotBeReservedWhenItWillBeOcuppiedRule.IsError)
+        if (cannotBeReservedWhenItWillBeOccuppiedRule.IsError)
         {
-            return cannotBeReservedWhenItWillBeOcuppiedRule.FirstError;
+            return cannotBeReservedWhenItWillBeOccuppiedRule.FirstError;
         }
 
         table.Reserve(reservedDateTime, reservationTimeRange);

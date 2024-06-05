@@ -35,9 +35,32 @@ internal sealed class CannotReserveWhenTimeOfReservationIsOutOfScheduleRule : IB
 
     public bool IsRestaurantOpenForReservation()
     {
-        if (_restaurantSchedule.Day.DayOfWeek == _reservationDateTimeRequested.DayOfWeek
-            && _restaurantSchedule.HoursOfOperation.Start <= _reservationTimeRangeRequested.Start
-            && _restaurantSchedule.HoursOfOperation.End > _reservationTimeRangeRequested.End)
+        var openingTime = _restaurantSchedule.HoursOfOperation.Start;
+        var closingTime = _restaurantSchedule.HoursOfOperation.End;
+
+        var reservationStart = _reservationTimeRangeRequested.Start;
+        var reservationEnd = _reservationTimeRangeRequested.End;
+
+        bool isSameDay = openingTime < closingTime;
+        bool isOvernight = !isSameDay;
+
+        if (isSameDay)
+        {
+            return reservationStart >= openingTime && reservationEnd <= closingTime;
+        }
+        
+        // Handling overnight case
+        if (reservationStart >= openingTime || reservationEnd <= closingTime)
+        {
+            return true;
+        }
+
+        // Handle edge case where the reservation end time is past midnight of the next day
+        var nextDay = _reservationDateTimeRequested.AddDays(1).DayOfWeek;
+        
+        if (isOvernight 
+            && _restaurantSchedule.Day.DayOfWeek == nextDay
+            && reservationEnd <= closingTime)
         {
             return true;
         }
