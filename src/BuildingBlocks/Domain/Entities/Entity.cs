@@ -29,14 +29,14 @@ public abstract class Entity<TId, TIdType> : IEquatable<Entity<TId, TIdType>>, I
 
 
     //Business rules validation
-    public ErrorOr<Unit> CheckRule(IBusinessRule rule)
+    public ErrorOr<Success> CheckRule(IBusinessRule rule)
     {
         if (rule.IsBroken())
         {
             return rule.Error;
         }
 
-        return Unit.Value;
+        return new Success();
     }
 
 
