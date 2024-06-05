@@ -1,4 +1,5 @@
-﻿using Dinners.Domain.Common;
+﻿using Dinners.Application.Restaurants.Post.Requests;
+using Dinners.Domain.Common;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantInformations;
 using Dinners.Domain.Restaurants.RestaurantRatings;
@@ -28,46 +29,48 @@ public sealed class RestaurantTests
 
     public List<RestaurantSchedule> RestaurantSchedules()
     {
-        var startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
+        var startDateTime = TimeSpan.FromHours(DateTime.Now.Hour);
 
+        RestaurantScheduleRequest restaurantScheduleRequest = new(DayOfWeek.Monday, "10", "20");
+        
         var restaurantSchedules = new List<RestaurantSchedule>
         {
             RestaurantSchedule.Create(
                 RestaurantId,
-                DayOfWeek.Monday,
-                startDateTime,
-                startDateTime.AddHours(8)),
+                restaurantScheduleRequest.Day,
+                TimeSpan.FromHours(int.Parse(restaurantScheduleRequest.Start)),
+                startDateTime.Add(TimeSpan.FromHours(int.Parse("8")))),
 
             RestaurantSchedule.Create(
                 RestaurantId,
                 DayOfWeek.Tuesday,
                 startDateTime,
-                startDateTime.AddHours(8)),
+                startDateTime.Add(TimeSpan.FromHours(int.Parse("8")))),
 
             RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Wednesday,
                 startDateTime,
-                startDateTime.AddHours(8)),
+                startDateTime.Add(TimeSpan.FromHours(int.Parse("8")))),
 
             RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Thursday,
                 startDateTime,
-                startDateTime.AddHours(8)),
+                startDateTime.Add(TimeSpan.FromHours(int.Parse("8")))),
 
             RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Friday,
                 startDateTime,
-                startDateTime.AddHours(8)),
+                startDateTime.Add(TimeSpan.FromHours(int.Parse("8")))),
 
             RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Saturday,
                 startDateTime,
-                startDateTime.AddHours(8)),
+                startDateTime.Add(TimeSpan.FromHours(int.Parse("8")))),
 
             RestaurantSchedule.Create(RestaurantId,
                 DayOfWeek.Sunday,
                 startDateTime,
-                startDateTime.AddHours(8))
+                startDateTime.Add(TimeSpan.FromHours(int.Parse("4"))))
         };
 
         return restaurantSchedules;
@@ -145,15 +148,20 @@ public sealed class RestaurantTests
     {
         var restaurant = CreateRestaurant();
 
-        var reservationDateTime = DateTime.Now.AddMinutes(20);
+        var reservationDateTime = TimeSpan.FromHours(DateTime.Now.AddMinutes(20).Hour);
 
-        restaurant.ReserveTable(1, new TimeRange(reservationDateTime, reservationDateTime.AddMinutes(45)));
+        var result = restaurant.ReserveTable(1, 
+            new TimeRange(reservationDateTime, 
+                reservationDateTime.Add(TimeSpan.FromMinutes(45))),
+            DateTime.Now);
 
-        var secondReservationDateTime = DateTime.Now.AddMinutes(10);
+        var secondReservationDateTime = TimeSpan.FromHours(DateTime.Now.AddMinutes(10).Hour);
 
         var reservationInterfering = restaurant.ReserveTable(
             1,
-            new TimeRange(secondReservationDateTime, secondReservationDateTime.AddMinutes(30)));
+            new TimeRange(secondReservationDateTime, 
+                secondReservationDateTime.Add(TimeSpan.FromMinutes(45))),
+            DateTime.Now);
 
         bool reservationIsError = reservationInterfering.FirstError.Code == "Table.CannotBeReservedAtCertainTimeWhenTableIsReservedAtThatTime";
 
@@ -163,17 +171,15 @@ public sealed class RestaurantTests
     [Fact]
     public void Reserve_Table_Should_ReturnAnError_WhenTimeOfReservationIsOutOfSchedule()
     {
-        var startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
-
         List<RestaurantSchedule> restaurantSchedules = new()
         {
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
-                startDateTime,
-                startDateTime.AddMinutes(30)),
+                TimeSpan.Parse("07:00"),
+                TimeSpan.Parse("20:00")),
 
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.AddDays(1).DayOfWeek,
-                startDateTime,
-                startDateTime.AddMinutes(30))
+                TimeSpan.Parse("07:00"),
+                TimeSpan.Parse("20:00"))
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -188,7 +194,9 @@ public sealed class RestaurantTests
             DateTime.UtcNow);
 
         var reservationTable = restaurant.ReserveTable(1,
-            new TimeRange(DateTime.Now.AddHours(1), DateTime.Now.AddHours(1).AddMinutes(30)));
+            new TimeRange(start: TimeSpan.Parse("21:00"),
+                end: TimeSpan.Parse("21:30")),
+            DateTime.Now.AddDays(1).AddHours(2));
 
         bool isErrorTimeOfReservationIsOutOfSchedule = reservationTable.FirstError.Code == "Restaurant.CannotReserveWhenTimeOfReservationIsOutOfSchedule";
 
@@ -198,17 +206,17 @@ public sealed class RestaurantTests
     [Fact]
     public void Reserve_Table_Should_ReturnAnError_WhenRestaurantHasClosedOutOfSchedule()
     {
-        var startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
+        var startDateTime = TimeSpan.FromHours(DateTime.Now.Hour);
 
         List<RestaurantSchedule> restaurantSchedules = new()
         {
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
                 startDateTime,
-                startDateTime.AddHours(8)),
+                startDateTime.Add(TimeSpan.FromHours(8))),
 
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.AddDays(1).DayOfWeek,
-                startDateTime,
-                startDateTime.AddHours(8))
+                 startDateTime,
+                startDateTime.Add(TimeSpan.FromHours(8)))
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -226,7 +234,9 @@ public sealed class RestaurantTests
         restaurant.Close(restaurant.RestaurantAdministrations.First().AdministratorId);
 
         var reservationTable = restaurant.ReserveTable(1,
-            new TimeRange(DateTime.Now.AddHours(1), DateTime.Now.AddHours(1).AddMinutes(30)));
+            new TimeRange(TimeSpan.FromHours(DateTime.Now.AddHours(1).Hour), 
+                TimeSpan.FromHours(DateTime.Now.AddHours(1).AddMinutes(30).Hour)), 
+            DateTime.Now);
 
         bool isErrorCannotReserveWhenRestaurantHasClosedOutOfSchedule =
             reservationTable
@@ -243,7 +253,9 @@ public sealed class RestaurantTests
 
         var tableReservation = restaurant.ReserveTable(
             1,
-            new TimeRange(DateTime.Now.AddHours(1), DateTime.Now.AddHours(1).AddMinutes(30)));
+            new TimeRange(TimeSpan.FromHours(DateTime.Now.AddHours(1).Hour), 
+                TimeSpan.FromHours(1).Add(TimeSpan.FromMinutes(30))),
+            DateTime.Now);
 
         bool isStoredInsideRestaurantTable = restaurant
             .RestaurantTables
@@ -270,30 +282,9 @@ public sealed class RestaurantTests
     [Fact]
     public void Close_Should_ReturnAnError_WhenRestaurantIsClosed()
     {
-        var startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
+        var restaurant = CreateRestaurant();
 
-        List<RestaurantSchedule> restaurantSchedules = new()
-        {
-            RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
-                startDateTime,
-                startDateTime),
-
-            RestaurantSchedule.Create(RestaurantId,
-                DateTime.Now.AddDays(1).DayOfWeek,
-                startDateTime,
-                startDateTime)
-        };
-
-        var restaurant = Restaurant.Post(RestaurantId,
-            RestaurantInformation,
-            RestaurantLocalization,
-            restaurantSchedules,
-            RestaurantContact,
-            RestaurantTables,
-            RestaurantAdministrations,
-            new List<string>() { "Juan Carlos González" },
-            new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
-            DateTime.UtcNow);
+        restaurant.Close(restaurant.RestaurantAdministrations.First().AdministratorId); // RestaurantScheduleStatus = Closed;
 
         var restaurantClose = restaurant.Close(restaurant.RestaurantAdministrations.First().AdministratorId);
 
@@ -334,7 +325,10 @@ public sealed class RestaurantTests
     {
         var restaurant = CreateRestaurant();
 
-        var openRestaurant = restaurant.Open(restaurant.RestaurantAdministrations.First().AdministratorId);
+        var openRestaurant = restaurant.Open(restaurant
+            .RestaurantAdministrations
+            .First()
+            .AdministratorId);
 
         bool isErrorCannotOpenTheRestaurant = openRestaurant
             .FirstError
@@ -348,22 +342,17 @@ public sealed class RestaurantTests
     {
         var openingHour = DateTime.Now.AddHours(1).Hour;
 
-        var startDateTime = new DateTime(DateTime.Now.Year,
-            DateTime.Now.Month,
-            DateTime.Now.Day,
-            openingHour,
-            0,
-            0);
+        var startDateTime = TimeSpan.FromHours(DateTime.Now.Hour);
 
         List<RestaurantSchedule> restaurantSchedules = new()
         {
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
                 startDateTime,
-                startDateTime.AddHours(8)),
+                startDateTime.Add(TimeSpan.FromHours(8))),
 
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.AddDays(1).DayOfWeek,
                 startDateTime,
-                startDateTime.AddHours(8))
+                startDateTime.Add(TimeSpan.FromHours(8)))
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -658,18 +647,21 @@ public sealed class RestaurantTests
             new List<string>() { "Bagre", "Sancocho de pescado", "Tilapia" },
             DateTime.UtcNow);
 
-        var timeOfReservation = DateTime.Now.AddHours(1);
+        var timeOfReservation = TimeSpan.FromHours(DateTime.Now.Hour).Add(TimeSpan.FromHours(1));
+        var reservationDateTime = DateTime.Now.AddHours(1);
 
-        restaurant.ReserveTable(1, new TimeRange(timeOfReservation, timeOfReservation.AddMinutes(30)));
+        restaurant.ReserveTable(1, new TimeRange(timeOfReservation, 
+                TimeSpan.FromHours(TimeSpan.FromMinutes(30).Hours)), 
+                DateTime.Now);
 
-        restaurant.CancelReservation(1, timeOfReservation);
+        restaurant.CancelReservation(1, reservationDateTime);
 
         bool isReservationTimeInRestaurantTables = restaurant
             .RestaurantTables
             .Where(r => r.Number == 1)
             .Single()
             .ReservedHours
-            .Any(r => r.ReservationDateTime == timeOfReservation);
+            .Any(r => r.ReservationDateTime == reservationDateTime);
 
         Assert.False(isReservationTimeInRestaurantTables);
     }
@@ -981,7 +973,7 @@ public sealed class RestaurantTests
 
         bool isErrorCannotRate = rating
             .FirstError
-            .Code == "RestaurantRatings.CannotRate";
+            .Code == "RestaurantRatings.CannotRateWhenClientHasNotVisitedTheRestaurant";
 
         Assert.True(isErrorCannotRate);
     }
@@ -1034,8 +1026,8 @@ public sealed class RestaurantTests
 
         var modifySchedule = restaurant.ModifySchedule(Guid.NewGuid(),
             DateTime.Now.DayOfWeek,
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0),
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.AddHours(7).Hour, DateTime.Now.AddHours(7).Minute, 0));
+            TimeSpan.FromHours(DateTime.Now.Hour),
+            TimeSpan.FromHours(DateTime.Now.AddHours(7).Hour));
 
         bool isErrorCannotChangeWhenUserIsNotAdministrator = modifySchedule
             .FirstError

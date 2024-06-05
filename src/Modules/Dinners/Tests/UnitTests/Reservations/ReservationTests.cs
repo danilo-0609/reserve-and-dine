@@ -44,7 +44,7 @@ public sealed class ReservationTests
     [Fact]
     public void Request_Should_ReturnAnReservationInstance_WhenSuccessful()
     {
-        //Neccessary information from restaurant for implementing robust business logic 
+        //Necessary information from restaurant for implementing robust business logic 
 
         var restaurantTests = new RestaurantTests();
 
@@ -54,8 +54,8 @@ public sealed class ReservationTests
             .Where(r => !r.ReservedHours
                 .Any(
                     t => t.ReservationDateTime.Date == _reservationInformation.ReservationDateTime.Date &&
-                         t.ReservationTimeRange.Start <= _reservationInformation.ReservationDateTime &&
-                         t.ReservationTimeRange.End > _reservationInformation.ReservationDateTime))
+                         t.ReservationTimeRange.Start <= _reservationInformation.ReservationDateTime.TimeOfDay &&
+                         t.ReservationTimeRange.End > _reservationInformation.ReservationDateTime.TimeOfDay))
             .Select(r => r.Number)
             .ToList();
 
@@ -88,8 +88,8 @@ public sealed class ReservationTests
             .Where(r => !r.ReservedHours
                 .Any(
                     t => t.ReservationDateTime.Date == _reservationInformation.ReservationDateTime.Date &&
-                         t.ReservationTimeRange.Start <= _reservationInformation.ReservationDateTime &&
-                         t.ReservationTimeRange.End > _reservationInformation.ReservationDateTime))
+                         t.ReservationTimeRange.Start <= _reservationInformation.ReservationDateTime.TimeOfDay &&
+                         t.ReservationTimeRange.End > _reservationInformation.ReservationDateTime.TimeOfDay))
             .Select(r => r.Number)
             .ToList();
 
@@ -281,11 +281,11 @@ public sealed class ReservationTests
 
         var finish = reservation.Value.Finish();
 
-        bool isErrorCannotFinishIfStatusIsNotAsisting = finish
+        bool isErrorCannotFinishIfStatusIsNotAssisting = finish
             .FirstError
-            .Code == "Reservation.CannotFinishIfStatusIsNotAsisting";
+            .Code == "Reservation.CannotFinishIfStatusIsNotAssisting";
 
-        Assert.True(isErrorCannotFinishIfStatusIsNotAsisting);
+        Assert.True(isErrorCannotFinishIfStatusIsNotAssisting);
     }
 
     [Fact]
