@@ -1,4 +1,4 @@
-﻿namespace API.Modules.Dinners.Requets;
+﻿namespace API.Modules.Dinners.Requests.Menus;
 
 public sealed record PublishMenuRequest(Guid RestaurantId,
         string Title,

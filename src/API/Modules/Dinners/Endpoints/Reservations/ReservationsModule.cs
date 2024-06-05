@@ -1,7 +1,8 @@
-﻿using API.AuthorizationPolicies.Dinners.Reservations.Access;
+﻿using API.AuthorizationPolicies;
+using API.AuthorizationPolicies.Dinners.Reservations.Access;
 using API.AuthorizationPolicies.Dinners.Reservations.Get;
 using API.Configuration;
-using API.Modules.Dinners.Requets;
+using API.Modules.Dinners.Requests.Reservations;
 using Carter;
 using Dinners.Application.Reservations.Cancel;
 using Dinners.Application.Reservations.Finish;
@@ -19,18 +20,16 @@ namespace API.Modules.Dinners.Endpoints.Reservations;
 public sealed class ReservationsModule : CarterModule
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IAuthorizationService _authorizationService;
 
-    public ReservationsModule(IHttpContextAccessor httpContextAccessor, IAuthorizationService authorizationService)
+    public ReservationsModule(IHttpContextAccessor httpContextAccessor)
         : base("/reservations")
     {
         _httpContextAccessor = httpContextAccessor;
-        _authorizationService = authorizationService;
     }
 
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/{id}", async (Guid id, [FromServices] ISender sender) =>
+        app.MapGet("/{id}", async (Guid id, [FromServices] ISender sender, [FromServices] IAuthorizationService authorizationService) =>
         {
             var result = await sender.Send(new GetReservationByIdQuery(id));
 
@@ -39,10 +38,10 @@ public sealed class ReservationsModule : CarterModule
                 return Results.NotFound(result.Errors.Single(r => r.Type == ErrorType.NotFound));
             }
 
-            var authorization = await _authorizationService.AuthorizeAsync(
+            var authorization = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor!.HttpContext!.User,
                 id,
-                new CanGetReservationRequirement());
+                Policy.CanGetReservation);
 
             if (!authorization.Succeeded)
             {
@@ -72,7 +71,7 @@ public sealed class ReservationsModule : CarterModule
         })
             .RequireAuthorization();
 
-        app.MapPut("/cancel/{id}", async (Guid id, [FromServices] ISender sender) =>
+        app.MapPut("/cancel/{id}", async (Guid id, [FromServices] ISender sender, [FromServices] IAuthorizationService authorizationService) =>
         {
             var result = await sender.Send(new CancelReservationCommand(id));
 
@@ -81,7 +80,7 @@ public sealed class ReservationsModule : CarterModule
                 return Results.NotFound(result.Errors.Single(r => r.Type == ErrorType.NotFound));
             }
 
-            var authorization = await _authorizationService.AuthorizeAsync(
+            var authorization = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor!.HttpContext!.User,
                 id,
                 new CanAccessToReservationRequirement());
@@ -97,7 +96,7 @@ public sealed class ReservationsModule : CarterModule
         })
             .RequireAuthorization();
 
-        app.MapPost("/assist/{id}", async (Guid id, [FromServices] ISender sender) =>
+        app.MapPost("/assist/{id}", async (Guid id, [FromServices] ISender sender, [FromServices] IAuthorizationService authorizationService) =>
         {
             var result = await sender.Send(new VisitReservationCommand(id));
 
@@ -106,7 +105,7 @@ public sealed class ReservationsModule : CarterModule
                 return Results.NotFound(result.Errors.Single(r => r.Type == ErrorType.NotFound));
             }
 
-            var authorization = await _authorizationService.AuthorizeAsync(
+            var authorization = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor!.HttpContext!.User,
                 id,
                 new CanGetReservationRequirement());
@@ -122,7 +121,7 @@ public sealed class ReservationsModule : CarterModule
         })
             .RequireAuthorization();
 
-        app.MapPut("/pay/{id}", async (Guid id, [FromServices] ISender sender) =>
+        app.MapPut("/pay/{id}", async (Guid id, [FromServices] ISender sender, [FromServices] IAuthorizationService authorizationService) =>
         {
             var result = await sender.Send(new PayReservationCommand(id));
 
@@ -131,7 +130,7 @@ public sealed class ReservationsModule : CarterModule
                 return Results.NotFound(result.Errors.Single(r => r.Type == ErrorType.NotFound));
             }
 
-            var authorization = await _authorizationService.AuthorizeAsync(
+            var authorization = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor!.HttpContext!.User,
                 id,
                 new CanAccessToReservationRequirement());
@@ -147,7 +146,7 @@ public sealed class ReservationsModule : CarterModule
         })
             .RequireAuthorization();
 
-        app.MapPut("/finish/{id}", async (Guid id, [FromServices] ISender sender) =>
+        app.MapPut("/finish/{id}", async (Guid id, [FromServices] ISender sender, [FromServices] IAuthorizationService authorizationService) =>
         {
             var result = await sender.Send(new FinishReservationCommand(id));
 
@@ -156,7 +155,7 @@ public sealed class ReservationsModule : CarterModule
                 return Results.NotFound(result.Errors.Single(r => r.Type == ErrorType.NotFound));
             }
 
-            var authorization = await _authorizationService.AuthorizeAsync(
+            var authorization = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor!.HttpContext!.User,
                 id,
                 new CanAccessToReservationRequirement());

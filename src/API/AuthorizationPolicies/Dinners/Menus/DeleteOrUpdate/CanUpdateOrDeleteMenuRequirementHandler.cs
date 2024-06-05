@@ -2,6 +2,7 @@
 using Dinners.Domain.Restaurants;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace API.AuthorizationPolicies.Dinners.Menus.DeleteOrUpdate;
 
@@ -26,7 +27,9 @@ public sealed class CanUpdateOrDeleteMenuRequirementHandler : AuthorizationHandl
             return;
         }
 
-        Guid userId = Guid.Parse(userIdValue);
+        Match match = Regex.Match(userIdValue, @"\b([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\b");
+
+        Guid userId = Guid.Parse(match.Value);
 
         var menu = await _menuRepository.GetByIdAsync(MenuId.Create(menuId), CancellationToken.None);
 

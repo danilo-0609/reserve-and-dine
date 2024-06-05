@@ -1,4 +1,4 @@
-﻿namespace API.Modules.Dinners.Requets;
+﻿namespace API.Modules.Dinners.Requests.Restaurants;
 
 public sealed record UpdateTableRequest(int Number,
     int Seats,

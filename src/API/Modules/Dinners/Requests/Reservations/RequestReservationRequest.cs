@@ -1,4 +1,4 @@
-﻿namespace API.Modules.Dinners.Requets;
+﻿namespace API.Modules.Dinners.Requests.Reservations;
 
 public sealed record RequestReservationRequest(int ReservedTable,
         string Start,

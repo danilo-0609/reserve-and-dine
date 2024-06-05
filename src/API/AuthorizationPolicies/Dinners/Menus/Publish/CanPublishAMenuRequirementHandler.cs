@@ -1,6 +1,7 @@
 ﻿using Dinners.Domain.Restaurants;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace API.AuthorizationPolicies.Dinners.Menus.Publish;
 
@@ -26,9 +27,11 @@ public sealed class CanPublishAMenuRequirementHandler : AuthorizationHandler<Can
             return;
         }
 
-        Guid userId = Guid.Parse(userIdValue);
+        Match match = Regex.Match(userIdValue, @"\b([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\b");
 
-       
+        Guid userId = Guid.Parse(match.Value);
+
+
         var restaurant = await _restaurantRepository.GetRestaurantById(RestaurantId.Create(restaurantId));
 
         if (restaurant is null)

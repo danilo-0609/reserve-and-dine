@@ -1,6 +1,6 @@
 ﻿using Dinners.Application.Restaurants.Post.Requests;
 
-namespace API.Modules.Dinners.Requets;
+namespace API.Modules.Dinners.Requests.Restaurants;
 
 public sealed record PostRestaurantRequest(RestaurantInformationRequest RestaurantInformation,
     RestaurantLocalizationRequest RestaurantLocalization,
@@ -9,4 +9,4 @@ public sealed record PostRestaurantRequest(RestaurantInformationRequest Restaura
     List<RestaurantAdministrationRequest> RestaurantAdministrations,
     RestaurantContactRequest RestaurantContact,
     List<string> Chefs,
-    List<string> Specialties);   
+    List<string> Specialties);

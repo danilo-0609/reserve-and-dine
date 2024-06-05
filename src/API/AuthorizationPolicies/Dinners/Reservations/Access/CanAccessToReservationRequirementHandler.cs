@@ -1,6 +1,7 @@
 ﻿using Dinners.Domain.Reservations;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace API.AuthorizationPolicies.Dinners.Reservations.Access;
 
@@ -24,8 +25,10 @@ public class CanAccessToReservationRequirementHandler : AuthorizationHandler<Can
             return;
         }
 
-        Guid userId = Guid.Parse(userIdValue);
+        Match match = Regex.Match(userIdValue, @"\b([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\b");
 
+        Guid userId = Guid.Parse(match.Value);
+        
         var reservation = await _reservationRepository.GetByIdAsync(ReservationId.Create(resource), CancellationToken.None);
 
         if (reservation!.ReservationAttendees.ClientId == userId)

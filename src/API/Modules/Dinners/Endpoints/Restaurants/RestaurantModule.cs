@@ -1,5 +1,5 @@
 ﻿using API.Configuration;
-using API.Modules.Dinners.Requets;
+using API.Modules.Dinners.Requests.Restaurants;
 using Carter;
 using Dinners.Application.Restaurants.Administration.Add;
 using Dinners.Application.Restaurants.Administration.Delete;
@@ -30,7 +30,6 @@ using Dinners.Application.Restaurants.UpdateContact;
 using Dinners.Application.Restaurants.UpdateInformation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Modules.Dinners.Endpoints.Restaurants;
 
@@ -88,7 +87,7 @@ public sealed class RestaurantModule : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/tables/availables/{id}", async (Guid id, string availableTablesStatus, [FromServices] ISender sender) =>
+        app.MapPut("/tables/available/{id}", async (Guid id, string availableTablesStatus, [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new ModifyAvailableTableStatusCommand(id, availableTablesStatus));
 

@@ -1,6 +1,6 @@
 ﻿using API.AuthorizationPolicies.Dinners.Menus.Publish;
 using API.Configuration;
-using API.Modules.Dinners.Requets;
+using API.Modules.Dinners.Requests.Menus;
 using Carter;
 using Dinners.Application.Menus.GetById;
 using Dinners.Application.Menus.GetByIngredients;
@@ -24,13 +24,11 @@ namespace API.Modules.Dinners.Endpoints.Menus;
 public sealed class MenusModules : CarterModule
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IAuthorizationService _authorizationService;
-
-    public MenusModules(IHttpContextAccessor httpContextAccessor, IAuthorizationService authorizationService)
+    
+    public MenusModules(IHttpContextAccessor httpContextAccessor)
         : base("/menus")
     {
         _httpContextAccessor = httpContextAccessor;
-        _authorizationService = authorizationService;
     }
 
     public override void AddRoutes(IEndpointRouteBuilder app)
@@ -44,9 +42,12 @@ public sealed class MenusModules : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPost("/", async ([FromBody] PublishMenuRequest request, [FromServices] ISender sender) =>
+        app.MapPost("/", async (
+            [FromBody] PublishMenuRequest request, 
+            [FromServices] ISender sender, 
+            [FromServices] IAuthorizationService authorizationService) =>
         {
-            var authorization = await _authorizationService.AuthorizeAsync(
+            var authorization = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor!.HttpContext!.User,
                 request.RestaurantId,
                 new CanPublishAMenuRequirement());
@@ -85,7 +86,9 @@ public sealed class MenusModules : CarterModule
         })
         .RequireAuthorization();
 
-        app.MapGet("/ingredient/{ingredient}", async (string ingredient, [FromServices] ISender sender) =>
+        app.MapGet("/ingredient", async (
+            [FromBody] string ingredient, 
+            [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetMenusByIngredientQuery(ingredient));
 
