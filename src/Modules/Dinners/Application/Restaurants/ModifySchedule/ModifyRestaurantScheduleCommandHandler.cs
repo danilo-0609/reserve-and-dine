@@ -30,8 +30,8 @@ internal sealed class ModifyRestaurantScheduleCommandHandler : ICommandHandler<M
 
         var modifySchedule = restaurant.ModifySchedule(_executionContextAccessor.UserId, 
             request.Day, 
-            request.Start, 
-            request.End);
+            TimeSpan.Parse(request.Start), 
+            TimeSpan.Parse(request.End));
     
         if (modifySchedule.IsError)
         {

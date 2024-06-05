@@ -4,5 +4,5 @@ namespace Dinners.Application.Restaurants.ModifySchedule;
 
 public sealed record ModifyRestaurantScheduleCommand(Guid RestaurantId,
     DayOfWeek Day,
-    TimeSpan Start,
-    TimeSpan End) : ICommand<ErrorOr<Success>>;
+    string Start,
+    string End) : ICommand<ErrorOr<Success>>;
