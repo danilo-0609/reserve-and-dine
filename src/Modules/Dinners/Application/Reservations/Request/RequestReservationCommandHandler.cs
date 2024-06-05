@@ -17,15 +17,13 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
     private readonly IMenuRepository _menuRepository;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public RequestReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor, IMenuRepository menuRepository, IUnitOfWork unitOfWork)
+    public RequestReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor, IMenuRepository menuRepository)
     {
         _reservationRepository = reservationRepository;
         _restaurantRepository = restaurantRepository;
         _executionContextAccessor = executionContextAccessor;
         _menuRepository = menuRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<ErrorOr<Guid>> Handle(RequestReservationCommand request, CancellationToken cancellationToken)
@@ -63,8 +61,8 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
             .Select(r => r.Price)
             .Single();
 
-        var startTime = TimeSpan.FromHours(int.Parse(request.Start));
-        var endTime = TimeSpan.FromHours(int.Parse(request.End));
+        var startTime = TimeSpan.Parse(request.Start);
+        var endTime = TimeSpan.Parse(request.Start);
 
         var reservationInformation = ReservationInformation.Create(request.ReservedTable,
             price.Amount,

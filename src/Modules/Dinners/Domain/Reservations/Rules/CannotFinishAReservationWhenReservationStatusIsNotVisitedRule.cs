@@ -17,5 +17,5 @@ internal sealed class CannotFinishAReservationWhenReservationStatusIsNotVisitedR
 
     public bool IsBroken() => _reservationStatus != ReservationStatus.Visiting;
 
-    public static string Message => "Cannot finish a reservation when reservation status is not asisting";
+    public static string Message => "Cannot finish a reservation when reservation status is not assisting";
 }
