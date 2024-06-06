@@ -7,7 +7,6 @@ using Carter;
 using Dinners.Application.Reservations.Cancel;
 using Dinners.Application.Reservations.Finish;
 using Dinners.Application.Reservations.GetById;
-using Dinners.Application.Reservations.Payments.Pays;
 using Dinners.Application.Reservations.Request;
 using Dinners.Application.Reservations.Visit;
 using ErrorOr;
@@ -109,31 +108,6 @@ public sealed class ReservationsModule : CarterModule
                 _httpContextAccessor!.HttpContext!.User,
                 id,
                 new CanGetReservationRequirement());
-
-            if (!authorization.Succeeded)
-            {
-                return Results.Forbid();
-            }
-
-            return result.Match(
-                onValue => Results.NoContent(),
-                onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        })
-            .RequireAuthorization();
-
-        app.MapPut("/pay/{id}", async (Guid id, [FromServices] ISender sender, [FromServices] IAuthorizationService authorizationService) =>
-        {
-            var result = await sender.Send(new PayReservationCommand(id));
-
-            if (result.FirstError.Type == ErrorType.NotFound)
-            {
-                return Results.NotFound(result.Errors.Single(r => r.Type == ErrorType.NotFound));
-            }
-
-            var authorization = await authorizationService.AuthorizeAsync(
-                _httpContextAccessor!.HttpContext!.User,
-                id,
-                new CanAccessToReservationRequirement());
 
             if (!authorization.Succeeded)
             {

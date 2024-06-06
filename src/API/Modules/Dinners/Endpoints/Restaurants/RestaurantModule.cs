@@ -298,9 +298,7 @@ public sealed class RestaurantModule : CarterModule
             var command = await sender.Send(new AddTableCommand(id,
                 request.Number,
                 request.Seats,
-                request.IsPremium,
-                request.Price,
-                request.Currency));
+                request.IsPremium));
 
             return command.Match(
                 onValue => Results.Created(onValue.ToString(), onValue),
@@ -330,9 +328,7 @@ public sealed class RestaurantModule : CarterModule
             var command = await sender.Send(new UpgradeTableCommand(id,
                 request.Number,
                 request.Seats,
-                request.IsPremium,
-                request.Price,
-                request.Currency));
+                request.IsPremium));
 
             return command.Match(
                 onValue => Results.NoContent(),
