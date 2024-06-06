@@ -1,13 +1,10 @@
 ﻿using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.MenuReviews;
 using Dinners.Domain.Reservations;
-using Dinners.Domain.Reservations.Refunds;
-using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantRatings;
 using Dinners.Domain.Restaurants.RestaurantSchedules;
 using Dinners.Domain.Restaurants.RestaurantTables;
-using Dinners.Infrastructure.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Domain.ReservationsMenus;
 using Dinners.Infrastructure.Domain.Restaurants.RestaurantsRatings;
 using Dinners.Infrastructure.Outbox;
@@ -33,10 +30,6 @@ public sealed class DinnersDbContext : DbContext, IApplicationDbContext
     public DbSet<ReservationMenus> ReservationMenus { get; set; }
 
     public DbSet<Reservation> Reservations { get; set; }
-
-    public DbSet<ReservationPayment> ReservationPayments { get; set; }
-
-    public DbSet<Refund> Refunds { get; set; }
 
     public DbSet<Restaurant> Restaurants { get; set; }
 
