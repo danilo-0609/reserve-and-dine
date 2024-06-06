@@ -9,7 +9,7 @@ internal sealed class CancelReservationsAfterRestaurantWasClosedOutOfScheduleJob
     {
         var jobKey = new JobKey(nameof(CancelReservationsAfterRestaurantWasClosedOutOfScheduleJob));
 
-        options.AddJob<CancelNotPaidReservationsJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
+        options.AddJob<CancelReservationsAfterRestaurantWasClosedOutOfScheduleJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
             .AddTrigger(
                 trigger =>
                     trigger.ForJob(jobKey)

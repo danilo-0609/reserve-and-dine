@@ -10,32 +10,32 @@ namespace Dinners.Infrastructure.Jobs;
 internal sealed class CancelNotAssistedReservationsJob : IJob
 {
     private readonly DinnersDbContext _dbContext;
-    private readonly ILogger<CancelNotPaidReservationsJob> _logger;
+    private readonly ILogger<CancelNotAssistedReservationsJob> _logger;
     private readonly IReservationRepository _reservationRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CancelNotAssistedReservationsJob(DinnersDbContext dbContext, 
-        ILogger<CancelNotPaidReservationsJob> logger, 
-        IReservationRepository reservationRepository, 
-        IUnitOfWork unitOfWork)
+    public CancelNotAssistedReservationsJob(DinnersDbContext dbContext,
+        IReservationRepository reservationRepository,
+        IUnitOfWork unitOfWork,
+        ILogger<CancelNotAssistedReservationsJob> logger)
     {
         _dbContext = dbContext;
-        _logger = logger;
         _reservationRepository = reservationRepository;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task Execute(IJobExecutionContext context)
     { 
         _logger.LogInformation("Working on: {@Name}. At {@DateTime}",
-            nameof(CancelNotPaidReservationsJob),
+            nameof(CancelNotAssistedReservationsJob),
             DateTime.UtcNow);
 
         var expirationLimit = DateTime.UtcNow.AddMinutes(-15);
 
         List<Reservation> reservations = await _dbContext
             .Reservations
-            .Where(t => t.ReservationStatus == ReservationStatus.Paid &&
+            .Where(t => t.ReservationStatus == ReservationStatus.Requested &&
                     t.ReservationInformation.ReservationDateTime <= expirationLimit)
             .Take(20)
             .ToListAsync();
