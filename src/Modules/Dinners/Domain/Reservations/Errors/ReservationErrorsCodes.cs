@@ -18,17 +18,14 @@ public static class ReservationErrorsCodes
         Error.Validation("Reservation.CannotReserveWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReserved", CannotReservedWhenNumberOfAttendeesIsGreaterThanSeatsOfTableReservedRule.Message);
 
     public static Error CancelWhenReservationStatusIsNotPaidOrRequested =>
-        Error.Validation("Reservation.CancelWhenReservationStatusIsNotPaidOrRequested", CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule.Message);
+        Error.Validation("Reservation.CancelWhenReservationStatusIsNotPaidOrRequested", CannotCancelWhenReservationStatusIsNotRequestedRule.Message);
 
     public static Error CannotAssistToReservationOutOfTheRequestedTime =>
         Error.Validation("Reservation.MustAssistToReservationInTheRequestedTime", MustAssistToReservationInTheRequestedTimeRule.Message);
 
-    public static Error AssistWhenReservationStatusIsNotPaid =>
-        Error.Validation("Reservation.AssistWhenReservationStatusIsNotPaid", CannotAssistWhenReservationStatusIsNotPaidRule.Message);
+    public static Error CannotVisitWhenReservationStatusIsNotRequested =>
+        Error.Validation("Reservation.CannotVisitWhenReservationStatusIsNotRequested", CannotVisitWhenReservationStatusIsNotRequestedRule.Message);
 
     public static Error MenuNotFound =>
         Error.NotFound("Reservation.MenuNotFound", "The menu in the reservation was not found");
-
-    public static Error CannotPayWhenReservationStatusIsNotRequested =>
-        Error.Validation("Reservation.CannotPayWhenReservationStatusIsNotRequested", CannotPayWhenReservationStatusIsNotRequestedRule.Message);
 }

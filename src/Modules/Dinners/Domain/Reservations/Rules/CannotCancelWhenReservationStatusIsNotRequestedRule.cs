@@ -4,11 +4,11 @@ using ErrorOr;
 
 namespace Dinners.Domain.Reservations.Rules;
 
-internal sealed class CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule : IBusinessRule
+internal sealed class CannotCancelWhenReservationStatusIsNotRequestedRule : IBusinessRule
 {
     private readonly ReservationStatus _reservationStatus;
 
-    public CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule(ReservationStatus reservationStatus)
+    public CannotCancelWhenReservationStatusIsNotRequestedRule(ReservationStatus reservationStatus)
     {
         _reservationStatus = reservationStatus;
     }
@@ -19,7 +19,7 @@ internal sealed class CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRul
 
     private bool CanCancelReservation(ReservationStatus reservationStatus)
     {
-        if (reservationStatus == ReservationStatus.Paid || reservationStatus == ReservationStatus.Requested)
+        if ( reservationStatus == ReservationStatus.Requested)
         {
             return true;
         }

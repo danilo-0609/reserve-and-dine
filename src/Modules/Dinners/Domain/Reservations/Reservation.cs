@@ -1,10 +1,7 @@
 ﻿using BuildingBlocks.Domain.AggregateRoots;
-using BuildingBlocks.Domain.Results;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Reservations.DomainEvents;
 using Dinners.Domain.Reservations.Errors;
-using Dinners.Domain.Reservations.Refunds;
-using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Reservations.Rules;
 using Dinners.Domain.Restaurants;
 using ErrorOr;
@@ -27,13 +24,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
     public ReservationStatus ReservationStatus { get; private set; }
 
-    public ReservationPaymentId? ReservationPaymentId { get; private set; }
-
-    public RefundId? RefundId { get; private set; }
-
     public DateTime RequestedAt { get; private set; }
-
-    public DateTime? PaidAt { get; private set; }
 
     public DateTime? CancelledAt { get; private set; }
 
@@ -74,37 +65,11 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
 
     public ErrorOr<Success> Cancel(string causeOfCancellation = "")
     {
-        var canCancelReservation = CheckRule(new CannotCancelWhenReservationStatusIsNotPayedOrRequesteddRule(ReservationStatus));
+        var canCancelReservation = CheckRule(new CannotCancelWhenReservationStatusIsNotRequestedRule(ReservationStatus));
 
         if (canCancelReservation.IsError)
         {
             return canCancelReservation.FirstError;
-        }
-
-        if (ReservationStatus == ReservationStatus.Paid)
-        {
-            Refund refund = Refund.Payback(
-                Id,
-                ReservationAttendees.ClientId,
-                ReservationInformation.ReservationPrice,
-                DateTime.UtcNow);
-
-            AddDomainEvent(new ReservationCancelledDomainEvent(
-                Guid.NewGuid(),
-                Id,
-                RestaurantId,
-                ReservationInformation.ReservedTable,
-                causeOfCancellation,
-                ReservationInformation.ReservationDateTime,
-                DateTime.UtcNow));
-
-            AddDomainEvent(refund.DomainEvents.First());
-
-            RefundId = refund.Id;
-            CancelledAt = DateTime.UtcNow;
-            ReservationStatus = ReservationStatus.Cancelled;
-
-            
         }
 
         AddDomainEvent(new ReservationCancelledDomainEvent(
@@ -122,35 +87,6 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return new Success();
     }
 
-    public ErrorOr<ReservationPaymentId> Pay()
-    {
-        var cannotPayWhenStatusIsNotRequested = CheckRule(new CannotPayWhenReservationStatusIsNotRequestedRule(ReservationStatus));
-
-        if (cannotPayWhenStatusIsNotRequested.IsError)
-        {
-            return cannotPayWhenStatusIsNotRequested.FirstError;
-        }
-
-        var payment = ReservationPayment.PayFromReservation(
-            ReservationAttendees.ClientId,
-            Id,
-            ReservationInformation.ReservationPrice,
-            ReservationStatus,
-            DateTime.UtcNow);
-
-        if (payment.IsError)
-        {
-            return payment.FirstError;
-        }
-
-        AddDomainEvent(payment.Value.DomainEvents.First());
-
-        ReservationStatus = ReservationStatus.Paid;
-        PaidAt = DateTime.UtcNow;
-
-        return payment.Value.Id;
-    }
-
     public ErrorOr<Success> Visit()
     {
         var mustVisitInReservationTime = CheckRule(new MustAssistToReservationInTheRequestedTimeRule(DateTime.Now, ReservationInformation.ReservationDateTime));
@@ -160,11 +96,11 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             return mustVisitInReservationTime.FirstError;
         }
 
-        var cannotVisitWhenReservationStatusIsNotPaidRule = CheckRule(new CannotAssistWhenReservationStatusIsNotPaidRule(ReservationStatus));
-
-        if (cannotVisitWhenReservationStatusIsNotPaidRule.IsError)
+        var cannotVisitWhenReservationIsCancelled = CheckRule(new CannotVisitWhenReservationStatusIsNotRequestedRule(ReservationStatus));
+        
+        if (cannotVisitWhenReservationIsCancelled.IsError)
         {
-            return cannotVisitWhenReservationStatusIsNotPaidRule.FirstError;
+            return cannotVisitWhenReservationIsCancelled.FirstError;
         }
 
         AddDomainEvent(new ReservationVisitedDomainEvent(Guid.NewGuid(),
@@ -199,12 +135,11 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return new Success();
     }
 
-    public Reservation Update(ReservationInformation reservationInformation,
+    public Reservation Update(
+        ReservationInformation reservationInformation,
         List<MenuId> menuIds,
         ReservationStatus reservationStatus,
-        ReservationAttendees reservationAttendees,
-        ReservationPaymentId? reservationPaymentId,
-        RefundId? refundId)
+        ReservationAttendees reservationAttendees)
     {
         return new Reservation(Id,
             reservationInformation,
@@ -212,10 +147,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
             RestaurantId,
             reservationStatus,
             reservationAttendees,
-            reservationPaymentId,
-            refundId,
             RequestedAt,
-            PaidAt,
             CancelledAt);
     }
 
@@ -259,7 +191,6 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         ReservationStatus reservationStatus,
         List<MenuId> menuIds,
         DateTime requestedAt,
-        DateTime? payedAt = null,
         DateTime? cancelledAt = null)
     {
         Id = id;
@@ -269,7 +200,6 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         ReservationStatus = reservationStatus;
 
         RequestedAt = requestedAt;
-        PaidAt = payedAt;
         CancelledAt = cancelledAt;
 
         _menuIds = menuIds;
@@ -281,10 +211,7 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         RestaurantId restaurantId,
         ReservationStatus reservationStatus,
         ReservationAttendees reservationAttendees,
-        ReservationPaymentId? reservationPaymentId,
-        RefundId? refundId,
         DateTime requestedAt,
-        DateTime? paidAt = null,
         DateTime? cancelledAt = null)
     {
         Id = id;
@@ -293,11 +220,8 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         RestaurantId = restaurantId;
         ReservationAttendees = reservationAttendees;
         ReservationStatus = reservationStatus;
-        ReservationPaymentId = reservationPaymentId;
-        RefundId = refundId;
-
+        
         RequestedAt = requestedAt;
-        PaidAt = paidAt;
         CancelledAt = cancelledAt;
     }
 
