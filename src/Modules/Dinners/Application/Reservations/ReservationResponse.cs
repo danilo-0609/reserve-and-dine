@@ -7,5 +7,4 @@ public sealed record ReservationResponse(Guid Id,
     Guid RestaurantId,
     ReservationAttendeesResponse ReservationAttendees,
     string ReservationStatus,
-    Guid? PaymentId,
     List<Guid> MenuIds);

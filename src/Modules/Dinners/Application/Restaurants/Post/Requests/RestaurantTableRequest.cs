@@ -2,6 +2,4 @@
 
 public sealed record RestaurantTableRequest(int Number,
         int Seats,
-        bool IsPremium, 
-        decimal Price,
-        string Currency);
+        bool IsPremium);

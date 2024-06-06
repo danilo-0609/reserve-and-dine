@@ -31,7 +31,7 @@ internal sealed class GetRestaurantsByNameQueryHandler : IQueryHandler<GetRestau
                 restaurant.RestaurantInformation.Description,
                 restaurant.RestaurantInformation.Type,
                 restaurant.Chefs.ToList().ConvertAll(chef => chef.Value),
-                restaurant.Specialities.ToList().ConvertAll(speciality => speciality.Value));
+                restaurant.Specialties.ToList().ConvertAll(specialty => specialty.Value));
 
             var restaurantLocalizationResponse = new RestaurantLocalizationResponse(restaurant.RestaurantLocalization.Country,
                 restaurant.RestaurantLocalization.City,

@@ -32,8 +32,7 @@ internal sealed class UpgradeTableCommandHandler : ICommandHandler<UpgradeTableC
         var updateTable = restaurant.UpgradeTable(_executionContextAccessor.UserId,
                 request.Number,
                 request.Seats,
-                request.IsPremium,
-                new Price(request.Price, request.Currency));
+                request.IsPremium);
 
         if (updateTable.IsError)
         {

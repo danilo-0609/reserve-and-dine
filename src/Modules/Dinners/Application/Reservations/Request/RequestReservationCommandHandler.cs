@@ -55,18 +55,10 @@ internal sealed class RequestReservationCommandHandler : ICommandHandler<Request
             return Error.NotFound("Reservation.TableNotFound", "The table was not found");
         }
 
-        Price price = restaurant
-            .RestaurantTables
-            .Where(r => r.Number == request.ReservedTable)
-            .Select(r => r.Price)
-            .Single();
-
         var startTime = TimeSpan.Parse(request.Start);
-        var endTime = TimeSpan.Parse(request.Start);
+        var endTime = TimeSpan.Parse(request.End);
 
         var reservationInformation = ReservationInformation.Create(request.ReservedTable,
-            price.Amount,
-            price.Currency,
             startTime,
             endTime,
             request.ReservationDateTime);

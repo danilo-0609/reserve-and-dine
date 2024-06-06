@@ -7,6 +7,4 @@ namespace Dinners.Application.Restaurants.Tables.Update;
 public sealed record UpgradeTableCommand(Guid RestaurantId,
     int Number,
     int Seats,
-    bool IsPremium,
-    decimal Price,
-    string Currency) : ICommand<ErrorOr<Unit>>;
+    bool IsPremium) : ICommand<ErrorOr<Unit>>;

@@ -18,18 +18,6 @@ internal sealed class RestaurantTablesRequestValidator : AbstractValidator<Resta
         RuleFor(r => r.IsPremium)
             .NotEmpty()
             .NotNull();
-
-        RuleFor(r => r.Price)
-            .NotEmpty()
-            .NotNull();
-
-        RuleFor(r => r.Price)
-            .LessThanOrEqualTo(2_000_000);
-
-        RuleFor(r => r.Currency)
-            .NotEmpty()
-            .Must(value => Enum.TryParse(value, out Currency currency))
-            .WithMessage("Currency must be COP or USD");
     }
 
     private enum MenuType
@@ -37,11 +25,5 @@ internal sealed class RestaurantTablesRequestValidator : AbstractValidator<Resta
         Breakfast,
         Lunch,
         Dinner
-    }
-
-    private enum Currency
-    {
-        USD,
-        COP
     }
 }

@@ -24,7 +24,6 @@ internal sealed class GetReservationByIdQueryHandler : IQueryHandler<GetReservat
         }
 
         ReservationInformationResponse reservationInformation = new(reservation.ReservationInformation.ReservedTable,
-            reservation.ReservationInformation.ReservationPrice,
             reservation.ReservationInformation.TimeOfReservation,
             reservation.ReservationInformation.ReservationDateTime);
 
@@ -37,7 +36,6 @@ internal sealed class GetReservationByIdQueryHandler : IQueryHandler<GetReservat
             reservation.RestaurantId.Value,
             reservationAttendees,
             reservation.ReservationStatus.Value,
-            reservation.ReservationPaymentId?.Value,
             reservation.MenuIds.ConvertAll(r => r.Value));
 
         return reservationResponse;

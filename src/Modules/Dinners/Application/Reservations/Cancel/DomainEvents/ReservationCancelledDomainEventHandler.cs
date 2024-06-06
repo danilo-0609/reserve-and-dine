@@ -1,9 +1,5 @@
 ﻿using BuildingBlocks.Application;
-using Dinners.Application.Common;
 using Dinners.Domain.Reservations.DomainEvents;
-using Dinners.Domain.Restaurants;
-using Dinners.Domain.Restaurants.Errors;
-using Domain.Restaurants;
 
 namespace Dinners.Application.Reservations.Cancel.DomainEvents;
 

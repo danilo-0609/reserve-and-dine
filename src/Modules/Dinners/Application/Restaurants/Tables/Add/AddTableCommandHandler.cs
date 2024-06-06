@@ -32,8 +32,7 @@ internal sealed class AddTableCommandHandler : ICommandHandler<AddTableCommand, 
         var addTable = restaurant.AddTable(_executionContextAccessor.UserId, 
             request.Number, 
             request.Seats, 
-            request.IsPremium,
-            new Price(request.Price, request.Currency));
+            request.IsPremium);
     
         if (addTable.IsError)
         {
