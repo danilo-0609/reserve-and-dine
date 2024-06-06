@@ -1,5 +1,4 @@
 ﻿using Dinners.Domain.Menus.MenuReviews;
-using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Infrastructure.Resolvers;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;

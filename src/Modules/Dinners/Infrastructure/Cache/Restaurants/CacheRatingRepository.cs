@@ -1,7 +1,5 @@
-﻿using Dinners.Domain.Reservations.Refunds;
-using Dinners.Domain.Restaurants;
+﻿using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantRatings;
-using Dinners.Infrastructure.Domain.Restaurants.RestaurantsRatings;
 using Dinners.Infrastructure.Resolvers;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
