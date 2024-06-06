@@ -87,8 +87,8 @@ public sealed class RestaurantTests
 
     private List<RestaurantTable> RestaurantTables = new List<RestaurantTable>()
     {
-        RestaurantTable.Create(RestaurantId, 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
-        RestaurantTable.Create(RestaurantId, 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+        RestaurantTable.Create(RestaurantId, 1, 4, false, new List<ReservedHour>()),
+        RestaurantTable.Create(RestaurantId, 2, 5, false, new List<ReservedHour>())
     };
 
     private List<RestaurantAdministration> RestaurantAdministrations = new List<RestaurantAdministration>()
@@ -378,7 +378,7 @@ public sealed class RestaurantTests
     {
         var restaurant = CreateRestaurant();
 
-        var addTable = restaurant.AddTable(Guid.NewGuid(), 3, 4, true, new Price(20m, "USD"));
+        var addTable = restaurant.AddTable(Guid.NewGuid(), 3, 4, true);
 
         bool isErrorCannotChangeRestaurantProperties = addTable
             .FirstError
@@ -392,9 +392,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -411,8 +411,7 @@ public sealed class RestaurantTests
         var addTable = restaurant.AddTable(restaurant.RestaurantAdministrations.First().AdministratorId,
             1,
             4,
-            true,
-            new Price(20m, "USD"));
+            true);
 
         bool isErrorCannotAddTableWithDuplicateNumber = addTable
             .FirstError
@@ -426,9 +425,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -447,8 +446,7 @@ public sealed class RestaurantTests
         restaurant.AddTable(restaurant.RestaurantAdministrations.First().AdministratorId, 
             tableNumber, 
             4, 
-            true, 
-            new Price(20m, "USD"));
+            true);
 
         bool isNewRestaurantTableStoredInRestaurantTables = restaurant
             .RestaurantTables
@@ -493,9 +491,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -524,7 +522,7 @@ public sealed class RestaurantTests
     {
         var restaurant = CreateRestaurant();
 
-        var upgradeTable = restaurant.UpgradeTable(Guid.NewGuid(), 1, 5, true, new Price(20m, "USD"));
+        var upgradeTable = restaurant.UpgradeTable(Guid.NewGuid(), 1, 5, true);
 
         bool isErrorCannotChangeRestaurantProperties = upgradeTable
             .FirstError
@@ -543,8 +541,7 @@ public sealed class RestaurantTests
         var deleteTable = restaurant.UpgradeTable(restaurant.RestaurantAdministrations.First().AdministratorId,
             tableNumber,
             5,
-            true, 
-            new Price(20m, "USD"));
+            true);
 
         bool isErrorTableDoesNotExist = deleteTable
             .FirstError
@@ -556,13 +553,13 @@ public sealed class RestaurantTests
     [Fact]
     public void UpgradeTable_Should_UpdateRestaurantTable_WhenSuccessful()
     {
-        var firstRestaurantTable = RestaurantTable.Create(RestaurantId, 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>());
+        var firstRestaurantTable = RestaurantTable.Create(RestaurantId, 1, 4, false, new List<ReservedHour>());
 
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -581,8 +578,7 @@ public sealed class RestaurantTests
         restaurant.UpgradeTable(restaurant.RestaurantAdministrations.First().AdministratorId,
             1,
             newAmountOfSeats,
-            true,
-            new Price(20m, "USD"));
+            true);
 
         var restauranTableUpdated = restaurant
             .RestaurantTables
@@ -599,9 +595,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var tableNumber = 3;
@@ -631,9 +627,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -671,9 +667,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -703,9 +699,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -735,9 +731,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -767,9 +763,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -799,9 +795,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,
@@ -829,9 +825,9 @@ public sealed class RestaurantTests
     {
         List<RestaurantTable> restaurantTables = new()
         {
-            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new Price(20m, "USD"), new List<ReservedHour>()),
+            RestaurantTable.Create(RestaurantId, number: 1, 4, false, new List<ReservedHour>()),
 
-            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new Price(20m, "USD"), new List<ReservedHour>())
+            RestaurantTable.Create(RestaurantId, number: 2, 5, false, new List<ReservedHour>())
         };
 
         var restaurant = Restaurant.Post(RestaurantId,

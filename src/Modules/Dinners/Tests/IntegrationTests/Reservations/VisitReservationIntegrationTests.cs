@@ -40,8 +40,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
     {
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddHours(2).TimeOfDay,
             DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddHours(2));
@@ -55,8 +53,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
             RestaurantId.CreateUnique(),
             reservationAttendees,
             new List<MenuId>());
-
-        reservation.Value.Pay();
 
         await DbContext.Reservations.AddAsync(reservation.Value);
         await DbContext.SaveChangesAsync();
@@ -78,8 +74,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
     {
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.TimeOfDay,
             DateTime.Now.AddMinutes(45).TimeOfDay,
             DateTime.Now);
@@ -114,8 +108,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
     {
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.TimeOfDay,
             DateTime.Now.AddMinutes(45).TimeOfDay,
             DateTime.Now);
@@ -129,8 +121,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
             RestaurantId.CreateUnique(),
             reservationAttendees,
             new List<MenuId>());
-
-        reservation.Value.Pay();
 
         await DbContext.Reservations.AddAsync(reservation.Value);
         await DbContext.SaveChangesAsync();
@@ -153,8 +143,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.TimeOfDay,
             DateTime.Now.AddMinutes(45).TimeOfDay,
             DateTime.Now);
@@ -169,7 +157,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
         restaurant.OccupyTable(reservation.Value.ReservationInformation.ReservedTable); //Table will be occuppied
 
         await DbContext.Reservations.AddAsync(reservation.Value);
@@ -194,8 +181,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.TimeOfDay,
             DateTime.Now.AddMinutes(45).TimeOfDay,
             DateTime.Now);
@@ -210,7 +195,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
 
         await DbContext.Reservations.AddAsync(reservation.Value);
         await DbContext.Restaurants.AddAsync(restaurant);
@@ -239,8 +223,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.TimeOfDay,
             DateTime.Now.AddMinutes(45).TimeOfDay,
             DateTime.Now);
@@ -255,7 +237,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
 
         reservation.Value.ClearDomainEvents();
         restaurant.ClearDomainEvents();
@@ -344,8 +325,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.TimeOfDay,
             DateTime.Now.AddMinutes(45).TimeOfDay,
             DateTime.Now);
@@ -360,7 +339,6 @@ public sealed class VisitReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>() { menuId, menuId2 } );
 
-        reservation.Value.Pay();
 
         await DbContext.Restaurants.AddAsync(restaurant);
         await DbContext.Reservations.AddAsync(reservation.Value);

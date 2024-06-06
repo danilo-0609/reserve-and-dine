@@ -31,8 +31,6 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
     {
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddHours(2).TimeOfDay,
             DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddHours(2));
@@ -47,7 +45,6 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
         reservation.Value.Visit();
 
         await DbContext.Reservations.AddAsync(reservation.Value);
@@ -71,8 +68,6 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddHours(2).TimeOfDay,
             DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddHours(2));
@@ -95,22 +90,20 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
 
         var result = await Sender.Send(command);
 
-        bool isErrorCannotFinishIfStatusIsNotAsisting = result
+        bool isErrorCannotFinishIfStatusIsNotAssisting = result
             .FirstError
-            .Code == "Reservation.CannotFinishIfStatusIsNotAsisting";
+            .Code == "Reservation.CannotFinishIfStatusIsNotAssisting";
 
-        Assert.True(isErrorCannotFinishIfStatusIsNotAsisting);
+        Assert.True(isErrorCannotFinishIfStatusIsNotAssisting);
     }
 
     [Fact]
-    public async void Finish_Should_ReturnAnError_WhenRestaurantTableIsNotOccuppiedNow()
+    public async void Finish_Should_ReturnAnError_WhenRestaurantTableIsNotOccupiedNow()
     {
         var restaurant = new RestaurantTests().CreateRestaurant(RestaurantId.CreateUnique());
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddHours(2).TimeOfDay,
             DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddHours(2));
@@ -125,7 +118,6 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
         reservation.Value.Visit();
 
         await DbContext.Reservations.AddAsync(reservation.Value);
@@ -150,8 +142,6 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddMinutes(1).TimeOfDay,
             DateTime.Now.AddMinutes(1).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddMinutes(1));
@@ -166,7 +156,6 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
         reservation.Value.Visit();
 
         restaurant.OccupyTable(reservation.Value.ReservationInformation.ReservedTable);
@@ -187,14 +176,12 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async void Finish_Should_TurnIsOccuppiedPropertyInRestaurantTableToFalse_WhenSuccessful()
+    public async void Finish_Should_TurnIsOcuppiedPropertyInRestaurantTableToFalse_WhenSuccessful()
     {
         var restaurant = new RestaurantTests().CreateRestaurant(RestaurantId.CreateUnique());
 
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddMinutes(1).TimeOfDay,
             DateTime.Now.AddMinutes(1).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddMinutes(1));
@@ -209,7 +196,6 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
         reservation.Value.Visit();
 
         restaurant.OccupyTable(reservation.Value.ReservationInformation.ReservedTable);

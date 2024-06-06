@@ -10,8 +10,6 @@ public sealed class ReservationTests
 {
     private readonly ReservationInformation _reservationInformation = ReservationInformation.Create(
         reservedTable: 1,
-        25.99m,
-        "USD",
         DateTime.Now.AddHours(2).TimeOfDay,
         DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
         DateTime.Now.AddHours(2));
@@ -42,7 +40,7 @@ public sealed class ReservationTests
     }
 
     [Fact]
-    public void Request_Should_ReturnAnReservationInstance_WhenSuccessful()
+    public void Request_Should_ReturnAReservationInstance_WhenSuccessful()
     {
         //Necessary information from restaurant for implementing robust business logic 
 
@@ -121,8 +119,6 @@ public sealed class ReservationTests
             _reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Pay();
-
         //Assist reservation
         reservation.Value.Visit();
 
@@ -136,89 +132,21 @@ public sealed class ReservationTests
     }
 
     [Fact]
-    public void Cancel_Should_RefundMoneyPaid_WhenReservationHasBeenPaid()
+    public void Visit_Should_ReturnAnError_WhenReservationStatusIsNotRequested()
     {
-        var reservation = Reservation.Request(_reservationInformation,
-            4,
-            RestaurantId.CreateUnique(),
-            _reservationAttendees,
-            new List<MenuId>());
+        ReservationInformation reservationInformation = ReservationInformation.Create(
+            reservedTable: 1,
+            DateTime.Now.TimeOfDay,
+            DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
+            DateTime.Now);
 
-        reservation.Value.Pay();
-
-        reservation.Value.Cancel();
-
-        bool hasRefundedMoney = reservation
-            .Value
-            .RefundId is not null;
-
-        Assert.True(hasRefundedMoney);
-    }
-
-    [Fact]
-    public void Cancel_Should_RaiseReservationCancelledDomainEvent_WhenSuccessful()
-    {
-        var reservation = Reservation.Request(_reservationInformation,
+        var reservation = Reservation.Request(reservationInformation,
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
             new List<MenuId>());
 
         reservation.Value.Cancel();
-
-        bool hasRaisedReservationCancelledDomainEvent = reservation
-            .Value
-            .DomainEvents
-            .Any(r => r.GetType() == typeof(ReservationCancelledDomainEvent));
-
-        Assert.True(hasRaisedReservationCancelledDomainEvent);
-    }
-
-    [Fact]
-    public void Pay_Should_ReturnAnError_WhenReservationStatusIsNotRequested()
-    {
-        var reservation = Reservation.Request(_reservationInformation,
-            4,
-            RestaurantId.CreateUnique(),
-            _reservationAttendees,
-            new List<MenuId>());
-
-        reservation.Value.Cancel();
-
-        var pay = reservation.Value.Pay();
-
-        bool isErrorCannotPayWhenReservationStatusIsNotRequested = pay
-            .FirstError
-            .Code == "Reservation.CannotPayWhenReservationStatusIsNotRequested";
-
-        Assert.True(isErrorCannotPayWhenReservationStatusIsNotRequested);
-    }
-
-    [Fact]
-    public void Pay_Should_ReturnAReservationPaymentId_WhenSuccessful()
-    {
-        var reservation = Reservation.Request(_reservationInformation,
-            4,
-            RestaurantId.CreateUnique(),
-            _reservationAttendees,
-            new List<MenuId>());
-
-        var pay = reservation.Value.Pay();
-
-        bool hasReturnedReservationPaymentId = pay
-            .Value is not null;
-
-        Assert.True(hasReturnedReservationPaymentId);
-    }
-
-    [Fact]
-    public void Visit_Should_ReturnAnError_WhenReservationStatusIsNotPaid()
-    {
-        var reservation = Reservation.Request(_reservationInformation,
-            4,
-            RestaurantId.CreateUnique(),
-            _reservationAttendees,
-            new List<MenuId>());
 
         var visit = reservation.Value.Visit();
 
@@ -232,13 +160,17 @@ public sealed class ReservationTests
     [Fact]
     public void Visit_Should_RaiseReservationVisitedDomainEvent_WhenSuccessful()
     {
-        var reservation = Reservation.Request(_reservationInformation,
+        ReservationInformation reservationInformation = ReservationInformation.Create(
+            reservedTable: 1,
+            DateTime.Now.TimeOfDay,
+            DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
+            DateTime.Now);
+
+        var reservation = Reservation.Request(reservationInformation,
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
             new List<MenuId>());
-
-        reservation.Value.Pay();
 
         reservation.Value.Visit();
 
@@ -253,13 +185,17 @@ public sealed class ReservationTests
     [Fact]
     public void Visit_Should_TurnReservationStatusToVisiting_WhenSuccessful()
     {
-        var reservation = Reservation.Request(_reservationInformation,
+        ReservationInformation reservationInformation = ReservationInformation.Create(
+            reservedTable: 1,
+            DateTime.Now.TimeOfDay,
+            DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
+            DateTime.Now);
+
+        var reservation = Reservation.Request(reservationInformation,
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
             new List<MenuId>());
-
-        reservation.Value.Pay();
 
         reservation.Value.Visit();
 
@@ -291,13 +227,17 @@ public sealed class ReservationTests
     [Fact]
     public void Finish_Should_RaiseAReservationFinishedDomainEvent_WhenSuccessful()
     {
-        var reservation = Reservation.Request(_reservationInformation,
+        ReservationInformation reservationInformation = ReservationInformation.Create(
+            reservedTable: 1,
+            DateTime.Now.TimeOfDay,
+            DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
+            DateTime.Now);
+
+        var reservation = Reservation.Request(reservationInformation,
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
             new List<MenuId>());
-
-        reservation.Value.Pay();
 
         reservation.Value.Visit();
 
@@ -314,13 +254,17 @@ public sealed class ReservationTests
     [Fact]
     public void Finish_Should_TurnReservationStatusToFinished_WhenSuccessful()
     {
-        var reservation = Reservation.Request(_reservationInformation,
+        ReservationInformation reservationInformation = ReservationInformation.Create(
+            reservedTable: 1,
+            DateTime.Now.TimeOfDay,
+            DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
+            DateTime.Now);
+
+        var reservation = Reservation.Request(reservationInformation,
             4,
             RestaurantId.CreateUnique(),
             _reservationAttendees,
             new List<MenuId>());
-
-        reservation.Value.Pay();
 
         reservation.Value.Visit();
 

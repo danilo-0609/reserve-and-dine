@@ -26,8 +26,8 @@ public sealed class ModifyScheduleIntegrationTests : BaseIntegrationTest
         var command = new ModifyRestaurantScheduleCommand(
             RestaurantId: Guid.NewGuid(),
             DayOfWeek.Monday,
-            DateTime.Now,
-            DateTime.Now.AddHours(8));
+            DateTime.Now.TimeOfDay.ToString(),
+            DateTime.Now.AddHours(8).TimeOfDay.ToString());
 
         _executionContextAccessorMock.UserId.Returns(Guid.NewGuid());
 
@@ -55,8 +55,8 @@ public sealed class ModifyScheduleIntegrationTests : BaseIntegrationTest
         var command = new ModifyRestaurantScheduleCommand(
             RestaurantId: restaurant.Id.Value,
             DayOfWeek.Monday,
-            DateTime.Now,
-            DateTime.Now.AddHours(8));
+            DateTime.Now.TimeOfDay.ToString(),
+            DateTime.Now.AddHours(8).TimeOfDay.ToString());
 
         //User is not admin
         _executionContextAccessorMock.UserId.Returns(Guid.NewGuid());
@@ -85,8 +85,8 @@ public sealed class ModifyScheduleIntegrationTests : BaseIntegrationTest
         var command = new ModifyRestaurantScheduleCommand(
             RestaurantId: restaurant.Id.Value,
             DayOfWeek.Monday,
-            DateTime.Now,
-            DateTime.Now.AddHours(8));
+            DateTime.Now.TimeOfDay.ToString(),
+            DateTime.Now.AddHours(8).TimeOfDay.ToString());
 
         _executionContextAccessorMock.UserId.Returns(restaurant
             .RestaurantAdministrations
@@ -107,8 +107,8 @@ public sealed class ModifyScheduleIntegrationTests : BaseIntegrationTest
         bool isScheduleAdded = getRestaurant
             .RestaurantSchedules
             .Any(r => r.Day.DayOfWeek == command.Day &&
-                r.HoursOfOperation.Start == command.Start &&
-                r.HoursOfOperation.End == command.End);
+                r.HoursOfOperation.Start == TimeSpan.Parse(command.Start) &&
+                r.HoursOfOperation.End == TimeSpan.Parse(command.End));
 
         Assert.True(isScheduleAdded);
     }

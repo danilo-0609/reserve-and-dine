@@ -30,9 +30,7 @@ public sealed class AddTableIntegrationTests : BaseIntegrationTest
         var command = new AddTableCommand(RestaurantId: Guid.NewGuid(),
             1,
             5,
-            true,
-            15.21m,
-            "USD");
+            true);
 
         var result = await Sender.Send(command);
 
@@ -54,9 +52,7 @@ public sealed class AddTableIntegrationTests : BaseIntegrationTest
         var command = new AddTableCommand(RestaurantId: restaurant.Id.Value,
             1,
             5,
-            true,
-            15.21m,
-            "USD");
+            true);
 
         _executionContextAccessor.UserId.Returns(Guid.NewGuid());
 
@@ -83,9 +79,7 @@ public sealed class AddTableIntegrationTests : BaseIntegrationTest
         var command = new AddTableCommand(RestaurantId: restaurant.Id.Value,
             Number: 1,
             5,
-            true,
-            15.21m,
-            "USD");
+            true);
 
         _executionContextAccessor.UserId.Returns(restaurant.RestaurantAdministrations.First().AdministratorId);
 
@@ -113,9 +107,7 @@ public sealed class AddTableIntegrationTests : BaseIntegrationTest
         var command = new AddTableCommand(RestaurantId: restaurant.Id.Value,
             Number: numberOfTable,
             5,
-            true,
-            15.21m,
-            "USD");
+            true);
 
         _executionContextAccessor.UserId.Returns(restaurant.RestaurantAdministrations.First().AdministratorId);
 

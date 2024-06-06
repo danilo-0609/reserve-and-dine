@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IntegrationTests\Restaurants\Delete\" />
     <Folder Include="IntegrationTests\Restaurants\Tables\Get\" />
     <Folder Include="IntegrationTests\Restaurants\Tables\Update\" />
   </ItemGroup>

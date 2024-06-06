@@ -24,7 +24,7 @@ public sealed class PostRestaurantIntegrationTests : BaseIntegrationTest
 
         var restaurantSchedules = restaurant.RestaurantSchedules.ConvertAll(r =>
         {
-            return new RestaurantScheduleRequest(r.Day.DayOfWeek, r.HoursOfOperation.Start, r.HoursOfOperation.End);
+            return new RestaurantScheduleRequest(r.Day.DayOfWeek, "7", "20");
         });
 
         var restaurantLocalization = new RestaurantLocalizationRequest(restaurant.RestaurantLocalization.Country,
@@ -36,7 +36,7 @@ public sealed class PostRestaurantIntegrationTests : BaseIntegrationTest
 
         var restaurantTablesRequest = restaurant.RestaurantTables.ConvertAll(r =>
         {
-            return new RestaurantTableRequest(r.Number, r.Seats, r.IsPremium, r.Price.Amount, r.Price.Currency);
+            return new RestaurantTableRequest(r.Number, r.Seats, r.IsPremium);
         });
 
         var restaurantAdministrationsRequest = restaurant.RestaurantAdministrations.ConvertAll(r =>
@@ -60,7 +60,7 @@ public sealed class PostRestaurantIntegrationTests : BaseIntegrationTest
             restaurantAdministrationsRequest,
             restaurantContact,
             restaurant.Chefs.ConvertAll(r => r.Value),
-            restaurant.Specialities.ConvertAll(r => r.Value));
+            restaurant.Specialties.ConvertAll(r => r.Value));
     
         var result = await Sender.Send(command);
 

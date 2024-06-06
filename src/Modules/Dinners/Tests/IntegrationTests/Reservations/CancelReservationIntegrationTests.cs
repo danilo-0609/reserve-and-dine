@@ -29,8 +29,6 @@ public sealed class CancelReservationIntegrationTests : BaseIntegrationTest
     {
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddHours(2).TimeOfDay,
             DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddHours(2));
@@ -66,8 +64,6 @@ public sealed class CancelReservationIntegrationTests : BaseIntegrationTest
     {
         var reservationInformation = ReservationInformation.Create(
             reservedTable: 1,
-            25.99m,
-            "USD",
             DateTime.Now.AddHours(2).TimeOfDay,
             DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
             DateTime.Now.AddHours(2));
@@ -95,44 +91,5 @@ public sealed class CancelReservationIntegrationTests : BaseIntegrationTest
             .AnyAsync(res => res.ReservationStatus == ReservationStatus.Cancelled);
 
         Assert.True(isReservationStatusCancelled);
-    }
-
-    [Fact]
-    public async void Cancel_Should_PublishMoneyRefundedDomainEventToAddRefundEntityToDatabase_WhenUserHasPaid()
-    {
-        var reservationInformation = ReservationInformation.Create(
-            reservedTable: 1,
-            25.99m,
-            "USD",
-            DateTime.Now.AddHours(2).TimeOfDay,
-            DateTime.Now.AddHours(2).AddMinutes(45).TimeOfDay,
-            DateTime.Now.AddHours(2));
-
-        var reservationAttendees = ReservationAttendees.Create(Guid.NewGuid(),
-            "Client name",
-            numberOfAttendees: 4);
-
-        var reservation = Reservation.Request(reservationInformation,
-            4,
-            RestaurantId.CreateUnique(),
-            reservationAttendees,
-            new List<MenuId>());
-
-        reservation.Value.Pay();
-
-        await DbContext.Reservations.AddAsync(reservation.Value);
-        await DbContext.SaveChangesAsync();
-
-        var command = new CancelReservationCommand(reservation.Value.Id.Value);
-
-        await Sender.Send(command);
-
-        await Task.Delay(15_000);
-
-        bool isRefundEntityStoredInDatabase = await DbContext
-            .Refunds
-            .AnyAsync();
-    
-        Assert.True(isRefundEntityStoredInDatabase);
     }
 }
