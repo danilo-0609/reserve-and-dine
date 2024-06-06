@@ -2,8 +2,6 @@
 using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.MenuReviews;
 using Dinners.Domain.Reservations;
-using Dinners.Domain.Reservations.Refunds;
-using Dinners.Domain.Reservations.ReservationsPayments;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.RestaurantRatings;
 using Dinners.Infrastructure.Blobs;
@@ -14,8 +12,6 @@ using Dinners.Infrastructure.Domain.Menus;
 using Dinners.Infrastructure.Domain.Menus.MenuReviews;
 using Dinners.Infrastructure.Domain.Menus.Reviews;
 using Dinners.Infrastructure.Domain.Reservations;
-using Dinners.Infrastructure.Domain.Reservations.Payments;
-using Dinners.Infrastructure.Domain.Reservations.Refunds;
 using Dinners.Infrastructure.Domain.Restaurants;
 using Dinners.Infrastructure.Domain.Restaurants.Ratings;
 using Dinners.Infrastructure.EventsBus;
@@ -46,7 +42,6 @@ public static class DependencyInjection
         services.AddQuartz();
         services.ConfigureOptions<ProcessDinnersOutboxMessagesJobSetup>();
         services.ConfigureOptions<CancelNotAsistedReservationsJobSetup>();
-        services.ConfigureOptions<CancelNotPaidReservationsJobSetup>();
         services.ConfigureOptions<CancelReservationsAfterRestaurantWasClosedOutOfScheduleJobSetup>();
 
         services.AddScoped<IApplicationDbContext>(sp =>
@@ -64,12 +59,6 @@ public static class DependencyInjection
 
         services.AddScoped<IReservationRepository, ReservationRepository>();
         services.Decorate<IReservationRepository, CacheReservationRepository>();
-
-        services.AddScoped<IReservationPaymentRepository, PaymentRepository>();
-        services.Decorate<IReservationPaymentRepository, CachePaymentRepository>();
-
-        services.AddScoped<IRefundRepository, RefundRepository>();
-        services.Decorate<IRefundRepository, CacheRefundRepository>();
 
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.Decorate<IReviewRepository, CacheReviewRepository>();
