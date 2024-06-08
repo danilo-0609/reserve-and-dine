@@ -41,5 +41,10 @@ public sealed class RestaurantSchedule : Entity<RestaurantScheduleId, Guid>
         ReopeningTime = reopeningTime;
     }
 
+    public void ClearReopeningTime()
+    {
+        ReopeningTime = null;
+    }
+
     private RestaurantSchedule() { }
 }

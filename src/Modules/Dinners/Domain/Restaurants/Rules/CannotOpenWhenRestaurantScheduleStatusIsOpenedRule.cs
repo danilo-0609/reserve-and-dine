@@ -16,7 +16,7 @@ internal sealed class CannotOpenWhenRestaurantScheduleStatusIsOpenedRule : IBusi
 
     public Error Error => RestaurantErrorCodes.CannotOpenWhenRestaurantIsOpened;
 
-    public bool IsBroken() => _scheduleStatus == RestaurantScheduleStatus.Opened;
+    public bool IsBroken() => _scheduleStatus == RestaurantScheduleStatus.Open;
 
     public static string Message => "Cannot open when restaurant schedule status is opened";
 }
