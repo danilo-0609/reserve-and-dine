@@ -3,7 +3,7 @@ using Quartz;
 
 namespace Dinners.Infrastructure.Jobs.Setups;
 
-internal sealed class CancelNotAsistedReservationsJobSetup : IConfigureOptions<QuartzOptions>
+internal sealed class CancelNotAssistedReservationsJobSetup : IConfigureOptions<QuartzOptions>
 {
     public void Configure(QuartzOptions options)
     {
