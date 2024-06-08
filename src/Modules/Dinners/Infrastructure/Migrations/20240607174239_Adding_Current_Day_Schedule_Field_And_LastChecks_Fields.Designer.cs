@@ -5,6 +5,7 @@ using Dinners.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,9 +13,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dinners.Infrastructure.Migrations
 {
     [DbContext(typeof(DinnersDbContext))]
-    partial class DinnersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240607174239_Adding_Current_Day_Schedule_Field_And_LastChecks_Fields")]
+    partial class Adding_Current_Day_Schedule_Field_And_LastChecks_Fields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

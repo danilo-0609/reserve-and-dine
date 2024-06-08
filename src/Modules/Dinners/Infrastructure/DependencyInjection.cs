@@ -41,8 +41,12 @@ public static class DependencyInjection
         services.AddQuartzHostedService();
         services.AddQuartz();
         services.ConfigureOptions<ProcessDinnersOutboxMessagesJobSetup>();
-        services.ConfigureOptions<CancelNotAsistedReservationsJobSetup>();
+        services.ConfigureOptions<CancelNotAssistedReservationsJobSetup>();
         services.ConfigureOptions<CancelReservationsAfterRestaurantWasClosedOutOfScheduleJobSetup>();
+        services.ConfigureOptions<SetCurrentDayScheduleJobSetup>();
+        services.ConfigureOptions<SetRestaurantScheduleStatusToClosedAfterClosingTimeJobSetup>();
+        services.ConfigureOptions<SetRestaurantScheduleStatusToOpenAfterOpeningTimeJobSetup>();
+        services.ConfigureOptions<ClearReopeningTimesAfterTheyFinishJobSetup>();
 
         services.AddScoped<IApplicationDbContext>(sp =>
             sp.GetRequiredService<DinnersDbContext>());

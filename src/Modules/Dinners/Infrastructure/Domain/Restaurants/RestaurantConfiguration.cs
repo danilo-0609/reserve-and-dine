@@ -89,6 +89,11 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
                 .IsRequired(false);
         });
 
+        builder.ComplexProperty(r => r.CurrentDaySchedule, x =>
+        {
+            x.Property(r => r.DayOfWeek).HasColumnName("CurrentDaySchedule");
+        });
+
         builder.ComplexProperty(r => r.RestaurantContact, x =>
         {
             x.Property(r => r.Email).HasColumnName("Email");
@@ -234,8 +239,8 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
 
             x.Property(r => r.Id)
                 .HasConversion(
-                    specialityId => specialityId.Value,
-                    value => SpecialityId.Create(value))
+                    specialtyId => specialtyId.Value,
+                    value => SpecialtyId.Create(value))
                 .HasColumnName("SpecialtyId");
 
             x.Property(r => r.RestaurantId)
@@ -245,7 +250,7 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
             .ValueGeneratedNever()
             .HasColumnName("RestaurantId");
 
-            x.Property(r => r.Value).HasColumnName("Speciality");
+            x.Property(r => r.Value).HasColumnName("Specialty");
         });
 
         builder.OwnsMany(p => p.RestaurantImagesUrl, c =>
@@ -272,5 +277,13 @@ internal sealed class RestaurantConfiguration : IEntityTypeConfiguration<Restaur
 
         builder.Property(r => r.PostedAt)
             .HasColumnName("PostedAt");
+
+        builder.Property(r => r.LastCheckedScheduleStatus)
+            .HasColumnName("LastCheckedScheduleStatus")
+            .IsRequired(false);
+        
+        builder.Property(r => r.LastCheckedCurrentDaySchedule)
+            .HasColumnName("LastCheckedCurrentDaySchedule")
+            .IsRequired(false);
     }
 }
