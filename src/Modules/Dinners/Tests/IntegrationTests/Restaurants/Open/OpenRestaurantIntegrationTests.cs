@@ -114,7 +114,7 @@ public sealed class OpenRestaurantIntegrationTests : BaseIntegrationTest
             .Where(r => r.Id == restaurantId)
             .SingleOrDefaultAsync();
         
-        bool scheduleStatusIsOpened = getRestaurant!.RestaurantScheduleStatus == RestaurantScheduleStatus.Opened;
+        bool scheduleStatusIsOpened = getRestaurant!.RestaurantScheduleStatus == RestaurantScheduleStatus.Open;
 
         Assert.True(scheduleStatusIsOpened);
     }

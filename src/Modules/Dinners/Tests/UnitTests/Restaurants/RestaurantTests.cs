@@ -173,9 +173,13 @@ public sealed class RestaurantTests
     {
         List<RestaurantSchedule> restaurantSchedules = new()
         {
+            RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek - 1,
+                TimeSpan.Parse("21:00"),
+                TimeSpan.Parse("02:00")),
+
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.DayOfWeek,
-                TimeSpan.Parse("07:00"),
-                TimeSpan.Parse("20:00")),
+                TimeSpan.Parse("21:00"),
+                TimeSpan.Parse("03:00")),
 
             RestaurantSchedule.Create(RestaurantId, DateTime.Now.AddDays(1).DayOfWeek,
                 TimeSpan.Parse("07:00"),
@@ -194,9 +198,9 @@ public sealed class RestaurantTests
             DateTime.UtcNow);
 
         var reservationTable = restaurant.ReserveTable(1,
-            new TimeRange(start: TimeSpan.Parse("21:00"),
-                end: TimeSpan.Parse("21:30")),
-            DateTime.Now.AddDays(1).AddHours(2));
+            new TimeRange(start: TimeSpan.Parse("07:00"),
+                end: TimeSpan.Parse("07:30")),
+            DateTime.Now.AddDays(1).AddMinutes(30));
 
         bool isErrorTimeOfReservationIsOutOfSchedule = reservationTable.FirstError.Code == "Restaurant.CannotReserveWhenTimeOfReservationIsOutOfSchedule";
 
@@ -368,7 +372,7 @@ public sealed class RestaurantTests
 
         restaurant.Open(restaurant.RestaurantAdministrations.First().AdministratorId);
 
-        bool isRestaurantOpened = restaurant.RestaurantScheduleStatus == RestaurantScheduleStatus.Opened;
+        bool isRestaurantOpened = restaurant.RestaurantScheduleStatus == RestaurantScheduleStatus.Open;
 
         Assert.True(isRestaurantOpened);
     }
