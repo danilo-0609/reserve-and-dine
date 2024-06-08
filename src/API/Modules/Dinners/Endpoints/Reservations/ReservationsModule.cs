@@ -9,6 +9,7 @@ using Dinners.Application.Reservations.Finish;
 using Dinners.Application.Reservations.GetById;
 using Dinners.Application.Reservations.Request;
 using Dinners.Application.Reservations.Visit;
+using Dinners.Domain.Restaurants;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -39,7 +40,9 @@ public sealed class ReservationsModule : CarterModule
 
             var authorization = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor!.HttpContext!.User,
-                id,
+                new Tuple<RestaurantId, Guid>(
+                    RestaurantId.Create(result.Value.RestaurantId), 
+                    result.Value.ReservationAttendees.ClientId),
                 Policy.CanGetReservation);
 
             if (!authorization.Succeeded)

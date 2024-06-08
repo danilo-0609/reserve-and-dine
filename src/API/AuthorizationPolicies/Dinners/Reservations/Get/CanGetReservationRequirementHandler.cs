@@ -6,18 +6,16 @@ using System.Text.RegularExpressions;
 
 namespace API.AuthorizationPolicies.Dinners.Reservations.Get;
 
-public class CanGetReservationRequirementHandler : AuthorizationHandler<CanGetReservationRequirement, Guid>
+public class CanGetReservationRequirementHandler : AuthorizationHandler<CanGetReservationRequirement, Tuple<RestaurantId, Guid>>
 {
-    private readonly IReservationRepository _reservationRepository;
     private readonly IRestaurantRepository _restaurantRepository;
 
-    public CanGetReservationRequirementHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository)
+    public CanGetReservationRequirementHandler(IRestaurantRepository restaurantRepository)
     {
-        _reservationRepository = reservationRepository;
         _restaurantRepository = restaurantRepository;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CanGetReservationRequirement requirement, Guid resource)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CanGetReservationRequirement requirement, Tuple<RestaurantId, Guid> resources)
     {
         string? userIdValue = context.User.Claims
                     .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value.ToString();
@@ -31,23 +29,15 @@ public class CanGetReservationRequirementHandler : AuthorizationHandler<CanGetRe
 
         Guid userId = Guid.Parse(match.Value);
 
-        var reservation = await _reservationRepository
-            .GetByIdAsync(ReservationId.Create(resource), CancellationToken.None);
-
-        if (reservation is null)
-        {
-            return;
-        }
-
         var restaurant = await _restaurantRepository
-            .GetRestaurantById(reservation!.RestaurantId);
+            .GetRestaurantById(resources.Item1);
 
         if (restaurant is null)
         {
             return;
         }
 
-        if (reservation.ReservationAttendees.ClientId == userId ||
+        if (resources.Item2 == userId ||
             restaurant.RestaurantAdministrations.Any(r => r.AdministratorId == userId))
         {
             context.Succeed(requirement);
