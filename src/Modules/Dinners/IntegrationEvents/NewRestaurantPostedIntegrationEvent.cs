@@ -5,4 +5,4 @@ namespace Dinners.IntegrationEvents;
 public sealed record NewRestaurantPostedIntegrationEvent(Guid IntegrationEventId,
     Guid RestaurantId,
     Guid ClientId,
-    DateTime OcurredOn) : IntegrationEvent(IntegrationEventId, OcurredOn);
+    DateTime OccurredOn) : IntegrationEvent(IntegrationEventId, OccurredOn);

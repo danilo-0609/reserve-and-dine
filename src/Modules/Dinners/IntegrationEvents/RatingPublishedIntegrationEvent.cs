@@ -9,4 +9,4 @@ public sealed record RatingPublishedIntegrationEvent(
     int Stars,
     Guid RestaurantId,
     string RestaurantTitle,
-    DateTime OcurredOn) : IntegrationEvent(IntegrationEventId, OcurredOn);
+    DateTime OccurredOn) : IntegrationEvent(IntegrationEventId, OccurredOn);
