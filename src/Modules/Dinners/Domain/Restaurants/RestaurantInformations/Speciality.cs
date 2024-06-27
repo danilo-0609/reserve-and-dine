@@ -2,15 +2,15 @@
 
 namespace Dinners.Domain.Restaurants.RestaurantInformations;
 
-public sealed class Speciality : Entity<SpecialityId, Guid>
+public sealed class Speciality : Entity<SpecialtyId, Guid>
 {
-    public new SpecialityId Id { get; private set; }
+    public new SpecialtyId Id { get; private set; }
 
     public RestaurantId RestaurantId { get; private set; }
 
     public string Value { get; private set; }
 
-    public Speciality(SpecialityId id, RestaurantId restaurantId, string value)
+    public Speciality(SpecialtyId id, RestaurantId restaurantId, string value)
     {
         Id = id;
         RestaurantId = restaurantId;
