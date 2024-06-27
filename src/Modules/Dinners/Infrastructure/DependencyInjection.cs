@@ -15,6 +15,7 @@ using Dinners.Infrastructure.Domain.Reservations;
 using Dinners.Infrastructure.Domain.Restaurants;
 using Dinners.Infrastructure.Domain.Restaurants.Ratings;
 using Dinners.Infrastructure.EventsBus;
+using Dinners.Infrastructure.Jobs;
 using Dinners.Infrastructure.Jobs.Setups;
 using Dinners.Infrastructure.Outbox.BackgroundJobs;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,7 @@ public static class DependencyInjection
         services.ConfigureOptions<SetRestaurantScheduleStatusToClosedAfterClosingTimeJobSetup>();
         services.ConfigureOptions<SetRestaurantScheduleStatusToOpenAfterOpeningTimeJobSetup>();
         services.ConfigureOptions<ClearReopeningTimesAfterTheyFinishJobSetup>();
+        services.ConfigureOptions<FinishReservationsWhenEndTimeHasComeJobSetup>();
 
         services.AddScoped<IApplicationDbContext>(sp =>
             sp.GetRequiredService<DinnersDbContext>());
