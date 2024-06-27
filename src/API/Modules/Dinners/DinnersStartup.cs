@@ -1,7 +1,7 @@
 ﻿using Dinners.Application;
 using Dinners.Infrastructure;
 
-namespace API.Modules.Dinners.Startup;
+namespace API.Modules.Dinners;
 
 public static class DinnersStartup
 {

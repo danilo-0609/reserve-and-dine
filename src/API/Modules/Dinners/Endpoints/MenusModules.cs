@@ -1,5 +1,4 @@
-﻿using API.AuthorizationPolicies.Dinners.Menus.Publish;
-using API.Configuration;
+﻿using API.Configuration;
 using API.Modules.Dinners.Requests.Menus;
 using Carter;
 using Dinners.Application.Menus.GetById;
@@ -16,15 +15,14 @@ using Dinners.Application.Menus.Review;
 using Dinners.Application.Menus.UpdateReview.Comments;
 using Dinners.Application.Menus.UpdateReview.Rate;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Modules.Dinners.Endpoints.Menus;
+namespace API.Modules.Dinners.Endpoints;
 
 public sealed class MenusModules : CarterModule
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    
+
     public MenusModules(IHttpContextAccessor httpContextAccessor)
         : base("/menus")
     {
@@ -33,7 +31,9 @@ public sealed class MenusModules : CarterModule
 
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/{id}", async (Guid id, [FromServices] ISender sender) =>
+        app.MapGet("/{id}", async (
+            Guid id,
+            [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetMenuByIdQuery(id));
 
@@ -43,20 +43,9 @@ public sealed class MenusModules : CarterModule
         });
 
         app.MapPost("/", async (
-            [FromBody] PublishMenuRequest request, 
-            [FromServices] ISender sender, 
-            [FromServices] IAuthorizationService authorizationService) =>
+            [FromBody] PublishMenuRequest request,
+            [FromServices] ISender sender) =>
         {
-            var authorization = await authorizationService.AuthorizeAsync(
-                _httpContextAccessor!.HttpContext!.User,
-                request.RestaurantId,
-                new CanPublishAMenuRequirement());
-
-            if (!authorization.Succeeded)
-            {
-                return Results.Forbid();
-            }
-
             var command = await sender.Send(new PublishMenuCommand(request.RestaurantId,
                 request.Title,
                 request.Description,
@@ -87,7 +76,7 @@ public sealed class MenusModules : CarterModule
         .RequireAuthorization();
 
         app.MapGet("/ingredient", async (
-            [FromBody] string ingredient, 
+            [FromQuery] string ingredient,
             [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetMenusByIngredientQuery(ingredient));
@@ -97,7 +86,9 @@ public sealed class MenusModules : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("/name/{name}", async (string name, ISender sender) =>
+        app.MapGet("/name", async (
+            [FromQuery] string name,
+            [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetMenusByNameQuery(name));
 
@@ -106,7 +97,9 @@ public sealed class MenusModules : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapGet("/reviews/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("/reviews/{id}", async (
+            Guid id,
+            [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetMenuReviewsByMenuIdQuery(id));
 
@@ -115,7 +108,10 @@ public sealed class MenusModules : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/images/{id}", async ([FromForm] IFormFile file, Guid id, [FromServices] ISender sender) =>
+        app.MapPut("/images/{id}", async (
+            [FromForm] IFormFile file,
+            Guid id,
+            [FromServices] ISender sender) =>
         {
             var filePath = await GetFilePath(file);
 
@@ -126,13 +122,14 @@ public sealed class MenusModules : CarterModule
             return command.Match(
                 onValue => Results.NoContent(),
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
 
         static async Task<string> GetFilePath(IFormFile file)
         {
             string filePath = Path.GetTempFileName();
 
-            using (var stream = System.IO.File.Create(filePath))
+            using (var stream = File.Create(filePath))
             {
                 await file.CopyToAsync(stream);
             }
@@ -140,16 +137,23 @@ public sealed class MenusModules : CarterModule
             return filePath;
         }
 
-        app.MapDelete("/images/{id}", async (Guid id, string menuImageUrl, [FromServices] ISender sender) =>
+        app.MapDelete("/images/{id}/{imageId}", async (
+            Guid id,
+            Guid imageId,
+            [FromServices] ISender sender) =>
         {
-            var command = await sender.Send(new DeleteMenuImageCommand(id, menuImageUrl));
+            var command = await sender.Send(new DeleteMenuImageCommand(id, imageId));
 
             return command.Match(
                  onValue => Results.NoContent(),
                  onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
 
-        app.MapGet("/images/{menuId}/{imageId}", async (Guid menuId, Guid imageId, ISender sender) =>
+        app.MapGet("/images/{menuId}/{imageId}", async (
+            Guid menuId,
+            Guid imageId,
+            [FromServices] ISender sender) =>
         {
             var query = await sender.Send(new GetMenuImageByIdQuery(menuId, imageId));
 
@@ -158,7 +162,10 @@ public sealed class MenusModules : CarterModule
                 onError => new ProblemError(_httpContextAccessor).Errors(onError));
         });
 
-        app.MapPut("/schedules/{id}", async (Guid id, [FromBody] SetMenuScheduleRequest request, [FromServices] ISender sender) =>
+        app.MapPut("/schedules/{id}", async (
+            Guid id,
+            [FromBody] SetMenuScheduleRequest request,
+            [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new SetMenuScheduleCommand(id,
                 request.Day,
@@ -168,9 +175,13 @@ public sealed class MenusModules : CarterModule
             return command.Match(
                  onValue => Results.NoContent(),
                  onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
 
-        app.MapPut("/specification/{id}", async (Guid id, [FromBody] UpdateMenuDetailsRequest request, [FromServices] ISender sender) =>
+        app.MapPut("/specification/{id}", async (
+            Guid id,
+            [FromBody] UpdateMenuDetailsRequest request,
+            [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpdateMenuDetailsCommand(id,
                 request.Title,
@@ -187,33 +198,46 @@ public sealed class MenusModules : CarterModule
             return command.Match(
                  onValue => Results.NoContent(),
                  onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
 
-        app.MapPost("/reviews/{id}", async (Guid id, [FromBody] ReviewMenuRequest request, [FromServices] ISender sender) =>
+        app.MapPost("/reviews/{id}", async (
+            Guid id,
+            [FromBody] ReviewMenuRequest request,
+            [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new ReviewMenuCommand(id, request.Rate, request.Comment));
 
             return command.Match(
                  onValue => Results.Created(onValue.ToString(), onValue),
                  onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
 
-        app.MapPut("/reviews/comments/{menuReviewId}", async (Guid menuReviewId, string comment, [FromServices] ISender sender) =>
+        app.MapPut("/reviews/comments/{menuReviewId}", async (
+            Guid menuReviewId,
+            string comment,
+            [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpdateReviewCommentCommand(menuReviewId, comment));
 
             return command.Match(
                  onValue => Results.NoContent(),
                  onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
 
-        app.MapPut("/reviews/rates/{menuReviewId}", async (Guid menuReviewId, decimal rate, [FromServices] ISender sender) =>
+        app.MapPut("/reviews/rates/{menuReviewId}", async (
+            Guid menuReviewId,
+            decimal rate,
+            [FromServices] ISender sender) =>
         {
             var command = await sender.Send(new UpdateReviewRateCommand(menuReviewId, rate));
 
             return command.Match(
                  onValue => Results.NoContent(),
                  onError => new ProblemError(_httpContextAccessor).Errors(onError));
-        });
+        })
+            .RequireAuthorization();
     }
 }

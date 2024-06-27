@@ -13,7 +13,7 @@ public sealed class UsersModule : CarterModule
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UsersModule(IHttpContextAccessor httpContextAccessor)
-        : base("users")
+        : base("auth")
     {
         _httpContextAccessor = httpContextAccessor;
     }

@@ -1,7 +1,7 @@
 ﻿using Users.Application;
 using Users.Infrastructure;
 
-namespace API.Modules.Users.Startup;
+namespace API.Modules.Users;
 
 public static class UsersStartup
 {
