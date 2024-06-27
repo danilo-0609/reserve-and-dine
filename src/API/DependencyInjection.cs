@@ -9,9 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Users.Infrastructure.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using API.AuthorizationPolicies.Dinners.Menus.DeleteOrUpdate;
-using API.AuthorizationPolicies.Dinners.Menus.Publish;
 using API.AuthorizationPolicies;
 
 namespace API;

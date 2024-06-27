@@ -1,9 +1,9 @@
 using API;
-using API.Modules.Dinners.Startup;
-using API.Modules.Users.Startup;
 using API.OptionsSetup;
 using Carter;
 using API.Connections;
+using API.Modules.Dinners;
+using API.Modules.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
