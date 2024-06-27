@@ -45,7 +45,7 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
         await DbContext.Reservations.AddAsync(reservation.Value);
         await DbContext.SaveChangesAsync();
@@ -118,7 +118,7 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
         await DbContext.Reservations.AddAsync(reservation.Value);
         await DbContext.Restaurants.AddAsync(restaurant);
@@ -156,7 +156,7 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
         restaurant.OccupyTable(reservation.Value.ReservationInformation.ReservedTable);
 
@@ -196,7 +196,7 @@ public sealed class FinishReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
         restaurant.OccupyTable(reservation.Value.ReservationInformation.ReservedTable);
 

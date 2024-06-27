@@ -43,7 +43,7 @@ public sealed class CancelReservationIntegrationTests : BaseIntegrationTest
             reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Cancel(); //ReservationStatus = Cancelled;
+        reservation.Value.Cancel(reservation.Value.ReservationAttendees.ClientId); //ReservationStatus = Cancelled;
 
         await DbContext.Reservations.AddAsync(reservation.Value);
         await DbContext.SaveChangesAsync();

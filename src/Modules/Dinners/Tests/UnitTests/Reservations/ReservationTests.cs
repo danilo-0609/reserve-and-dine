@@ -120,9 +120,9 @@ public sealed class ReservationTests
             new List<MenuId>());
 
         //Assist reservation
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
-        var cancel = reservation.Value.Cancel();
+        var cancel = reservation.Value.Cancel(reservation.Value.ReservationAttendees.ClientId);
 
         bool isErrorCancelWhenReservationStatusIsAssisted = cancel
             .FirstError
@@ -146,9 +146,9 @@ public sealed class ReservationTests
             _reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Cancel();
+        reservation.Value.Cancel(reservation.Value.ReservationAttendees.ClientId);
 
-        var visit = reservation.Value.Visit();
+        var visit = reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
         bool isErrorAssistWhenReservationStatusIsNotPaid = visit
             .FirstError
@@ -172,7 +172,7 @@ public sealed class ReservationTests
             _reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
         bool hasRaisedReservationVisitedDomainEvent = reservation
             .Value
@@ -197,7 +197,7 @@ public sealed class ReservationTests
             _reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
         bool hasRaisedReservationVisitedDomainEvent = reservation
             .Value
@@ -215,7 +215,7 @@ public sealed class ReservationTests
             _reservationAttendees,
             new List<MenuId>());
 
-        var finish = reservation.Value.Finish();
+        var finish = reservation.Value.Finish(reservation.Value.ReservationAttendees.ClientId);
 
         bool isErrorCannotFinishIfStatusIsNotAssisting = finish
             .FirstError
@@ -239,9 +239,9 @@ public sealed class ReservationTests
             _reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
-        reservation.Value.Finish();
+        reservation.Value.Finish(reservation.Value.ReservationAttendees.ClientId);
 
         bool hasRaisedReservationFinishedDomainEvent = reservation
             .Value
@@ -266,9 +266,9 @@ public sealed class ReservationTests
             _reservationAttendees,
             new List<MenuId>());
 
-        reservation.Value.Visit();
+        reservation.Value.Visit(reservation.Value.ReservationAttendees.ClientId);
 
-        reservation.Value.Finish();
+        reservation.Value.Finish(reservation.Value.ReservationAttendees.ClientId);
 
         bool isReservationStatusFinished = reservation
             .Value
