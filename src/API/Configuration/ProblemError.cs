@@ -36,6 +36,8 @@ public sealed class ProblemError
             ErrorType.Conflict => StatusCodes.Status409Conflict,
             ErrorType.Validation => StatusCodes.Status400BadRequest,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
+            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
             _ => StatusCodes.Status500InternalServerError
         };
 
