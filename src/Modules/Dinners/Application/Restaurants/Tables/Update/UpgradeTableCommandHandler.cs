@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Dinners.Application.Restaurants.Tables.Update;
 
-internal sealed class UpgradeTableCommandHandler : ICommandHandler<UpgradeTableCommand, ErrorOr<Unit>>
+internal sealed class UpgradeTableCommandHandler : ICommandHandler<UpgradeTableCommand, ErrorOr<Success>>
 {
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
@@ -20,7 +20,7 @@ internal sealed class UpgradeTableCommandHandler : ICommandHandler<UpgradeTableC
         _executionContextAccessor = executionContextAccessor;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(UpgradeTableCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(UpgradeTableCommand request, CancellationToken cancellationToken)
     {
         Restaurant? restaurant = await _restaurantRepository.GetRestaurantById(RestaurantId.Create(request.RestaurantId));
 
@@ -41,6 +41,6 @@ internal sealed class UpgradeTableCommandHandler : ICommandHandler<UpgradeTableC
 
         await _restaurantRepository.UpdateAsync(restaurant);
 
-        return Unit.Value;
+        return new Success();
     }
 }

@@ -2,24 +2,26 @@
 using Dinners.Domain.Reservations.Errors;
 using Dinners.Domain.Reservations;
 using ErrorOr;
-using MediatR;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
+using BuildingBlocks.Application;
 
 namespace Dinners.Application.Reservations.Finish;
 
-internal sealed class FinishReservationCommandHandler : ICommandHandler<FinishReservationCommand, ErrorOr<Unit>>
+internal sealed class FinishReservationCommandHandler : ICommandHandler<FinishReservationCommand, ErrorOr<Success>>
 {
     private readonly IReservationRepository _reservationRepository;
     private readonly IRestaurantRepository _restaurantRepository;
+    private readonly IExecutionContextAccessor _executionContextAccessor;
 
-    public FinishReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository)
+    public FinishReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IExecutionContextAccessor executionContextAccessor)
     {
         _reservationRepository = reservationRepository;
         _restaurantRepository = restaurantRepository;
+        _executionContextAccessor = executionContextAccessor;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(FinishReservationCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(FinishReservationCommand request, CancellationToken cancellationToken)
     {
         Reservation? reservation = await _reservationRepository.GetByIdAsync(ReservationId.Create(request.ReservationId), cancellationToken);
 
@@ -28,7 +30,7 @@ internal sealed class FinishReservationCommandHandler : ICommandHandler<FinishRe
             return ReservationErrorsCodes.NotFound;
         }
 
-        var finishReservation = reservation.Finish();
+        var finishReservation = reservation.Finish(_executionContextAccessor.UserId);
 
         if (finishReservation.IsError)
         {
@@ -52,6 +54,6 @@ internal sealed class FinishReservationCommandHandler : ICommandHandler<FinishRe
         await _reservationRepository.UpdateAsync(reservation, cancellationToken);
         await _restaurantRepository.UpdateAsync(restaurant);
 
-        return Unit.Value;
+        return new Success();
     }
 }

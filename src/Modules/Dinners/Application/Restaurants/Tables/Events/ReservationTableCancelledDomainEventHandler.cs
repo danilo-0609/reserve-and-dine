@@ -24,7 +24,7 @@ internal sealed class ReservationTableCancelledDomainEventHandler : IDomainEvent
 
         if (reservation.ReservationStatus != ReservationStatus.Cancelled)
         {
-            reservation.Cancel("Restaurant was closed out of schedule and reservation cannot be made when restaurant is closed");
+            reservation.Cancel(reservation.ReservationAttendees.ClientId, "Restaurant was closed out of schedule and reservation cannot be made when restaurant is closed");
         }
     }
 }

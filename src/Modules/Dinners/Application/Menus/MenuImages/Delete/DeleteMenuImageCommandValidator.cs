@@ -9,7 +9,7 @@ internal sealed class DeleteMenuImageCommandValidator : AbstractValidator<Delete
         RuleFor(r => r.Id)
             .NotEmpty();
 
-        RuleFor(r => r.MenuImageUrl)
+        RuleFor(r => r.ImageId)
             .NotEmpty();
     }
 }

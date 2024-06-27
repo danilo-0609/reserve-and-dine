@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Application;
 using Dinners.Application.Common;
-using Dinners.Domain.Common;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Menus.Errors;
 using Dinners.Domain.Reservations;

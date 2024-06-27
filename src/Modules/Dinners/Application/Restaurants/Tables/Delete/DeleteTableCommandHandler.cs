@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Dinners.Application.Restaurants.Tables.Delete;
 
-internal sealed class DeleteTableCommandHandler : ICommandHandler<DeleteTableCommand, ErrorOr<Unit>>
+internal sealed class DeleteTableCommandHandler : ICommandHandler<DeleteTableCommand, ErrorOr<Success>>
 {
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IExecutionContextAccessor _executionContextAccessor;
@@ -19,7 +19,7 @@ internal sealed class DeleteTableCommandHandler : ICommandHandler<DeleteTableCom
         _executionContextAccessor = executionContextAccessor;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(DeleteTableCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(DeleteTableCommand request, CancellationToken cancellationToken)
     {
         Restaurant? restaurant = await _restaurantRepository.GetRestaurantById(RestaurantId.Create(request.RestaurantId));
 
@@ -37,6 +37,6 @@ internal sealed class DeleteTableCommandHandler : ICommandHandler<DeleteTableCom
 
         await _restaurantRepository.UpdateAsync(restaurant);
 
-        return Unit.Value;
+        return new Success();
     }
 }

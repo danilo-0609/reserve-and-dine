@@ -1,11 +1,11 @@
-﻿using Dinners.Application.Common;
+﻿using BuildingBlocks.Application;
+using Dinners.Application.Common;
 using Dinners.Domain.Menus;
 using Dinners.Domain.Reservations;
 using Dinners.Domain.Reservations.Errors;
 using Dinners.Domain.Restaurants;
 using Dinners.Domain.Restaurants.Errors;
 using ErrorOr;
-using MediatR;
 
 namespace Dinners.Application.Reservations.Visit;
 
@@ -14,14 +14,14 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
     private readonly IReservationRepository _reservationRepository;
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IMenuRepository _menuRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IExecutionContextAccessor _executionContextAccessor;
 
-    public VisitReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IUnitOfWork unitOfWork, IMenuRepository menuRepository)
+    public VisitReservationCommandHandler(IReservationRepository reservationRepository, IRestaurantRepository restaurantRepository, IUnitOfWork unitOfWork, IMenuRepository menuRepository, IExecutionContextAccessor executionContextAccessor)
     {
         _reservationRepository = reservationRepository;
         _restaurantRepository = restaurantRepository;
-        _unitOfWork = unitOfWork;
         _menuRepository = menuRepository;
+        _executionContextAccessor = executionContextAccessor;
     }
 
     public async Task<ErrorOr<Success>> Handle(VisitReservationCommand request, CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
             return ReservationErrorsCodes.NotFound;
         }
 
-        var assisting = reservation.Visit();
+        var assisting = reservation.Visit(_executionContextAccessor.UserId);
     
         if (assisting.IsError)
         {
@@ -63,16 +63,11 @@ internal sealed class VisitReservationCommandHandler : ICommandHandler<VisitRese
                 menu!.Consume(reservation.ReservationAttendees.ClientId);
 
                 await _menuRepository.UpdateAsync(menu!, cancellationToken);
-
-                await _unitOfWork.SaveChangesAsync();
             }
         }
 
         await _reservationRepository.UpdateAsync(reservation, cancellationToken);
         await _restaurantRepository.UpdateAsync(restaurant);
-
-
-        await _unitOfWork.SaveChangesAsync();
 
         return new Success();
     }

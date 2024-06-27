@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Dinners.Application.Reservations.Cancel;
 
-public sealed record CancelReservationCommand(Guid ReservationId) : ICommand<ErrorOr<Unit>>;
+public sealed record CancelReservationCommand(Guid ReservationId) : ICommand<ErrorOr<Success>>;
  

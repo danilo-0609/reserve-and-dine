@@ -1,12 +1,13 @@
 ﻿using Dinners.Application.Common;
 using Dinners.Domain.Menus;
+using Dinners.Domain.Menus.Details;
 using Dinners.Domain.Menus.Errors;
 using ErrorOr;
 using MediatR;
 
 namespace Dinners.Application.Menus.MenuImages.Delete;
 
-internal sealed class DeleteMenuImageCommandHandler : ICommandHandler<DeleteMenuImageCommand, ErrorOr<Unit>>
+internal sealed class DeleteMenuImageCommandHandler : ICommandHandler<DeleteMenuImageCommand, ErrorOr<Success>>
 {
     private readonly IMenuRepository _menuRepository;
     private readonly IMenuBlobService _blobService;
@@ -17,7 +18,7 @@ internal sealed class DeleteMenuImageCommandHandler : ICommandHandler<DeleteMenu
         _blobService = blobService;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(DeleteMenuImageCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(DeleteMenuImageCommand request, CancellationToken cancellationToken)
     {
         Menu? menu = await _menuRepository.GetByIdAsync(MenuId.Create(request.Id), cancellationToken);
     
@@ -26,19 +27,21 @@ internal sealed class DeleteMenuImageCommandHandler : ICommandHandler<DeleteMenu
             return MenuErrorCodes.NotFound;
         }
 
-        if (!menu.MenuImagesUrl.Any(r => r.Value == request.MenuImageUrl))
+        var menuImageId = MenuImageUrlId.Create(request.ImageId);
+
+        var menuImage = menu.MenuImagesUrl.Where(q => q.Id == menuImageId).SingleOrDefault();
+
+        if (menuImage is null)
         {
             return Error.NotFound("Menu.ImageNotFound", "Image was not found");
         }
 
-        await _blobService.DeleteBlobAsync(request.MenuImageUrl);
+        await _blobService.DeleteBlobAsync(menuImage.Value);
 
-        var menuImageUrl = menu.MenuImagesUrl.Where(r => r.Value == request.MenuImageUrl).Single();
-
-        menu.DeleteImage(request.MenuImageUrl, menuImageUrl.Id);
+        menu.DeleteImage(menuImage.Value, menuImage.Id);
     
         await _menuRepository.UpdateAsync(menu, cancellationToken);
 
-        return Unit.Value;
+        return new Success();
     }
 }
