@@ -1,5 +1,6 @@
 ﻿using Dinners.Application.Common;
 using Dinners.Domain.Reservations;
+using Dinners.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Quartz;
@@ -42,11 +43,10 @@ internal sealed class CancelNotAssistedReservationsJob : IJob
 
         foreach (var reservation in reservations)
         {
-            reservation.Cancel("Reservation must be assisted up to 15 minutes after reservation date time");
-
-            await _reservationRepository.UpdateAsync(reservation, CancellationToken.None);
+            reservation.Cancel(reservation.ReservationAttendees.ClientId, "Reservation must be assisted up to 15 minutes after reservation date time");
         }
 
+        _dbContext.Reservations.UpdateRange(reservations);
         await _unitOfWork.SaveChangesAsync();
     }
 }

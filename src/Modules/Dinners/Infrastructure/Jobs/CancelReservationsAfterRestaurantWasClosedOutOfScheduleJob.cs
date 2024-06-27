@@ -55,8 +55,9 @@ internal sealed class CancelReservationsAfterRestaurantWasClosedOutOfScheduleJob
                 }
             });
 
-            await _restaurantRepository.UpdateAsync(restaurant);
-            await _unitOfWork.SaveChangesAsync();
         }
+
+        _dbContext.Restaurants.UpdateRange(restaurants);
+        await _unitOfWork.SaveChangesAsync();
     }
 }
