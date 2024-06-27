@@ -203,7 +203,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
         return new Success();
     }
 
-    public ErrorOr<Success> AddTable(Guid userId,
+    public ErrorOr<RestaurantTableId> AddTable(Guid userId,
         int number,
         int seats,
         bool isPremium)
@@ -228,7 +228,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
 
         _restaurantTables.Add(restaurantTable);
 
-        return new Success();
+        return restaurantTable.Id;
     }
 
     public ErrorOr<Success> DeleteTable(Guid userId, int number)
@@ -267,9 +267,9 @@ public sealed class Restaurant : AggregateRoot<RestaurantId, Guid>
             return RestaurantErrorCodes.TableDoesNotExist;
         }
 
-        RestaurantTable? table = _restaurantTables.Where(r => r.Number == number)
+        _restaurantTables.Where(r => r.Number == number)
             .SingleOrDefault()!
-            .Upgrade(number, seats, isPremium);
+            .Upgrade(seats, isPremium);
 
         return new Success();
     }

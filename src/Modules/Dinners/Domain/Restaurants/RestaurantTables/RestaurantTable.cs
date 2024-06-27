@@ -36,11 +36,10 @@ public sealed class RestaurantTable : Entity<RestaurantTableId, Guid>
             reservedHours);
     }
 
-    public RestaurantTable Upgrade(int number,
-        int seats,
-        bool isPremium)
+    public void Upgrade(int seats, bool isPremium)
     {
-        return new RestaurantTable(base.Id, RestaurantId, number, seats, isPremium, _reservedHours);
+        Seats = seats;
+        IsPremium = isPremium;
     }
 
     public void CancelReservation(DateTime reservedTime)
