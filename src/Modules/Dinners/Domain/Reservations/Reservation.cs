@@ -63,13 +63,20 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return reservation;
     }
 
-    public ErrorOr<Success> Cancel(string causeOfCancellation = "")
+    public ErrorOr<Success> Cancel(Guid userId, string causeOfCancellation = "")
     {
-        var canCancelReservation = CheckRule(new CannotCancelWhenReservationStatusIsNotRequestedRule(ReservationStatus));
-
-        if (canCancelReservation.IsError)
+        var canUserCancelReservation = CheckRule(new OnlyClientCanAccessToReservationActionsRule(ReservationAttendees.ClientId, userId));
+        
+        if (canUserCancelReservation.IsError)
         {
-            return canCancelReservation.FirstError;
+            return canUserCancelReservation.FirstError;
+        }
+
+        var isStatusValidToCancel = CheckRule(new CannotCancelWhenReservationStatusIsNotRequestedRule(ReservationStatus));
+
+        if (isStatusValidToCancel.IsError)
+        {
+            return isStatusValidToCancel.FirstError;
         }
 
         AddDomainEvent(new ReservationCancelledDomainEvent(
@@ -87,8 +94,15 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return new Success();
     }
 
-    public ErrorOr<Success> Visit()
+    public ErrorOr<Success> Visit(Guid userId)
     {
+        var canUserCancelReservation = CheckRule(new OnlyClientCanAccessToReservationActionsRule(ReservationAttendees.ClientId, userId));
+
+        if (canUserCancelReservation.IsError)
+        {
+            return canUserCancelReservation.FirstError;
+        }
+
         var mustVisitInReservationTime = CheckRule(new MustAssistToReservationInTheRequestedTimeRule(DateTime.Now, ReservationInformation.ReservationDateTime));
         
         if (mustVisitInReservationTime.IsError)
@@ -114,8 +128,15 @@ public sealed class Reservation : AggregateRoot<ReservationId, Guid>
         return new Success();
     }
 
-    public ErrorOr<Success> Finish()
+    public ErrorOr<Success> Finish(Guid userId)
     {
+        var canUserCancelReservation = CheckRule(new OnlyClientCanAccessToReservationActionsRule(ReservationAttendees.ClientId, userId));
+
+        if (canUserCancelReservation.IsError)
+        {
+            return canUserCancelReservation.FirstError;
+        }
+
         var statusMustBeVisited = CheckRule(new CannotFinishAReservationWhenReservationStatusIsNotVisitedRule(ReservationStatus));
     
         if (statusMustBeVisited.IsError)

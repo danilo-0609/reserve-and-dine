@@ -28,4 +28,7 @@ public static class ReservationErrorsCodes
 
     public static Error MenuNotFound =>
         Error.NotFound("Reservation.MenuNotFound", "The menu in the reservation was not found");
+
+    public static Error UserIsNotAllowedToGetOrAccessContent =>
+        Error.Forbidden("Reservation.UserIsNotAllowedToGetOrAccessContent", "User is not allowed to get or access to the reservation content");
 }

@@ -1,6 +1,4 @@
-﻿using Dinners.Domain.Common;
-
-namespace Dinners.Domain.Reservations;
+﻿namespace Dinners.Domain.Reservations;
 
 public sealed record ReservationInformation
 {
