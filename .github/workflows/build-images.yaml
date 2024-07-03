@@ -1,0 +1,24 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Print directory structure
+      run: |
+        ls -R
+
+    - name: Build and push Docker image
+      run: |
+        docker build -f src/API/Dockerfile -t ghcr.io/danilo-0609/reserve-and-dine:latest .
+        docker push ghcr.io/danilo-0609/reserve-and-dine:latest
+
