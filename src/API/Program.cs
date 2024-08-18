@@ -4,33 +4,10 @@ using Carter;
 using API.Connections;
 using API.Modules.Dinners;
 using API.Modules.Users;
+using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVaultUri = Environment.GetEnvironmentVariable("KEY_VAULT_URI");
-
-builder.Configuration["ConnectionStrings:AzureKeyVaultUri"] = keyVaultUri;
-
-var connectionsManager = new ConnectionsManager(builder.Configuration);
-var databaseConnectionString = await connectionsManager.GetDatabaseConnectionString();
-var redisConnectionString = await connectionsManager.GetAzureRedisConnectionString();
-var dockerDatabaseConnectionString = await connectionsManager.GetDockerDatabaseConnectionString();
-var azureBlobStorageConnectionString = await connectionsManager.GetAzureBlobStorageConnectionString();
-
-var jwtIssuer = await connectionsManager.GetJWTIssuer();
-var jwtAudience = await connectionsManager.GetJWTAudience();
-var jwtSecretKey = await connectionsManager.GetJWTSecretKey();
-
-builder.Configuration["JWT:Issuer"] = jwtIssuer;
-builder.Configuration["JWT:Audience"] = jwtAudience;
-builder.Configuration["JWT:SecretKey"] = jwtSecretKey;
-
-builder.Configuration["ConnectionStrings:AzureSqlDatabase"] = databaseConnectionString;
-builder.Configuration["ConnectionStrings:RedisConnectionString"] = redisConnectionString;
-builder.Configuration["ConnectionStrings:DockerSqlDatabase"] = dockerDatabaseConnectionString;
-builder.Configuration["ConnectionStrings:AzureBlobStorage"] = azureBlobStorageConnectionString;
-
-builder.Services.AddSingleton<IConnectionsManager, ConnectionsManager>();
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 
 builder.Services.AddUsers(builder.Configuration);
@@ -45,9 +22,28 @@ builder.Services.AddDinners(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var allowFrontendApp = "frontend_application";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowFrontendApp,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+});
+
+builder.Services.AddControllers();
+
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "XSRF-TOKEN"; 
+});
+
 var app = builder.Build();
-
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -55,13 +51,29 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.MapGet("antiforgery/token", (IAntiforgery forgeryService, HttpContext context) =>
+{
+    var tokens = forgeryService.GetAndStoreTokens(context);
+    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!,
+        new CookieOptions { HttpOnly = false });
+
+    return Results.Ok();
+})
+    .RequireAuthorization();
+
+app.UseCors(allowFrontendApp);
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseAntiforgery();
+
 app.MapCarter();
+
+app.MapControllers();
 
 app.Run();
 
